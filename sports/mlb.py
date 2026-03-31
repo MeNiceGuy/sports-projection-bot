@@ -29,6 +29,40 @@ def get_recent_form(team_id: int):
     return {"last5_wins": wins, "last5_losses": losses, "form_score": wins - losses}
 
 
+def get_team_stats(team_id: int):
+    url = f"https://statsapi.mlb.com/api/v1/teams/{team_id}/stats?stats=season&group=hitting,pitching&season=2026&sportIds=1"
+    try:
+        resp = requests.get(url, timeout=20)
+        resp.raise_for_status()
+        payload = resp.json()
+        stats = payload.get("stats", [])
+    except Exception:
+        return {"ops": 0.0, "era": 99.0, "whip": 9.0}
+
+    hitting = {}
+    pitching = {}
+    for block in stats:
+        group = block.get("group", {}).get("displayName", "").lower()
+        splits = block.get("splits", [])
+        if not splits:
+            continue
+        stat = splits[0].get("stat", {})
+        if group == "hitting":
+            hitting = stat
+        elif group == "pitching":
+            pitching = stat
+    def f(v, default=0.0):
+        try:
+            return float(str(v).replace('%',''))
+        except Exception:
+            return default
+    return {
+        "ops": f(hitting.get("ops", 0.0), 0.0),
+        "era": f(pitching.get("era", 99.0), 99.0),
+        "whip": f(pitching.get("whip", 9.0), 9.0),
+    }
+
+
 def build_mlb_report():
     url = "https://statsapi.mlb.com/api/v1/schedule/games/?sportId=1"
     try:
@@ -63,13 +97,16 @@ def build_mlb_report():
         away_pct = away_wins / max(away_wins + away_losses, 1)
         home_form = get_recent_form(home_id) if home_id else {"last5_wins":0,"last5_losses":0,"form_score":0}
         away_form = get_recent_form(away_id) if away_id else {"last5_wins":0,"last5_losses":0,"form_score":0}
+        home_stats = get_team_stats(home_id) if home_id else {"ops":0.0,"era":99.0,"whip":9.0}
+        away_stats = get_team_stats(away_id) if away_id else {"ops":0.0,"era":99.0,"whip":9.0}
         form_edge = (home_form['form_score'] - away_form['form_score']) * 1.5
         home_field_bonus = 2.0
         home_pitcher = home.get("probablePitcher", {}).get("fullName", "")
         away_pitcher = away.get("probablePitcher", {}).get("fullName", "")
         pitcher_bonus = 1.0 if home_pitcher else 0.0
         pitcher_penalty = 1.0 if away_pitcher else 0.0
-        edge = round(((home_pct - away_pct) * 100) + home_field_bonus + pitcher_bonus - pitcher_penalty + form_edge, 2)
+        stat_edge = ((home_stats['ops'] - away_stats['ops']) * 10) + ((away_stats['era'] - home_stats['era']) * 2) + ((away_stats['whip'] - home_stats['whip']) * 3)
+        edge = round(((home_pct - away_pct) * 100) + home_field_bonus + pitcher_bonus - pitcher_penalty + form_edge + stat_edge, 2)
         if edge > 6:
             lean = home_name
             confidence = "Medium"
@@ -96,8 +133,12 @@ def build_mlb_report():
             "away_recent_form": f"{away_form['last5_wins']}-{away_form['last5_losses']}",
             "home_probable_pitcher": home_pitcher or "Unknown",
             "away_probable_pitcher": away_pitcher or "Unknown",
-            "factors": ["team record differential", "home field bonus", "probable pitcher presence", "recent form"],
-            "note": "Projection is currently based on team record differential, a simple home-field bonus, probable pitcher presence, and recent form. Upgrade with starter quality and bullpen strength next."
+            "home_ops": round(home_stats['ops'], 3),
+            "away_ops": round(away_stats['ops'], 3),
+            "home_era": round(home_stats['era'], 2),
+            "away_era": round(away_stats['era'], 2),
+            "factors": ["team record differential", "home field bonus", "probable pitcher presence", "recent form", "OPS", "ERA", "WHIP"],
+            "note": "Projection is currently based on team record differential, a simple home-field bonus, probable pitcher presence, recent form, and basic team hitting/pitching stats. Upgrade with starter quality and bullpen splits next."
         })
 
     return {
