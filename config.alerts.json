@@ -1,0 +1,7 @@
+{
+  "email_to": "you@example.com",
+  "min_confidence": ["Medium", "High"],
+  "min_edge_band": ["strong"],
+  "enabled_sports": ["nba", "mlb"],
+  "subject_prefix": "Sports Bot Alert"
+}

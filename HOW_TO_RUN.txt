@@ -28,6 +28,9 @@ C:\Users\1bosw\.openclaw\workspace\sports-projection-bot
 9. To generate self-audit upgrade suggestions:
    python run_self_audit.py
 
+10. To email strong NBA/MLB projections:
+   python run_alerts.py
+
 Current active sports:
 - NBA
 - MLB
