@@ -17,3 +17,5 @@ Collect public sports data, generate projection-style outputs, and track model p
 
 ## Important note
 This is a sports research tool, not a guaranteed winning system.
+
+Current NBA and MLB outputs now include clearer edge-band labeling so weak projections are easier to separate from stronger leans.

@@ -107,10 +107,10 @@ def build_mlb_report():
         pitcher_penalty = 1.0 if away_pitcher else 0.0
         stat_edge = ((home_stats['ops'] - away_stats['ops']) * 10) + ((away_stats['era'] - home_stats['era']) * 2) + ((away_stats['whip'] - home_stats['whip']) * 3)
         edge = round(((home_pct - away_pct) * 100) + home_field_bonus + pitcher_bonus - pitcher_penalty + form_edge + stat_edge, 2)
-        if edge > 6:
+        if edge > 8:
             lean = home_name
             confidence = "Medium"
-        elif edge < -6:
+        elif edge < -8:
             lean = away_name
             confidence = "Medium"
         else:
@@ -128,6 +128,7 @@ def build_mlb_report():
             "away_record": f"{away_wins}-{away_losses}",
             "simple_projection_lean": lean,
             "record_edge_pct": edge,
+            "edge_band": "strong" if abs(edge) >= 14 else "moderate" if abs(edge) >= 8 else "weak",
             "confidence": confidence,
             "home_recent_form": f"{home_form['last5_wins']}-{home_form['last5_losses']}",
             "away_recent_form": f"{away_form['last5_wins']}-{away_form['last5_losses']}",

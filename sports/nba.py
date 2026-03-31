@@ -93,10 +93,10 @@ def build_nba_report():
         possession_edge = ((home_stats['rebounds'] - away_stats['rebounds']) * 0.5) - ((home_stats['turnovers'] - away_stats['turnovers']) * 0.7)
         home_court_bonus = 3.0
         edge = round(((home_pct - away_pct) * 100) + home_court_bonus + form_edge + offense_edge + possession_edge, 2)
-        if edge > 4:
+        if edge > 8:
             lean = home_name
             confidence = "Medium"
-        elif edge < -4:
+        elif edge < -8:
             lean = away_name
             confidence = "Medium"
         else:
@@ -111,6 +111,7 @@ def build_nba_report():
             "away_record": f"{away_wins}-{away_losses}",
             "simple_projection_lean": lean,
             "record_edge_pct": edge,
+            "edge_band": "strong" if abs(edge) >= 12 else "moderate" if abs(edge) >= 8 else "weak",
             "confidence": confidence,
             "home_recent_form": f"{home_form['last5_wins']}-{home_form['last5_losses']}",
             "away_recent_form": f"{away_form['last5_wins']}-{away_form['last5_losses']}",
