@@ -78,6 +78,14 @@ def main():
                 value_b = round((model_prob_home - implied_b) * 100, 2)
             elif side_b_norm == away_team_norm and implied_b is not None:
                 value_b = round((model_prob_away - implied_b) * 100, 2)
+            teams_matched = {home_team_norm, away_team_norm} == {side_a_norm, side_b_norm}
+            lean_norm = normalize_team_name(game.get("simple_projection_lean", ""))
+            if lean_norm in {side_a_norm, side_b_norm}:
+                market_agreement = "leans_toward_model_side"
+            elif teams_matched:
+                market_agreement = "teams_matched_no_clear_model_lean"
+            else:
+                market_agreement = "name_mismatch"
             comparisons.append({
                 "sport": sport,
                 "game_id": game.get("game_id", ""),
@@ -98,7 +106,7 @@ def main():
                 "value_edge_a": value_a,
                 "value_edge_b": value_b,
                 "line_source": market.get("line_source", ""),
-                "market_agreement": "leans_toward_model_side" if normalize_team_name(game.get("simple_projection_lean", "")) in {side_a_norm, side_b_norm} else "name_mismatch_or_no_clear_match",
+                "market_agreement": market_agreement,
                 "note": "Market comparison layer now estimates model-vs-implied probability value edge from weighted scores and live odds."
             })
 
