@@ -11,7 +11,8 @@ A multi-sport projection and edge-research bot scaffold using public/open data w
 - result-merge structure added
 - confidence-bucket reporting added
 - self-audit / upgrade suggestion engine added
-- market comparison and player-props scaffolding added
+- market comparison added
+- early operational player-props layer added
 
 ## Goal
 Collect public sports data, generate projection-style outputs, and track model performance over time.

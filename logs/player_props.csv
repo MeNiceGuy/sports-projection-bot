@@ -1,2 +1,4 @@
 sport,game_id,player_name,prop_type,line,projection,edge_band,confidence,notes
-nba,example,Example Player,points,24.5,26.0,weak,Low,Player props scaffold only. Needs real player data source before meaningful use.
+nba,nba-live-sample-1,Primary Scorer Placeholder,points,24.5,26.8,moderate,Low,First operational props layer. Upgrade with real player game-log feed next.
+nba,nba-live-sample-2,Primary Rebounder Placeholder,rebounds,9.5,10.7,weak,Low,First operational props layer. Upgrade with real player game-log feed next.
+mlb,mlb-live-sample-1,Starting Pitcher Placeholder,strikeouts,5.5,6.1,weak,Low,First operational props layer. Upgrade with real pitcher/player feed next.

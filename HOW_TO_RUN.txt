@@ -34,8 +34,8 @@ C:\Users\1bosw\.openclaw\workspace\sports-projection-bot
 11. To compare projections against supplied market lines:
    python run_market_compare.py
 
-12. To seed the player-props scaffold:
-   python run_props_scaffold.py
+12. To build the current player-props output:
+   python run_props_engine.py
 
 Current active sports:
 - NBA
