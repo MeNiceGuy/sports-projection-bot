@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-31T17:12:44.358219",
+  "generated_at": "2026-03-31T17:20:50.715589",
   "active_sports": [
     "nba",
     "mlb"
@@ -8,7 +8,7 @@
     "nba": {
       "status": "ok",
       "model": "nba_record_edge_v1",
-      "generated_at": "2026-03-31T17:13:06.009160",
+      "generated_at": "2026-03-31T17:21:10.934364",
       "games": [
         {
           "game_id": "401810954",
@@ -219,7 +219,7 @@
     "mlb": {
       "status": "ok",
       "model": "mlb_record_edge_v1",
-      "generated_at": "2026-03-31T17:13:41.863631",
+      "generated_at": "2026-03-31T17:21:51.235872",
       "games": [
         {
           "game_id": "401814754",
@@ -237,18 +237,28 @@
           "away_probable_pitcher": "Unknown",
           "home_ops": 0.0,
           "away_ops": 0.0,
+          "home_obp": 0.0,
+          "away_obp": 0.0,
+          "home_slg": 0.0,
+          "away_slg": 0.0,
           "home_era": 99.0,
           "away_era": 99.0,
+          "home_whip": 9.0,
+          "away_whip": 9.0,
           "factors": [
             "team record differential",
             "home field bonus",
             "probable pitcher presence",
             "recent form",
             "OPS",
+            "OBP",
+            "SLG",
             "ERA",
-            "WHIP"
+            "WHIP",
+            "K/BB ratio",
+            "hits per 9"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-field bonus, probable pitcher presence, recent form, and basic team hitting/pitching stats. Upgrade with starter quality and bullpen splits next."
+          "note": "Projection is currently based on team record differential, home-field bonus, probable pitcher presence, recent form, and a wider team hitting/pitching stat set. Starter quality and bullpen context are still the biggest remaining MLB gaps."
         },
         {
           "game_id": "401814751",
@@ -266,18 +276,28 @@
           "away_probable_pitcher": "Unknown",
           "home_ops": 0.0,
           "away_ops": 0.0,
+          "home_obp": 0.0,
+          "away_obp": 0.0,
+          "home_slg": 0.0,
+          "away_slg": 0.0,
           "home_era": 99.0,
           "away_era": 99.0,
+          "home_whip": 9.0,
+          "away_whip": 9.0,
           "factors": [
             "team record differential",
             "home field bonus",
             "probable pitcher presence",
             "recent form",
             "OPS",
+            "OBP",
+            "SLG",
             "ERA",
-            "WHIP"
+            "WHIP",
+            "K/BB ratio",
+            "hits per 9"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-field bonus, probable pitcher presence, recent form, and basic team hitting/pitching stats. Upgrade with starter quality and bullpen splits next."
+          "note": "Projection is currently based on team record differential, home-field bonus, probable pitcher presence, recent form, and a wider team hitting/pitching stat set. Starter quality and bullpen context are still the biggest remaining MLB gaps."
         },
         {
           "game_id": "401814753",
@@ -295,18 +315,28 @@
           "away_probable_pitcher": "Unknown",
           "home_ops": 0.0,
           "away_ops": 0.0,
+          "home_obp": 0.0,
+          "away_obp": 0.0,
+          "home_slg": 0.0,
+          "away_slg": 0.0,
           "home_era": 99.0,
           "away_era": 99.0,
+          "home_whip": 9.0,
+          "away_whip": 9.0,
           "factors": [
             "team record differential",
             "home field bonus",
             "probable pitcher presence",
             "recent form",
             "OPS",
+            "OBP",
+            "SLG",
             "ERA",
-            "WHIP"
+            "WHIP",
+            "K/BB ratio",
+            "hits per 9"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-field bonus, probable pitcher presence, recent form, and basic team hitting/pitching stats. Upgrade with starter quality and bullpen splits next."
+          "note": "Projection is currently based on team record differential, home-field bonus, probable pitcher presence, recent form, and a wider team hitting/pitching stat set. Starter quality and bullpen context are still the biggest remaining MLB gaps."
         },
         {
           "game_id": "401814755",
@@ -324,18 +354,28 @@
           "away_probable_pitcher": "Unknown",
           "home_ops": 0.0,
           "away_ops": 0.0,
+          "home_obp": 0.0,
+          "away_obp": 0.0,
+          "home_slg": 0.0,
+          "away_slg": 0.0,
           "home_era": 99.0,
           "away_era": 99.0,
+          "home_whip": 9.0,
+          "away_whip": 9.0,
           "factors": [
             "team record differential",
             "home field bonus",
             "probable pitcher presence",
             "recent form",
             "OPS",
+            "OBP",
+            "SLG",
             "ERA",
-            "WHIP"
+            "WHIP",
+            "K/BB ratio",
+            "hits per 9"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-field bonus, probable pitcher presence, recent form, and basic team hitting/pitching stats. Upgrade with starter quality and bullpen splits next."
+          "note": "Projection is currently based on team record differential, home-field bonus, probable pitcher presence, recent form, and a wider team hitting/pitching stat set. Starter quality and bullpen context are still the biggest remaining MLB gaps."
         },
         {
           "game_id": "401814752",
@@ -353,18 +393,28 @@
           "away_probable_pitcher": "Unknown",
           "home_ops": 0.0,
           "away_ops": 0.0,
+          "home_obp": 0.0,
+          "away_obp": 0.0,
+          "home_slg": 0.0,
+          "away_slg": 0.0,
           "home_era": 99.0,
           "away_era": 99.0,
+          "home_whip": 9.0,
+          "away_whip": 9.0,
           "factors": [
             "team record differential",
             "home field bonus",
             "probable pitcher presence",
             "recent form",
             "OPS",
+            "OBP",
+            "SLG",
             "ERA",
-            "WHIP"
+            "WHIP",
+            "K/BB ratio",
+            "hits per 9"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-field bonus, probable pitcher presence, recent form, and basic team hitting/pitching stats. Upgrade with starter quality and bullpen splits next."
+          "note": "Projection is currently based on team record differential, home-field bonus, probable pitcher presence, recent form, and a wider team hitting/pitching stat set. Starter quality and bullpen context are still the biggest remaining MLB gaps."
         },
         {
           "game_id": "401814750",
@@ -382,18 +432,28 @@
           "away_probable_pitcher": "Unknown",
           "home_ops": 0.0,
           "away_ops": 0.0,
+          "home_obp": 0.0,
+          "away_obp": 0.0,
+          "home_slg": 0.0,
+          "away_slg": 0.0,
           "home_era": 99.0,
           "away_era": 99.0,
+          "home_whip": 9.0,
+          "away_whip": 9.0,
           "factors": [
             "team record differential",
             "home field bonus",
             "probable pitcher presence",
             "recent form",
             "OPS",
+            "OBP",
+            "SLG",
             "ERA",
-            "WHIP"
+            "WHIP",
+            "K/BB ratio",
+            "hits per 9"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-field bonus, probable pitcher presence, recent form, and basic team hitting/pitching stats. Upgrade with starter quality and bullpen splits next."
+          "note": "Projection is currently based on team record differential, home-field bonus, probable pitcher presence, recent form, and a wider team hitting/pitching stat set. Starter quality and bullpen context are still the biggest remaining MLB gaps."
         },
         {
           "game_id": "401814756",
@@ -411,18 +471,28 @@
           "away_probable_pitcher": "Unknown",
           "home_ops": 0.0,
           "away_ops": 0.0,
+          "home_obp": 0.0,
+          "away_obp": 0.0,
+          "home_slg": 0.0,
+          "away_slg": 0.0,
           "home_era": 99.0,
           "away_era": 99.0,
+          "home_whip": 9.0,
+          "away_whip": 9.0,
           "factors": [
             "team record differential",
             "home field bonus",
             "probable pitcher presence",
             "recent form",
             "OPS",
+            "OBP",
+            "SLG",
             "ERA",
-            "WHIP"
+            "WHIP",
+            "K/BB ratio",
+            "hits per 9"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-field bonus, probable pitcher presence, recent form, and basic team hitting/pitching stats. Upgrade with starter quality and bullpen splits next."
+          "note": "Projection is currently based on team record differential, home-field bonus, probable pitcher presence, recent form, and a wider team hitting/pitching stat set. Starter quality and bullpen context are still the biggest remaining MLB gaps."
         },
         {
           "game_id": "401814759",
@@ -440,18 +510,28 @@
           "away_probable_pitcher": "Unknown",
           "home_ops": 0.0,
           "away_ops": 0.0,
+          "home_obp": 0.0,
+          "away_obp": 0.0,
+          "home_slg": 0.0,
+          "away_slg": 0.0,
           "home_era": 99.0,
           "away_era": 99.0,
+          "home_whip": 9.0,
+          "away_whip": 9.0,
           "factors": [
             "team record differential",
             "home field bonus",
             "probable pitcher presence",
             "recent form",
             "OPS",
+            "OBP",
+            "SLG",
             "ERA",
-            "WHIP"
+            "WHIP",
+            "K/BB ratio",
+            "hits per 9"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-field bonus, probable pitcher presence, recent form, and basic team hitting/pitching stats. Upgrade with starter quality and bullpen splits next."
+          "note": "Projection is currently based on team record differential, home-field bonus, probable pitcher presence, recent form, and a wider team hitting/pitching stat set. Starter quality and bullpen context are still the biggest remaining MLB gaps."
         },
         {
           "game_id": "401814758",
@@ -469,18 +549,28 @@
           "away_probable_pitcher": "Unknown",
           "home_ops": 0.0,
           "away_ops": 0.0,
+          "home_obp": 0.0,
+          "away_obp": 0.0,
+          "home_slg": 0.0,
+          "away_slg": 0.0,
           "home_era": 99.0,
           "away_era": 99.0,
+          "home_whip": 9.0,
+          "away_whip": 9.0,
           "factors": [
             "team record differential",
             "home field bonus",
             "probable pitcher presence",
             "recent form",
             "OPS",
+            "OBP",
+            "SLG",
             "ERA",
-            "WHIP"
+            "WHIP",
+            "K/BB ratio",
+            "hits per 9"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-field bonus, probable pitcher presence, recent form, and basic team hitting/pitching stats. Upgrade with starter quality and bullpen splits next."
+          "note": "Projection is currently based on team record differential, home-field bonus, probable pitcher presence, recent form, and a wider team hitting/pitching stat set. Starter quality and bullpen context are still the biggest remaining MLB gaps."
         },
         {
           "game_id": "401814757",
@@ -498,18 +588,28 @@
           "away_probable_pitcher": "Unknown",
           "home_ops": 0.0,
           "away_ops": 0.0,
+          "home_obp": 0.0,
+          "away_obp": 0.0,
+          "home_slg": 0.0,
+          "away_slg": 0.0,
           "home_era": 99.0,
           "away_era": 99.0,
+          "home_whip": 9.0,
+          "away_whip": 9.0,
           "factors": [
             "team record differential",
             "home field bonus",
             "probable pitcher presence",
             "recent form",
             "OPS",
+            "OBP",
+            "SLG",
             "ERA",
-            "WHIP"
+            "WHIP",
+            "K/BB ratio",
+            "hits per 9"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-field bonus, probable pitcher presence, recent form, and basic team hitting/pitching stats. Upgrade with starter quality and bullpen splits next."
+          "note": "Projection is currently based on team record differential, home-field bonus, probable pitcher presence, recent form, and a wider team hitting/pitching stat set. Starter quality and bullpen context are still the biggest remaining MLB gaps."
         },
         {
           "game_id": "401814761",
@@ -527,18 +627,28 @@
           "away_probable_pitcher": "Unknown",
           "home_ops": 0.0,
           "away_ops": 0.0,
+          "home_obp": 0.0,
+          "away_obp": 0.0,
+          "home_slg": 0.0,
+          "away_slg": 0.0,
           "home_era": 99.0,
           "away_era": 99.0,
+          "home_whip": 9.0,
+          "away_whip": 9.0,
           "factors": [
             "team record differential",
             "home field bonus",
             "probable pitcher presence",
             "recent form",
             "OPS",
+            "OBP",
+            "SLG",
             "ERA",
-            "WHIP"
+            "WHIP",
+            "K/BB ratio",
+            "hits per 9"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-field bonus, probable pitcher presence, recent form, and basic team hitting/pitching stats. Upgrade with starter quality and bullpen splits next."
+          "note": "Projection is currently based on team record differential, home-field bonus, probable pitcher presence, recent form, and a wider team hitting/pitching stat set. Starter quality and bullpen context are still the biggest remaining MLB gaps."
         },
         {
           "game_id": "401814762",
@@ -556,18 +666,28 @@
           "away_probable_pitcher": "Unknown",
           "home_ops": 0.0,
           "away_ops": 0.0,
+          "home_obp": 0.0,
+          "away_obp": 0.0,
+          "home_slg": 0.0,
+          "away_slg": 0.0,
           "home_era": 99.0,
           "away_era": 99.0,
+          "home_whip": 9.0,
+          "away_whip": 9.0,
           "factors": [
             "team record differential",
             "home field bonus",
             "probable pitcher presence",
             "recent form",
             "OPS",
+            "OBP",
+            "SLG",
             "ERA",
-            "WHIP"
+            "WHIP",
+            "K/BB ratio",
+            "hits per 9"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-field bonus, probable pitcher presence, recent form, and basic team hitting/pitching stats. Upgrade with starter quality and bullpen splits next."
+          "note": "Projection is currently based on team record differential, home-field bonus, probable pitcher presence, recent form, and a wider team hitting/pitching stat set. Starter quality and bullpen context are still the biggest remaining MLB gaps."
         },
         {
           "game_id": "401814763",
@@ -585,18 +705,28 @@
           "away_probable_pitcher": "Unknown",
           "home_ops": 0.0,
           "away_ops": 0.0,
+          "home_obp": 0.0,
+          "away_obp": 0.0,
+          "home_slg": 0.0,
+          "away_slg": 0.0,
           "home_era": 99.0,
           "away_era": 99.0,
+          "home_whip": 9.0,
+          "away_whip": 9.0,
           "factors": [
             "team record differential",
             "home field bonus",
             "probable pitcher presence",
             "recent form",
             "OPS",
+            "OBP",
+            "SLG",
             "ERA",
-            "WHIP"
+            "WHIP",
+            "K/BB ratio",
+            "hits per 9"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-field bonus, probable pitcher presence, recent form, and basic team hitting/pitching stats. Upgrade with starter quality and bullpen splits next."
+          "note": "Projection is currently based on team record differential, home-field bonus, probable pitcher presence, recent form, and a wider team hitting/pitching stat set. Starter quality and bullpen context are still the biggest remaining MLB gaps."
         },
         {
           "game_id": "401814760",
@@ -614,18 +744,28 @@
           "away_probable_pitcher": "Unknown",
           "home_ops": 0.0,
           "away_ops": 0.0,
+          "home_obp": 0.0,
+          "away_obp": 0.0,
+          "home_slg": 0.0,
+          "away_slg": 0.0,
           "home_era": 99.0,
           "away_era": 99.0,
+          "home_whip": 9.0,
+          "away_whip": 9.0,
           "factors": [
             "team record differential",
             "home field bonus",
             "probable pitcher presence",
             "recent form",
             "OPS",
+            "OBP",
+            "SLG",
             "ERA",
-            "WHIP"
+            "WHIP",
+            "K/BB ratio",
+            "hits per 9"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-field bonus, probable pitcher presence, recent form, and basic team hitting/pitching stats. Upgrade with starter quality and bullpen splits next."
+          "note": "Projection is currently based on team record differential, home-field bonus, probable pitcher presence, recent form, and a wider team hitting/pitching stat set. Starter quality and bullpen context are still the biggest remaining MLB gaps."
         }
       ],
       "note": "MLB live data is connected. This is an early projection layer, not a finished betting model."
