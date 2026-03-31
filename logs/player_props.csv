@@ -1,4 +1,5 @@
 sport,game_id,player_name,prop_type,line,projection,edge_band,confidence,notes
 nba,nba-live-sample-1,Primary Scorer Placeholder,points,24.5,26.8,moderate,Low,First operational props layer. Upgrade with real player game-log feed next.
 nba,nba-live-sample-2,Primary Rebounder Placeholder,rebounds,9.5,10.7,weak,Low,First operational props layer. Upgrade with real player game-log feed next.
-mlb,mlb-live-sample-1,Starting Pitcher Placeholder,strikeouts,5.5,6.1,weak,Low,First operational props layer. Upgrade with real pitcher/player feed next.
+mlb,mlb-prop-live,Aaron Judge,hits,1.5,0.5,strong,Medium,MLB prop projection based on recent public game-log average. Upgrade with matchup/pitcher context next.
+mlb,mlb-prop-live,Aaron Judge,1.5,0.0,0.0,weak,Low,MLB prop projection based on recent public game-log average. Upgrade with matchup/pitcher context next.

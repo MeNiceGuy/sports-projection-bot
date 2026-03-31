@@ -4,8 +4,11 @@ import csv
 from datetime import datetime
 from pathlib import Path
 
+from bot.player_data import fetch_mlb_hitting_game_log, average_last_n
+
 ROOT = Path(__file__).resolve().parents[1]
 PROPS_PATH = ROOT / "logs" / "player_props.csv"
+TARGETS_PATH = ROOT / "logs" / "player_targets.csv"
 
 
 def build_nba_props():
@@ -39,20 +42,47 @@ def build_nba_props():
 
 
 def build_mlb_props():
-    sample_props = [
-        {
-            "sport": "mlb",
-            "game_id": "mlb-live-sample-1",
-            "player_name": "Starting Pitcher Placeholder",
-            "prop_type": "strikeouts",
-            "line": "5.5",
-            "projection": "6.1",
-            "edge_band": "weak",
-            "confidence": "Low",
-            "notes": "First operational props layer. Upgrade with real pitcher/player feed next."
-        }
-    ]
-    return sample_props
+    if not TARGETS_PATH.exists():
+        return []
+    rows = []
+    with TARGETS_PATH.open("r", encoding="utf-8", newline="") as f:
+        for row in csv.DictReader(f):
+            if row.get("sport", "").strip().lower() != "mlb":
+                continue
+            try:
+                player_id = int(row.get("player_id", "0"))
+            except Exception:
+                continue
+            game_logs = fetch_mlb_hitting_game_log(player_id)
+            prop_type = row.get("prop_type", "hits").strip()
+            values = [float(g.get(prop_type, 0) or 0) for g in game_logs]
+            proj = average_last_n(values, n=5)
+            try:
+                line = float(row.get("market_line", "0") or 0)
+            except Exception:
+                line = 0.0
+            diff = proj - line
+            if abs(diff) >= 1.0:
+                edge_band = "strong"
+                confidence = "Medium"
+            elif abs(diff) >= 0.5:
+                edge_band = "moderate"
+                confidence = "Low"
+            else:
+                edge_band = "weak"
+                confidence = "Low"
+            rows.append({
+                "sport": "mlb",
+                "game_id": "mlb-prop-live",
+                "player_name": row.get("player_name", ""),
+                "prop_type": prop_type,
+                "line": line,
+                "projection": proj,
+                "edge_band": edge_band,
+                "confidence": confidence,
+                "notes": "MLB prop projection based on recent public game-log average. Upgrade with matchup/pitcher context next."
+            })
+    return rows
 
 
 def write_props(rows):
