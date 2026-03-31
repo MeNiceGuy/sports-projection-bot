@@ -23,6 +23,10 @@ def american_to_implied_prob(odds):
     return None
 
 
+def normalize_matchup(text: str):
+    return " ".join((text or "").lower().replace("los angeles clippers", "la clippers").replace("los angeles lakers", "la lakers").split())
+
+
 def read_lines():
     if not MARKET_LINES.exists():
         return []
@@ -34,11 +38,12 @@ def main():
     report = json.loads(REPORT_PATH.read_text(encoding="utf-8")) if REPORT_PATH.exists() else {}
     lines = read_lines()
     comparisons = []
-    line_map = {(r.get("sport", ""), r.get("game_id", "")): r for r in lines}
+    line_map = {(r.get("sport", ""), normalize_matchup(r.get("matchup", ""))): r for r in lines if r.get("market", "") == "h2h"}
 
     for sport, block in report.get("reports", {}).items():
         for game in block.get("games", []):
-            market = line_map.get((sport, str(game.get("game_id", ""))))
+            matchup = game.get("matchup", "")
+            market = line_map.get((sport, normalize_matchup(matchup)))
             if not market:
                 continue
             odds_a = market.get("odds_a", "")
@@ -53,7 +58,6 @@ def main():
             model_prob_away = round(away_score / score_total, 4)
             side_a = market.get("side_a", "")
             side_b = market.get("side_b", "")
-            matchup = game.get("matchup", "")
             home_team = matchup.split(" at ")[-1] if " at " in matchup else ""
             away_team = matchup.split(" at ")[0] if " at " in matchup else ""
             value_a = None
