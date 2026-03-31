@@ -32,11 +32,12 @@ def build_nba_report():
         away_losses = int(away.get("losses", 0) or 0)
         home_pct = home_wins / max(home_wins + home_losses, 1)
         away_pct = away_wins / max(away_wins + away_losses, 1)
-        edge = round((home_pct - away_pct) * 100, 2)
-        if edge > 3:
+        home_court_bonus = 3.0
+        edge = round(((home_pct - away_pct) * 100) + home_court_bonus, 2)
+        if edge > 4:
             lean = home_name
             confidence = "Medium"
-        elif edge < -3:
+        elif edge < -4:
             lean = away_name
             confidence = "Medium"
         else:
@@ -52,7 +53,8 @@ def build_nba_report():
             "simple_projection_lean": lean,
             "record_edge_pct": edge,
             "confidence": confidence,
-            "note": "Projection is currently based on team record differential only. Upgrade with pace, injuries, and recent form next."
+            "factors": ["team record differential", "home court bonus"],
+            "note": "Projection is currently based on team record differential plus a simple home-court bonus. Upgrade with pace, injuries, and recent form next."
         })
 
     return {

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-31T16:17:13.615327",
+  "generated_at": "2026-03-31T16:20:30.357920",
   "active_sports": [
     "nba",
     "mlb"
@@ -8,7 +8,7 @@
     "nba": {
       "status": "ok",
       "model": "nba_record_edge_v1",
-      "generated_at": "2026-03-31T16:17:14.373131",
+      "generated_at": "2026-03-31T16:20:31.041959",
       "games": [
         {
           "game_id": "0022501099",
@@ -16,10 +16,14 @@
           "matchup": "Phoenix Suns at Orlando Magic",
           "home_record": "39-35",
           "away_record": "42-33",
-          "simple_projection_lean": "Phoenix Suns",
-          "record_edge_pct": -3.3,
-          "confidence": "Medium",
-          "note": "Projection is currently based on team record differential only. Upgrade with pace, injuries, and recent form next."
+          "simple_projection_lean": "No strong lean",
+          "record_edge_pct": -0.3,
+          "confidence": "Low",
+          "factors": [
+            "team record differential",
+            "home court bonus"
+          ],
+          "note": "Projection is currently based on team record differential plus a simple home-court bonus. Upgrade with pace, injuries, and recent form next."
         },
         {
           "game_id": "0022501100",
@@ -28,9 +32,13 @@
           "home_record": "18-57",
           "away_record": "39-36",
           "simple_projection_lean": "Charlotte Hornets",
-          "record_edge_pct": -28.0,
+          "record_edge_pct": -25.0,
           "confidence": "Medium",
-          "note": "Projection is currently based on team record differential only. Upgrade with pace, injuries, and recent form next."
+          "factors": [
+            "team record differential",
+            "home court bonus"
+          ],
+          "note": "Projection is currently based on team record differential plus a simple home-court bonus. Upgrade with pace, injuries, and recent form next."
         },
         {
           "game_id": "0022500652",
@@ -39,9 +47,13 @@
           "home_record": "29-45",
           "away_record": "24-51",
           "simple_projection_lean": "Milwaukee Bucks",
-          "record_edge_pct": 7.19,
+          "record_edge_pct": 10.19,
           "confidence": "Medium",
-          "note": "Projection is currently based on team record differential only. Upgrade with pace, injuries, and recent form next."
+          "factors": [
+            "team record differential",
+            "home court bonus"
+          ],
+          "note": "Projection is currently based on team record differential plus a simple home-court bonus. Upgrade with pace, injuries, and recent form next."
         },
         {
           "game_id": "0022501101",
@@ -50,9 +62,13 @@
           "home_record": "54-21",
           "away_record": "42-32",
           "simple_projection_lean": "Detroit Pistons",
-          "record_edge_pct": 15.24,
+          "record_edge_pct": 18.24,
           "confidence": "Medium",
-          "note": "Projection is currently based on team record differential only. Upgrade with pace, injuries, and recent form next."
+          "factors": [
+            "team record differential",
+            "home court bonus"
+          ],
+          "note": "Projection is currently based on team record differential plus a simple home-court bonus. Upgrade with pace, injuries, and recent form next."
         },
         {
           "game_id": "0022501102",
@@ -60,10 +76,14 @@
           "matchup": "New York Knicks at Houston Rockets",
           "home_record": "45-29",
           "away_record": "48-27",
-          "simple_projection_lean": "New York Knicks",
-          "record_edge_pct": -3.19,
-          "confidence": "Medium",
-          "note": "Projection is currently based on team record differential only. Upgrade with pace, injuries, and recent form next."
+          "simple_projection_lean": "No strong lean",
+          "record_edge_pct": -0.19,
+          "confidence": "Low",
+          "factors": [
+            "team record differential",
+            "home court bonus"
+          ],
+          "note": "Projection is currently based on team record differential plus a simple home-court bonus. Upgrade with pace, injuries, and recent form next."
         },
         {
           "game_id": "0022501103",
@@ -71,10 +91,14 @@
           "matchup": "Cleveland Cavaliers at Los Angeles Lakers",
           "home_record": "49-26",
           "away_record": "47-28",
-          "simple_projection_lean": "No strong lean",
-          "record_edge_pct": 2.67,
-          "confidence": "Low",
-          "note": "Projection is currently based on team record differential only. Upgrade with pace, injuries, and recent form next."
+          "simple_projection_lean": "Los Angeles Lakers",
+          "record_edge_pct": 5.67,
+          "confidence": "Medium",
+          "factors": [
+            "team record differential",
+            "home court bonus"
+          ],
+          "note": "Projection is currently based on team record differential plus a simple home-court bonus. Upgrade with pace, injuries, and recent form next."
         },
         {
           "game_id": "0022501104",
@@ -82,10 +106,14 @@
           "matchup": "Portland Trail Blazers at LA Clippers",
           "home_record": "39-36",
           "away_record": "38-38",
-          "simple_projection_lean": "No strong lean",
-          "record_edge_pct": 2.0,
-          "confidence": "Low",
-          "note": "Projection is currently based on team record differential only. Upgrade with pace, injuries, and recent form next."
+          "simple_projection_lean": "LA Clippers",
+          "record_edge_pct": 5.0,
+          "confidence": "Medium",
+          "factors": [
+            "team record differential",
+            "home court bonus"
+          ],
+          "note": "Projection is currently based on team record differential plus a simple home-court bonus. Upgrade with pace, injuries, and recent form next."
         }
       ],
       "note": "NBA live data is connected. This is an early projection layer, not a finished betting model."
@@ -93,7 +121,7 @@
     "mlb": {
       "status": "ok",
       "model": "mlb_record_edge_v1",
-      "generated_at": "2026-03-31T16:17:14.977297",
+      "generated_at": "2026-03-31T16:20:31.650793",
       "games": [
         {
           "game_id": 824861,
@@ -102,9 +130,16 @@
           "home_record": "2-2",
           "away_record": "3-1",
           "simple_projection_lean": "Texas Rangers",
-          "record_edge_pct": -25.0,
+          "record_edge_pct": -23.0,
           "confidence": "Medium",
-          "note": "Projection is currently based on team record differential only. Upgrade with probable starters, bullpen strength, and recent form next."
+          "home_probable_pitcher": "Unknown",
+          "away_probable_pitcher": "Unknown",
+          "factors": [
+            "team record differential",
+            "home field bonus",
+            "probable pitcher presence"
+          ],
+          "note": "Projection is currently based on team record differential, a simple home-field bonus, and whether probable pitchers are listed. Upgrade with starter quality, bullpen strength, and recent form next."
         },
         {
           "game_id": 824537,
@@ -113,9 +148,16 @@
           "home_record": "3-1",
           "away_record": "1-3",
           "simple_projection_lean": "Cincinnati Reds",
-          "record_edge_pct": 50.0,
+          "record_edge_pct": 52.0,
           "confidence": "Medium",
-          "note": "Projection is currently based on team record differential only. Upgrade with probable starters, bullpen strength, and recent form next."
+          "home_probable_pitcher": "Unknown",
+          "away_probable_pitcher": "Unknown",
+          "factors": [
+            "team record differential",
+            "home field bonus",
+            "probable pitcher presence"
+          ],
+          "note": "Projection is currently based on team record differential, a simple home-field bonus, and whether probable pitchers are listed. Upgrade with starter quality, bullpen strength, and recent form next."
         },
         {
           "game_id": 823485,
@@ -124,9 +166,16 @@
           "home_record": "1-3",
           "away_record": "3-1",
           "simple_projection_lean": "Washington Nationals",
-          "record_edge_pct": -50.0,
+          "record_edge_pct": -48.0,
           "confidence": "Medium",
-          "note": "Projection is currently based on team record differential only. Upgrade with probable starters, bullpen strength, and recent form next."
+          "home_probable_pitcher": "Unknown",
+          "away_probable_pitcher": "Unknown",
+          "factors": [
+            "team record differential",
+            "home field bonus",
+            "probable pitcher presence"
+          ],
+          "note": "Projection is currently based on team record differential, a simple home-field bonus, and whether probable pitchers are listed. Upgrade with starter quality, bullpen strength, and recent form next."
         },
         {
           "game_id": 823888,
@@ -135,9 +184,16 @@
           "home_record": "3-1",
           "away_record": "1-3",
           "simple_projection_lean": "Miami Marlins",
-          "record_edge_pct": 50.0,
+          "record_edge_pct": 52.0,
           "confidence": "Medium",
-          "note": "Projection is currently based on team record differential only. Upgrade with probable starters, bullpen strength, and recent form next."
+          "home_probable_pitcher": "Unknown",
+          "away_probable_pitcher": "Unknown",
+          "factors": [
+            "team record differential",
+            "home field bonus",
+            "probable pitcher presence"
+          ],
+          "note": "Projection is currently based on team record differential, a simple home-field bonus, and whether probable pitchers are listed. Upgrade with starter quality, bullpen strength, and recent form next."
         },
         {
           "game_id": 822836,
@@ -146,9 +202,16 @@
           "home_record": "3-1",
           "away_record": "1-3",
           "simple_projection_lean": "Toronto Blue Jays",
-          "record_edge_pct": 50.0,
+          "record_edge_pct": 52.0,
           "confidence": "Medium",
-          "note": "Projection is currently based on team record differential only. Upgrade with probable starters, bullpen strength, and recent form next."
+          "home_probable_pitcher": "Unknown",
+          "away_probable_pitcher": "Unknown",
+          "factors": [
+            "team record differential",
+            "home field bonus",
+            "probable pitcher presence"
+          ],
+          "note": "Projection is currently based on team record differential, a simple home-field bonus, and whether probable pitchers are listed. Upgrade with starter quality, bullpen strength, and recent form next."
         },
         {
           "game_id": 824942,
@@ -157,9 +220,16 @@
           "home_record": "3-1",
           "away_record": "0-4",
           "simple_projection_lean": "Atlanta Braves",
-          "record_edge_pct": 75.0,
+          "record_edge_pct": 77.0,
           "confidence": "Medium",
-          "note": "Projection is currently based on team record differential only. Upgrade with probable starters, bullpen strength, and recent form next."
+          "home_probable_pitcher": "Unknown",
+          "away_probable_pitcher": "Unknown",
+          "factors": [
+            "team record differential",
+            "home field bonus",
+            "probable pitcher presence"
+          ],
+          "note": "Projection is currently based on team record differential, a simple home-field bonus, and whether probable pitchers are listed. Upgrade with starter quality, bullpen strength, and recent form next."
         },
         {
           "game_id": 824699,
@@ -168,9 +238,16 @@
           "home_record": "2-2",
           "away_record": "2-3",
           "simple_projection_lean": "Chicago Cubs",
-          "record_edge_pct": 10.0,
+          "record_edge_pct": 12.0,
           "confidence": "Medium",
-          "note": "Projection is currently based on team record differential only. Upgrade with probable starters, bullpen strength, and recent form next."
+          "home_probable_pitcher": "Unknown",
+          "away_probable_pitcher": "Unknown",
+          "factors": [
+            "team record differential",
+            "home field bonus",
+            "probable pitcher presence"
+          ],
+          "note": "Projection is currently based on team record differential, a simple home-field bonus, and whether probable pitchers are listed. Upgrade with starter quality, bullpen strength, and recent form next."
         },
         {
           "game_id": 823807,
@@ -179,9 +256,16 @@
           "home_record": "3-1",
           "away_record": "2-2",
           "simple_projection_lean": "Milwaukee Brewers",
-          "record_edge_pct": 25.0,
+          "record_edge_pct": 27.0,
           "confidence": "Medium",
-          "note": "Projection is currently based on team record differential only. Upgrade with probable starters, bullpen strength, and recent form next."
+          "home_probable_pitcher": "Unknown",
+          "away_probable_pitcher": "Unknown",
+          "factors": [
+            "team record differential",
+            "home field bonus",
+            "probable pitcher presence"
+          ],
+          "note": "Projection is currently based on team record differential, a simple home-field bonus, and whether probable pitchers are listed. Upgrade with starter quality, bullpen strength, and recent form next."
         },
         {
           "game_id": 823077,
@@ -190,9 +274,16 @@
           "home_record": "2-2",
           "away_record": "3-1",
           "simple_projection_lean": "New York Mets",
-          "record_edge_pct": -25.0,
+          "record_edge_pct": -23.0,
           "confidence": "Medium",
-          "note": "Projection is currently based on team record differential only. Upgrade with probable starters, bullpen strength, and recent form next."
+          "home_probable_pitcher": "Unknown",
+          "away_probable_pitcher": "Unknown",
+          "factors": [
+            "team record differential",
+            "home field bonus",
+            "probable pitcher presence"
+          ],
+          "note": "Projection is currently based on team record differential, a simple home-field bonus, and whether probable pitchers are listed. Upgrade with starter quality, bullpen strength, and recent form next."
         },
         {
           "game_id": 824212,
@@ -201,9 +292,16 @@
           "home_record": "3-2",
           "away_record": "1-3",
           "simple_projection_lean": "Houston Astros",
-          "record_edge_pct": 35.0,
+          "record_edge_pct": 37.0,
           "confidence": "Medium",
-          "note": "Projection is currently based on team record differential only. Upgrade with probable starters, bullpen strength, and recent form next."
+          "home_probable_pitcher": "Unknown",
+          "away_probable_pitcher": "Unknown",
+          "factors": [
+            "team record differential",
+            "home field bonus",
+            "probable pitcher presence"
+          ],
+          "note": "Projection is currently based on team record differential, a simple home-field bonus, and whether probable pitchers are listed. Upgrade with starter quality, bullpen strength, and recent form next."
         },
         {
           "game_id": 825107,
@@ -212,9 +310,16 @@
           "home_record": "1-3",
           "away_record": "2-2",
           "simple_projection_lean": "Detroit Tigers",
-          "record_edge_pct": -25.0,
+          "record_edge_pct": -23.0,
           "confidence": "Medium",
-          "note": "Projection is currently based on team record differential only. Upgrade with probable starters, bullpen strength, and recent form next."
+          "home_probable_pitcher": "Unknown",
+          "away_probable_pitcher": "Unknown",
+          "factors": [
+            "team record differential",
+            "home field bonus",
+            "probable pitcher presence"
+          ],
+          "note": "Projection is currently based on team record differential, a simple home-field bonus, and whether probable pitchers are listed. Upgrade with starter quality, bullpen strength, and recent form next."
         },
         {
           "game_id": 823322,
@@ -223,9 +328,16 @@
           "home_record": "1-3",
           "away_record": "1-3",
           "simple_projection_lean": "No strong lean",
-          "record_edge_pct": 0.0,
+          "record_edge_pct": 2.0,
           "confidence": "Low",
-          "note": "Projection is currently based on team record differential only. Upgrade with probable starters, bullpen strength, and recent form next."
+          "home_probable_pitcher": "Unknown",
+          "away_probable_pitcher": "Unknown",
+          "factors": [
+            "team record differential",
+            "home field bonus",
+            "probable pitcher presence"
+          ],
+          "note": "Projection is currently based on team record differential, a simple home-field bonus, and whether probable pitchers are listed. Upgrade with starter quality, bullpen strength, and recent form next."
         },
         {
           "game_id": 823158,
@@ -234,9 +346,16 @@
           "home_record": "3-2",
           "away_record": "3-1",
           "simple_projection_lean": "New York Yankees",
-          "record_edge_pct": -15.0,
+          "record_edge_pct": -13.0,
           "confidence": "Medium",
-          "note": "Projection is currently based on team record differential only. Upgrade with probable starters, bullpen strength, and recent form next."
+          "home_probable_pitcher": "Unknown",
+          "away_probable_pitcher": "Unknown",
+          "factors": [
+            "team record differential",
+            "home field bonus",
+            "probable pitcher presence"
+          ],
+          "note": "Projection is currently based on team record differential, a simple home-field bonus, and whether probable pitchers are listed. Upgrade with starter quality, bullpen strength, and recent form next."
         },
         {
           "game_id": 823969,
@@ -245,9 +364,16 @@
           "home_record": "3-1",
           "away_record": "3-2",
           "simple_projection_lean": "Los Angeles Dodgers",
-          "record_edge_pct": 15.0,
+          "record_edge_pct": 17.0,
           "confidence": "Medium",
-          "note": "Projection is currently based on team record differential only. Upgrade with probable starters, bullpen strength, and recent form next."
+          "home_probable_pitcher": "Unknown",
+          "away_probable_pitcher": "Unknown",
+          "factors": [
+            "team record differential",
+            "home field bonus",
+            "probable pitcher presence"
+          ],
+          "note": "Projection is currently based on team record differential, a simple home-field bonus, and whether probable pitchers are listed. Upgrade with starter quality, bullpen strength, and recent form next."
         }
       ],
       "note": "MLB live data is connected. This is an early projection layer, not a finished betting model."
