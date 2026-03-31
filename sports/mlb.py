@@ -113,8 +113,9 @@ def build_mlb_report():
         away_pct = away_wins / max(away_wins + away_losses, 1)
         home_form = get_recent_form(home_id) if home_id else {"last5_wins":0,"last5_losses":0,"form_score":0}
         away_form = get_recent_form(away_id) if away_id else {"last5_wins":0,"last5_losses":0,"form_score":0}
-        home_stats = get_team_stats(home_id) if home_id else {"ops":0.0,"era":99.0,"whip":9.0}
-        away_stats = get_team_stats(away_id) if away_id else {"ops":0.0,"era":99.0,"whip":9.0}
+        default_stats = {"ops":0.0,"obp":0.0,"slg":0.0,"runs":0.0,"era":99.0,"whip":9.0,"strikeout_walk_ratio":0.0,"hits_per_9":9.0}
+        home_stats = get_team_stats(home_id) if home_id else default_stats
+        away_stats = get_team_stats(away_id) if away_id else default_stats
         form_edge = (home_form['form_score'] - away_form['form_score']) * 1.5
         home_field_bonus = 2.0
         home_pitcher = home.get("probablePitcher", {}).get("displayName", "") or home.get("probablePitcher", {}).get("fullName", "")
@@ -122,14 +123,14 @@ def build_mlb_report():
         pitcher_bonus = 1.0 if home_pitcher else 0.0
         pitcher_penalty = 1.0 if away_pitcher else 0.0
         stat_edge = (
-            ((home_stats['ops'] - away_stats['ops']) * 10)
-            + ((home_stats['obp'] - away_stats['obp']) * 8)
-            + ((home_stats['slg'] - away_stats['slg']) * 8)
-            + ((home_stats['runs'] - away_stats['runs']) * 0.25)
-            + ((away_stats['era'] - home_stats['era']) * 2)
-            + ((away_stats['whip'] - home_stats['whip']) * 3)
-            + ((home_stats['strikeout_walk_ratio'] - away_stats['strikeout_walk_ratio']) * 1.2)
-            + ((away_stats['hits_per_9'] - home_stats['hits_per_9']) * 1.0)
+            ((home_stats.get('ops', 0.0) - away_stats.get('ops', 0.0)) * 10)
+            + ((home_stats.get('obp', 0.0) - away_stats.get('obp', 0.0)) * 8)
+            + ((home_stats.get('slg', 0.0) - away_stats.get('slg', 0.0)) * 8)
+            + ((home_stats.get('runs', 0.0) - away_stats.get('runs', 0.0)) * 0.25)
+            + ((away_stats.get('era', 99.0) - home_stats.get('era', 99.0)) * 2)
+            + ((away_stats.get('whip', 9.0) - home_stats.get('whip', 9.0)) * 3)
+            + ((home_stats.get('strikeout_walk_ratio', 0.0) - away_stats.get('strikeout_walk_ratio', 0.0)) * 1.2)
+            + ((away_stats.get('hits_per_9', 9.0) - home_stats.get('hits_per_9', 9.0)) * 1.0)
         )
         edge = round(((home_pct - away_pct) * 100) + home_field_bonus + pitcher_bonus - pitcher_penalty + form_edge + stat_edge, 2)
         if edge > 10:
