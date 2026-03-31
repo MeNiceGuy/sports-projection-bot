@@ -31,6 +31,12 @@ C:\Users\1bosw\.openclaw\workspace\sports-projection-bot
 10. To email strong NBA/MLB projections:
    python run_alerts.py
 
+11. To compare projections against supplied market lines:
+   python run_market_compare.py
+
+12. To seed the player-props scaffold:
+   python run_props_scaffold.py
+
 Current active sports:
 - NBA
 - MLB
