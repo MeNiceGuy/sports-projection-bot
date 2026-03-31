@@ -1,0 +1,26 @@
+Sports Projection Bot - How To Run
+
+Project folder:
+C:\Users\1bosw\.openclaw\workspace\sports-projection-bot
+
+1. Open PowerShell in the project folder.
+2. Install dependencies:
+   python -m pip install -r requirements.txt
+
+3. Run the bot:
+   python run_bot.py
+
+4. The report will print in the terminal and also save to:
+   reports\daily_projection_report.json
+
+Current active sports:
+- NBA
+- MLB
+
+If you want to change active sports, edit:
+- config.json
+
+Current model status:
+- NBA: live early model
+- MLB: live early model
+- NFL/NHL/NCAAB/NCAAF: scaffold only

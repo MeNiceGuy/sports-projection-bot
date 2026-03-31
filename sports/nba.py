@@ -4,6 +4,33 @@ from datetime import datetime
 import requests
 
 
+def get_recent_form(team_abbr: str):
+    url = f"https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/{team_abbr.lower()}/schedule"
+    try:
+        resp = requests.get(url, timeout=20)
+        resp.raise_for_status()
+        payload = resp.json()
+        events = payload.get("events", [])
+    except Exception:
+        return {"last5_wins": 0, "last5_losses": 0, "form_score": 0}
+
+    results = []
+    for event in events:
+        comps = event.get("competitions", [])
+        if not comps:
+            continue
+        competitors = comps[0].get("competitors", [])
+        for c in competitors:
+            team = c.get("team", {})
+            if team.get("abbreviation", "").lower() == team_abbr.lower() and "winner" in c:
+                results.append(1 if c.get("winner") else 0)
+                break
+    last5 = results[-5:]
+    wins = sum(last5)
+    losses = len(last5) - wins
+    return {"last5_wins": wins, "last5_losses": losses, "form_score": wins - losses}
+
+
 def build_nba_report():
     url = "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json"
     try:
@@ -26,14 +53,19 @@ def build_nba_report():
         away = game.get("awayTeam", {})
         home_name = f"{home.get('teamCity', '')} {home.get('teamName', '')}".strip()
         away_name = f"{away.get('teamCity', '')} {away.get('teamName', '')}".strip()
+        home_abbr = home.get('teamTricode', '')
+        away_abbr = away.get('teamTricode', '')
         home_wins = int(home.get("wins", 0) or 0)
         home_losses = int(home.get("losses", 0) or 0)
         away_wins = int(away.get("wins", 0) or 0)
         away_losses = int(away.get("losses", 0) or 0)
         home_pct = home_wins / max(home_wins + home_losses, 1)
         away_pct = away_wins / max(away_wins + away_losses, 1)
+        home_form = get_recent_form(home_abbr)
+        away_form = get_recent_form(away_abbr)
+        form_edge = (home_form['form_score'] - away_form['form_score']) * 1.5
         home_court_bonus = 3.0
-        edge = round(((home_pct - away_pct) * 100) + home_court_bonus, 2)
+        edge = round(((home_pct - away_pct) * 100) + home_court_bonus + form_edge, 2)
         if edge > 4:
             lean = home_name
             confidence = "Medium"
@@ -53,8 +85,10 @@ def build_nba_report():
             "simple_projection_lean": lean,
             "record_edge_pct": edge,
             "confidence": confidence,
-            "factors": ["team record differential", "home court bonus"],
-            "note": "Projection is currently based on team record differential plus a simple home-court bonus. Upgrade with pace, injuries, and recent form next."
+            "home_recent_form": f"{home_form['last5_wins']}-{home_form['last5_losses']}",
+            "away_recent_form": f"{away_form['last5_wins']}-{away_form['last5_losses']}",
+            "factors": ["team record differential", "home court bonus", "recent form"],
+            "note": "Projection is currently based on team record differential, a simple home-court bonus, and recent form. Upgrade with pace and injuries next."
         })
 
     return {
