@@ -64,13 +64,12 @@ def get_team_stats(team_id: int):
 
 
 def build_mlb_report():
-    url = "https://statsapi.mlb.com/api/v1/schedule/games/?sportId=1"
+    url = "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard"
     try:
         resp = requests.get(url, timeout=20)
         resp.raise_for_status()
         payload = resp.json()
-        dates = payload.get("dates", [])
-        games_raw = dates[0].get("games", []) if dates else []
+        games_raw = payload.get("events", [])
     except Exception as e:
         return {
             "status": "error",
@@ -82,17 +81,29 @@ def build_mlb_report():
 
     games = []
     for game in games_raw:
-        teams = game.get("teams", {})
-        home = teams.get("home", {})
-        away = teams.get("away", {})
-        home_name = home.get("team", {}).get("name", "Unknown Home")
-        away_name = away.get("team", {}).get("name", "Unknown Away")
-        home_id = home.get("team", {}).get("id")
-        away_id = away.get("team", {}).get("id")
-        home_wins = int(home.get("leagueRecord", {}).get("wins", 0) or 0)
-        home_losses = int(home.get("leagueRecord", {}).get("losses", 0) or 0)
-        away_wins = int(away.get("leagueRecord", {}).get("wins", 0) or 0)
-        away_losses = int(away.get("leagueRecord", {}).get("losses", 0) or 0)
+        comps = game.get("competitions", [])
+        if not comps:
+            continue
+        comp = comps[0]
+        competitors = comp.get("competitors", [])
+        home = next((c for c in competitors if c.get("homeAway") == "home"), {})
+        away = next((c for c in competitors if c.get("homeAway") == "away"), {})
+        home_team = home.get("team", {})
+        away_team = away.get("team", {})
+        home_name = home_team.get("displayName", "Unknown Home")
+        away_name = away_team.get("displayName", "Unknown Away")
+        home_id = home_team.get("id")
+        away_id = away_team.get("id")
+        home_record_summary = (home.get("records") or [{}])[0].get("summary", "0-0")
+        away_record_summary = (away.get("records") or [{}])[0].get("summary", "0-0")
+        try:
+            home_wins, home_losses = [int(x) for x in home_record_summary.split('-')[:2]]
+        except Exception:
+            home_wins, home_losses = 0, 0
+        try:
+            away_wins, away_losses = [int(x) for x in away_record_summary.split('-')[:2]]
+        except Exception:
+            away_wins, away_losses = 0, 0
         home_pct = home_wins / max(home_wins + home_losses, 1)
         away_pct = away_wins / max(away_wins + away_losses, 1)
         home_form = get_recent_form(home_id) if home_id else {"last5_wins":0,"last5_losses":0,"form_score":0}
@@ -101,8 +112,8 @@ def build_mlb_report():
         away_stats = get_team_stats(away_id) if away_id else {"ops":0.0,"era":99.0,"whip":9.0}
         form_edge = (home_form['form_score'] - away_form['form_score']) * 1.5
         home_field_bonus = 2.0
-        home_pitcher = home.get("probablePitcher", {}).get("fullName", "")
-        away_pitcher = away.get("probablePitcher", {}).get("fullName", "")
+        home_pitcher = home.get("probablePitcher", {}).get("displayName", "") or home.get("probablePitcher", {}).get("fullName", "")
+        away_pitcher = away.get("probablePitcher", {}).get("displayName", "") or away.get("probablePitcher", {}).get("fullName", "")
         pitcher_bonus = 1.0 if home_pitcher else 0.0
         pitcher_penalty = 1.0 if away_pitcher else 0.0
         stat_edge = ((home_stats['ops'] - away_stats['ops']) * 10) + ((away_stats['era'] - home_stats['era']) * 2) + ((away_stats['whip'] - home_stats['whip']) * 3)
@@ -121,8 +132,8 @@ def build_mlb_report():
             confidence = "Low"
 
         games.append({
-            "game_id": game.get("gamePk", ""),
-            "start_time": game.get("status", {}).get("detailedState", "Scheduled"),
+            "game_id": game.get("id", ""),
+            "start_time": game.get("status", {}).get("type", {}).get("shortDetail", "Scheduled"),
             "matchup": f"{away_name} at {home_name}",
             "home_record": f"{home_wins}-{home_losses}",
             "away_record": f"{away_wins}-{away_losses}",

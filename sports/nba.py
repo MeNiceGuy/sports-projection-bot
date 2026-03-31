@@ -55,12 +55,12 @@ def get_team_stats(team_abbr: str):
 
 
 def build_nba_report():
-    url = "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json"
+    url = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard"
     try:
         resp = requests.get(url, timeout=20)
         resp.raise_for_status()
         payload = resp.json()
-        games_raw = payload.get("scoreboard", {}).get("games", [])
+        games_raw = payload.get("events", [])
     except Exception as e:
         return {
             "status": "error",
@@ -72,16 +72,29 @@ def build_nba_report():
 
     games = []
     for game in games_raw:
-        home = game.get("homeTeam", {})
-        away = game.get("awayTeam", {})
-        home_name = f"{home.get('teamCity', '')} {home.get('teamName', '')}".strip()
-        away_name = f"{away.get('teamCity', '')} {away.get('teamName', '')}".strip()
-        home_abbr = home.get('teamTricode', '')
-        away_abbr = away.get('teamTricode', '')
-        home_wins = int(home.get("wins", 0) or 0)
-        home_losses = int(home.get("losses", 0) or 0)
-        away_wins = int(away.get("wins", 0) or 0)
-        away_losses = int(away.get("losses", 0) or 0)
+        comps = game.get("competitions", [])
+        if not comps:
+            continue
+        comp = comps[0]
+        competitors = comp.get("competitors", [])
+        home = next((c for c in competitors if c.get("homeAway") == "home"), {})
+        away = next((c for c in competitors if c.get("homeAway") == "away"), {})
+        home_team = home.get("team", {})
+        away_team = away.get("team", {})
+        home_name = home_team.get('displayName', 'Unknown Home')
+        away_name = away_team.get('displayName', 'Unknown Away')
+        home_abbr = home_team.get('abbreviation', '')
+        away_abbr = away_team.get('abbreviation', '')
+        home_record_summary = (home.get("records") or [{}])[0].get("summary", "0-0")
+        away_record_summary = (away.get("records") or [{}])[0].get("summary", "0-0")
+        try:
+            home_wins, home_losses = [int(x) for x in home_record_summary.split('-')[:2]]
+        except Exception:
+            home_wins, home_losses = 0, 0
+        try:
+            away_wins, away_losses = [int(x) for x in away_record_summary.split('-')[:2]]
+        except Exception:
+            away_wins, away_losses = 0, 0
         home_pct = home_wins / max(home_wins + home_losses, 1)
         away_pct = away_wins / max(away_wins + away_losses, 1)
         home_form = get_recent_form(home_abbr)
@@ -104,8 +117,8 @@ def build_nba_report():
             confidence = "Low"
 
         games.append({
-            "game_id": game.get("gameId", ""),
-            "start_time": game.get("gameStatusText", ""),
+            "game_id": game.get("id", ""),
+            "start_time": game.get("status", {}).get("type", {}).get("shortDetail", ""),
             "matchup": f"{away_name} at {home_name}",
             "home_record": f"{home_wins}-{home_losses}",
             "away_record": f"{away_wins}-{away_losses}",
