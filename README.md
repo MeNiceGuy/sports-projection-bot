@@ -4,8 +4,9 @@ A multi-sport projection and edge-research bot scaffold using public/open data w
 
 ## Current status
 - shared projection architecture
-- NBA active first
-- placeholders for MLB, NFL, NHL, NCAAB, and NCAAF
+- NBA and MLB active
+- NFL, NHL, NCAAB, and NCAAF scaffolded
+- prediction logging and performance-summary layer added
 
 ## Goal
 Collect public sports data, generate projection-style outputs, and track model performance over time.

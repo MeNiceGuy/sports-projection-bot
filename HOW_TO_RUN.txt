@@ -13,6 +13,9 @@ C:\Users\1bosw\.openclaw\workspace\sports-projection-bot
 4. The report will print in the terminal and also save to:
    reports\daily_projection_report.json
 
+5. To append the current projections into the prediction log and build a basic performance summary:
+   python run_performance.py
+
 Current active sports:
 - NBA
 - MLB

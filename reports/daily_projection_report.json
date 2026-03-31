@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-31T16:31:01.124910",
+  "generated_at": "2026-03-31T16:37:59.240660",
   "active_sports": [
     "nba",
     "mlb"
@@ -8,7 +8,7 @@
     "nba": {
       "status": "ok",
       "model": "nba_record_edge_v1",
-      "generated_at": "2026-03-31T16:31:22.937467",
+      "generated_at": "2026-03-31T16:38:20.492374",
       "games": [
         {
           "game_id": "0022501099",
@@ -170,7 +170,7 @@
     "mlb": {
       "status": "ok",
       "model": "mlb_record_edge_v1",
-      "generated_at": "2026-03-31T16:31:57.314608",
+      "generated_at": "2026-03-31T16:38:54.778759",
       "games": [
         {
           "game_id": 824861,
