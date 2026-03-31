@@ -10,6 +10,7 @@ A multi-sport projection and edge-research bot scaffold using public/open data w
 - grading and validation structure added
 - result-merge structure added
 - confidence-bucket reporting added
+- self-audit / upgrade suggestion engine added
 
 ## Goal
 Collect public sports data, generate projection-style outputs, and track model performance over time.
