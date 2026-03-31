@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import datetime
 import requests
 
+from sports.model_utils import scale_ratio, scale_diff, weighted_score, confidence_from_gap, edge_band_from_gap
+
 
 def get_recent_form(team_id: int):
     url = f"https://statsapi.mlb.com/api/v1/schedule/games/?sportId=1&teamId={team_id}"
@@ -116,37 +118,44 @@ def build_mlb_report():
         default_stats = {"ops":0.0,"obp":0.0,"slg":0.0,"runs":0.0,"era":99.0,"whip":9.0,"strikeout_walk_ratio":0.0,"hits_per_9":9.0}
         home_stats = get_team_stats(home_id) if home_id else default_stats
         away_stats = get_team_stats(away_id) if away_id else default_stats
-        form_edge = (home_form['form_score'] - away_form['form_score']) * 1.5
-        home_field_bonus = 2.0
         home_pitcher = home.get("probablePitcher", {}).get("displayName", "") or home.get("probablePitcher", {}).get("fullName", "")
         away_pitcher = away.get("probablePitcher", {}).get("displayName", "") or away.get("probablePitcher", {}).get("fullName", "")
-        pitcher_bonus = 1.0 if home_pitcher else 0.0
-        pitcher_penalty = 1.0 if away_pitcher else 0.0
-        stat_edge = (
-            ((home_stats.get('ops', 0.0) - away_stats.get('ops', 0.0)) * 10)
-            + ((home_stats.get('obp', 0.0) - away_stats.get('obp', 0.0)) * 8)
-            + ((home_stats.get('slg', 0.0) - away_stats.get('slg', 0.0)) * 8)
-            + ((home_stats.get('runs', 0.0) - away_stats.get('runs', 0.0)) * 0.25)
-            + ((away_stats.get('era', 99.0) - home_stats.get('era', 99.0)) * 2)
-            + ((away_stats.get('whip', 9.0) - home_stats.get('whip', 9.0)) * 3)
-            + ((home_stats.get('strikeout_walk_ratio', 0.0) - away_stats.get('strikeout_walk_ratio', 0.0)) * 1.2)
-            + ((away_stats.get('hits_per_9', 9.0) - home_stats.get('hits_per_9', 9.0)) * 1.0)
-        )
-        edge = round(((home_pct - away_pct) * 100) + home_field_bonus + pitcher_bonus - pitcher_penalty + form_edge + stat_edge, 2)
+
+        home_recent_score = scale_ratio(home_form['last5_wins'], 5)
+        away_recent_score = scale_ratio(away_form['last5_wins'], 5)
+        home_strength_score = scale_ratio(home_pct, 1.0)
+        away_strength_score = scale_ratio(away_pct, 1.0)
+        home_matchup_score = scale_diff(((home_stats.get('ops', 0.0) - away_stats.get('ops', 0.0)) * 100) + ((away_stats.get('era', 99.0) - home_stats.get('era', 99.0)) * 8) + ((away_stats.get('whip', 9.0) - home_stats.get('whip', 9.0)) * 10), 40)
+        away_matchup_score = scale_diff(((away_stats.get('ops', 0.0) - home_stats.get('ops', 0.0)) * 100) + ((home_stats.get('era', 99.0) - away_stats.get('era', 99.0)) * 8) + ((home_stats.get('whip', 9.0) - away_stats.get('whip', 9.0)) * 10), 40)
+        home_advantage_score = 58.0
+        away_advantage_score = 42.0
+        home_pitcher_score = 60.0 if home_pitcher else 45.0
+        away_pitcher_score = 60.0 if away_pitcher else 45.0
+
+        home_score = weighted_score([
+            (home_recent_score, 0.25),
+            (home_advantage_score, 0.15),
+            (home_strength_score, 0.20),
+            (home_pitcher_score, 0.20),
+            (home_matchup_score, 0.20),
+        ])
+        away_score = weighted_score([
+            (away_recent_score, 0.25),
+            (away_advantage_score, 0.15),
+            (away_strength_score, 0.20),
+            (away_pitcher_score, 0.20),
+            (away_matchup_score, 0.20),
+        ])
+        edge = round(home_score - away_score, 2)
         if edge > 10:
             lean = home_name
-            confidence = "Medium"
         elif edge < -10:
             lean = away_name
-            confidence = "Medium"
         else:
             lean = "No strong lean"
-            confidence = "Low"
-
-        if not home_pitcher and not away_pitcher and confidence == "Medium":
-            confidence = "Low"
-        if abs(edge) >= 18 and (home_pitcher or away_pitcher):
-            confidence = "High"
+        confidence = confidence_from_gap(edge)
+        if not home_pitcher and not away_pitcher and confidence == "High":
+            confidence = "Medium"
 
         games.append({
             "game_id": game.get("id", ""),
@@ -156,7 +165,7 @@ def build_mlb_report():
             "away_record": f"{away_wins}-{away_losses}",
             "simple_projection_lean": lean,
             "record_edge_pct": edge,
-            "edge_band": "strong" if abs(edge) >= 14 else "moderate" if abs(edge) >= 8 else "weak",
+            "edge_band": edge_band_from_gap(edge),
             "confidence": confidence,
             "home_recent_form": f"{home_form['last5_wins']}-{home_form['last5_losses']}",
             "away_recent_form": f"{away_form['last5_wins']}-{away_form['last5_losses']}",
@@ -172,8 +181,10 @@ def build_mlb_report():
             "away_era": round(away_stats.get('era', 99.0), 2),
             "home_whip": round(home_stats.get('whip', 9.0), 2),
             "away_whip": round(away_stats.get('whip', 9.0), 2),
-            "factors": ["team record differential", "home field bonus", "probable pitcher presence", "recent form", "OPS", "OBP", "SLG", "ERA", "WHIP", "K/BB ratio", "hits per 9"],
-            "note": "Projection is currently based on team record differential, home-field bonus, probable pitcher presence, recent form, and a wider team hitting/pitching stat set. Starter quality and bullpen context are still the biggest remaining MLB gaps."
+            "home_weighted_score": home_score,
+            "away_weighted_score": away_score,
+            "factors": ["recent form", "home/away advantage", "team strength", "starter presence", "matchup edge"],
+            "note": "Projection now uses an early weighted-score model. True starter quality and bullpen context are still major MLB gaps."
         })
 
     return {

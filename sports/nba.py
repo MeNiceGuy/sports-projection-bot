@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import datetime
 import requests
 
+from sports.model_utils import scale_ratio, scale_diff, weighted_score, confidence_from_gap, edge_band_from_gap
+
 
 def get_recent_form(team_abbr: str):
     url = f"https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/{team_abbr.lower()}/schedule"
@@ -101,20 +103,42 @@ def build_nba_report():
         away_form = get_recent_form(away_abbr)
         home_stats = get_team_stats(home_abbr)
         away_stats = get_team_stats(away_abbr)
-        form_edge = (home_form['form_score'] - away_form['form_score']) * 1.5
-        offense_edge = ((home_stats['ppg'] - away_stats['ppg']) * 0.4) + ((home_stats['scoring_efficiency'] - away_stats['scoring_efficiency']) * 10)
-        possession_edge = ((home_stats['rebounds'] - away_stats['rebounds']) * 0.5) - ((home_stats['turnovers'] - away_stats['turnovers']) * 0.7)
-        home_court_bonus = 3.0
-        edge = round(((home_pct - away_pct) * 100) + home_court_bonus + form_edge + offense_edge + possession_edge, 2)
-        if edge > 8:
+
+        home_recent_score = scale_ratio(home_form['last5_wins'], 5)
+        away_recent_score = scale_ratio(away_form['last5_wins'], 5)
+        home_strength_score = scale_ratio(home_pct, 1.0)
+        away_strength_score = scale_ratio(away_pct, 1.0)
+        home_offense_score = scale_diff((home_stats['ppg'] - away_stats['ppg']) + ((home_stats['scoring_efficiency'] - away_stats['scoring_efficiency']) * 10), 25)
+        away_offense_score = scale_diff((away_stats['ppg'] - home_stats['ppg']) + ((away_stats['scoring_efficiency'] - home_stats['scoring_efficiency']) * 10), 25)
+        home_matchup_score = scale_diff(((home_stats['rebounds'] - away_stats['rebounds']) * 1.5) + ((away_stats['turnovers'] - home_stats['turnovers']) * 2.0), 20)
+        away_matchup_score = scale_diff(((away_stats['rebounds'] - home_stats['rebounds']) * 1.5) + ((home_stats['turnovers'] - away_stats['turnovers']) * 2.0), 20)
+        home_advantage_score = 60.0
+        away_advantage_score = 40.0
+        home_injury_score = 50.0
+        away_injury_score = 50.0
+
+        home_score = weighted_score([
+            (home_recent_score, 0.25),
+            (home_advantage_score, 0.15),
+            (home_strength_score, 0.20),
+            (home_injury_score, 0.20),
+            (home_matchup_score, 0.20),
+        ])
+        away_score = weighted_score([
+            (away_recent_score, 0.25),
+            (away_advantage_score, 0.15),
+            (away_strength_score, 0.20),
+            (away_injury_score, 0.20),
+            (away_matchup_score, 0.20),
+        ])
+        edge = round(home_score - away_score, 2)
+        if edge > 10:
             lean = home_name
-            confidence = "Medium"
-        elif edge < -8:
+        elif edge < -10:
             lean = away_name
-            confidence = "Medium"
         else:
             lean = "No strong lean"
-            confidence = "Low"
+        confidence = confidence_from_gap(edge)
 
         games.append({
             "game_id": game.get("id", ""),
@@ -124,7 +148,7 @@ def build_nba_report():
             "away_record": f"{away_wins}-{away_losses}",
             "simple_projection_lean": lean,
             "record_edge_pct": edge,
-            "edge_band": "strong" if abs(edge) >= 12 else "moderate" if abs(edge) >= 8 else "weak",
+            "edge_band": edge_band_from_gap(edge),
             "confidence": confidence,
             "home_recent_form": f"{home_form['last5_wins']}-{home_form['last5_losses']}",
             "away_recent_form": f"{away_form['last5_wins']}-{away_form['last5_losses']}",
@@ -134,8 +158,10 @@ def build_nba_report():
             "away_rebounds": round(away_stats['rebounds'], 2),
             "home_turnovers": round(home_stats['turnovers'], 2),
             "away_turnovers": round(away_stats['turnovers'], 2),
-            "factors": ["team record differential", "home court bonus", "recent form", "offensive production", "scoring efficiency", "rebounding", "turnover control"],
-            "note": "Projection is currently based on team record differential, a simple home-court bonus, recent form, offensive production, scoring efficiency, rebounding, and turnover control. Upgrade with injuries and pace next."
+            "home_weighted_score": home_score,
+            "away_weighted_score": away_score,
+            "factors": ["recent form", "home/away advantage", "team strength", "injury placeholder", "matchup edge"],
+            "note": "Projection now uses an early weighted-score model. Injury input is still a placeholder until a stronger feed is added."
         })
 
     return {
