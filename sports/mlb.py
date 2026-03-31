@@ -4,6 +4,7 @@ from datetime import datetime
 import requests
 
 from sports.model_utils import scale_ratio, scale_diff, weighted_score, confidence_from_gap, edge_band_from_gap
+from sports.mlb_pitching import get_team_pitching_quality
 
 
 def get_recent_form(team_id: int):
@@ -120,6 +121,8 @@ def build_mlb_report():
         away_stats = get_team_stats(away_id) if away_id else default_stats
         home_pitcher = home.get("probablePitcher", {}).get("displayName", "") or home.get("probablePitcher", {}).get("fullName", "")
         away_pitcher = away.get("probablePitcher", {}).get("displayName", "") or away.get("probablePitcher", {}).get("fullName", "")
+        home_pitching = get_team_pitching_quality(home_id) if home_id else {"quality_score": 40.0}
+        away_pitching = get_team_pitching_quality(away_id) if away_id else {"quality_score": 40.0}
 
         home_recent_score = scale_ratio(home_form['last5_wins'], 5)
         away_recent_score = scale_ratio(away_form['last5_wins'], 5)
@@ -129,8 +132,8 @@ def build_mlb_report():
         away_matchup_score = scale_diff(((away_stats.get('ops', 0.0) - home_stats.get('ops', 0.0)) * 100) + ((home_stats.get('era', 99.0) - away_stats.get('era', 99.0)) * 8) + ((home_stats.get('whip', 9.0) - away_stats.get('whip', 9.0)) * 10), 40)
         home_advantage_score = 58.0
         away_advantage_score = 42.0
-        home_pitcher_score = 60.0 if home_pitcher else 45.0
-        away_pitcher_score = 60.0 if away_pitcher else 45.0
+        home_pitcher_score = home_pitching.get('quality_score', 40.0) if home_pitcher else max(35.0, home_pitching.get('quality_score', 40.0) - 8.0)
+        away_pitcher_score = away_pitching.get('quality_score', 40.0) if away_pitcher else max(35.0, away_pitching.get('quality_score', 40.0) - 8.0)
 
         home_score = weighted_score([
             (home_recent_score, 0.25),

@@ -7,6 +7,7 @@ import requests
 from pypdf import PdfReader
 
 from sports.nba_injury_official import fetch_latest_pdf_link, base_headers
+from sports.nba_roles import player_importance_weight
 
 TEAM_MAP = {
     "ATL": "Atlanta Hawks", "BOS": "Boston Celtics", "BRK": "Brooklyn Nets", "BKN": "Brooklyn Nets",
@@ -28,10 +29,11 @@ STATUS_WEIGHTS = {
     "Not With Team": 6.0,
 }
 
-STATUS_PATTERN = re.compile(r"\b(Out|Doubtful|Questionable|Probable|Available|Not\s+With\s+Team)\b")
+STATUS_PATTERN = re.compile(r"^(Out|Doubtful|Questionable|Probable|Available|Not\s+With\s+Team)$")
 MATCHUP_PATTERN = re.compile(r"^[A-Z]{2,4}@([A-Z]{2,4})$")
 TIME_PATTERN = re.compile(r"^\d{2}:\d{2}$")
-SKIP_TOKENS = {"Injury", "Report:", "Page", "of", "Game", "Date", "Time", "Matchup", "Team", "Player", "Name", "Current", "Status", "Reason", "(ET)"}
+DATE_PATTERN = re.compile(r"^\d{2}/\d{2}/\d{2,4}$")
+SKIP_TOKENS = {"Injury", "Report:", "Page", "of", "Game", "Date", "Time", "Matchup", "Team", "Player", "Name", "Current", "Status", "Reason", "(ET)", "PM", "AM"}
 
 
 def extract_pdf_tokens(url: str):
@@ -42,17 +44,17 @@ def extract_pdf_tokens(url: str):
     for page in reader.pages:
         text.append(page.extract_text() or "")
     raw = "\n".join(text)
-    tokens = [t.strip() for t in raw.splitlines() if t.strip()]
-    return tokens
+    return [t.strip() for t in raw.splitlines() if t.strip()]
 
 
-def collect_team_statuses(tokens):
-    team_statuses = {}
+def collect_team_entries(tokens):
+    team_entries = {}
     current_team = None
+    pending_player = []
     i = 0
     while i < len(tokens):
         tok = tokens[i]
-        if tok in SKIP_TOKENS or TIME_PATTERN.match(tok) or MATCHUP_PATTERN.match(tok) or re.match(r"^\d{2}/\d{2}/\d{4}$", tok) or re.match(r"^\d{2}/\d{2}/\d{2}$", tok):
+        if tok in SKIP_TOKENS or TIME_PATTERN.match(tok) or MATCHUP_PATTERN.match(tok) or DATE_PATTERN.match(tok):
             i += 1
             continue
 
@@ -63,17 +65,25 @@ def collect_team_statuses(tokens):
                 matched_team = team
                 i += len(words)
                 current_team = matched_team
-                team_statuses.setdefault(current_team, [])
+                team_entries.setdefault(current_team, [])
+                pending_player = []
                 break
         if matched_team:
             continue
 
         if current_team:
-            m = STATUS_PATTERN.match(tok)
-            if m:
-                team_statuses[current_team].append(m.group(1).replace('  ', ' ').strip())
+            status_match = STATUS_PATTERN.match(tok)
+            if status_match:
+                status = status_match.group(1).replace('  ', ' ').strip()
+                player_name = " ".join(pending_player).strip()
+                if player_name:
+                    team_entries[current_team].append({"player": player_name, "status": status})
+                pending_player = []
+            else:
+                if tok not in {"Injury/Illness", "G", "League", "Personal", "Rest", "Two-", "Way", "On", "Assignment"}:
+                    pending_player.append(tok)
         i += 1
-    return team_statuses
+    return team_entries
 
 
 def get_team_injury_context(team_abbr: str):
@@ -86,18 +96,22 @@ def get_team_injury_context(team_abbr: str):
         if not pdf_url:
             return {"injury_count": 0, "injury_score": 50.0, "status": "no_pdf_found", "note": "No official NBA injury PDF link found."}
         tokens = extract_pdf_tokens(pdf_url)
-        team_statuses = collect_team_statuses(tokens)
+        team_entries = collect_team_entries(tokens)
     except Exception as e:
         return {"injury_count": 0, "injury_score": 50.0, "status": "unavailable", "note": f"Official NBA injury PDF unavailable: {e}"}
 
-    statuses = team_statuses.get(team_name, [])
-    injury_count = len(statuses)
-    impact = sum(STATUS_WEIGHTS.get(s, 2.0) for s in statuses)
-    injury_score = max(15.0, 50.0 - impact) if injury_count else 50.0
+    entries = team_entries.get(team_name, [])
+    injury_count = len(entries)
+    impact = 0.0
+    for entry in entries:
+        status_weight = STATUS_WEIGHTS.get(entry.get('status', ''), 2.0)
+        role_weight = player_importance_weight(entry.get('player', ''))
+        impact += status_weight * role_weight
+    injury_score = max(10.0, 50.0 - impact) if injury_count else 50.0
 
     return {
         "injury_count": injury_count,
         "injury_score": round(injury_score, 2),
         "status": "live" if injury_count else "no_listed_injuries",
-        "note": f"Official NBA injury PDF matched {injury_count} status token(s) for {team_name}.",
+        "note": f"Official NBA injury PDF matched {injury_count} player status row(s) for {team_name}.",
     }
