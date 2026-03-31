@@ -11,6 +11,18 @@ MARKET_LINES = ROOT / "logs" / "market_lines.csv"
 OUT = ROOT / "reports" / "market_comparison_report.json"
 
 
+def american_to_implied_prob(odds):
+    try:
+        odds = float(odds)
+    except Exception:
+        return None
+    if odds > 0:
+        return round(100 / (odds + 100), 4)
+    if odds < 0:
+        return round(abs(odds) / (abs(odds) + 100), 4)
+    return None
+
+
 def read_lines():
     if not MARKET_LINES.exists():
         return []
@@ -29,18 +41,29 @@ def main():
             market = line_map.get((sport, str(game.get("game_id", ""))))
             if not market:
                 continue
+            odds_a = market.get("odds_a", "")
+            odds_b = market.get("odds_b", "")
+            implied_a = american_to_implied_prob(odds_a)
+            implied_b = american_to_implied_prob(odds_b)
+            model_edge = game.get("record_edge_pct", "")
             comparisons.append({
                 "sport": sport,
                 "game_id": game.get("game_id", ""),
                 "matchup": game.get("matchup", ""),
                 "model_lean": game.get("simple_projection_lean", ""),
                 "model_edge_band": game.get("edge_band", ""),
+                "model_edge": model_edge,
                 "market_side_a": market.get("side_a", ""),
                 "market_side_b": market.get("side_b", ""),
                 "market_line_a": market.get("line_a", ""),
                 "market_line_b": market.get("line_b", ""),
+                "odds_a": odds_a,
+                "odds_b": odds_b,
+                "implied_prob_a": implied_a,
+                "implied_prob_b": implied_b,
                 "line_source": market.get("line_source", ""),
-                "note": "Manual or external market line comparison layer. This becomes stronger as real line data is fed in."
+                "market_agreement": "leans_toward_model_side" if game.get("simple_projection_lean", "") in {market.get('side_a', ''), market.get('side_b', '')} else "name_mismatch_or_no_clear_match",
+                "note": "Market comparison layer using live The Odds API lines. Stronger once team-name normalization and value scoring are tightened further."
             })
 
     out = {
