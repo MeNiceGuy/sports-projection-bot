@@ -6,6 +6,7 @@ import requests
 from sports.model_utils import scale_ratio, scale_diff, weighted_score, confidence_from_gap, edge_band_from_gap
 from sports.mlb_pitching import get_team_pitching_quality, get_probable_starter_quality
 from sports.mlb_schedule import build_probable_pitcher_map, today_date_str
+from sports.mlb_bullpen import get_team_bullpen_quality
 
 
 def get_recent_form(team_id: int):
@@ -128,6 +129,8 @@ def build_mlb_report():
         away_pitcher_id = pitcher_info.get("away_pitcher_id")
         home_pitching = get_team_pitching_quality(home_id) if home_id else {"quality_score": 40.0}
         away_pitching = get_team_pitching_quality(away_id) if away_id else {"quality_score": 40.0}
+        home_bullpen = get_team_bullpen_quality(home_id) if home_id else {"quality_score": 40.0}
+        away_bullpen = get_team_bullpen_quality(away_id) if away_id else {"quality_score": 40.0}
         home_starter_quality = get_probable_starter_quality(home_pitcher_id)
         away_starter_quality = get_probable_starter_quality(away_pitcher_id)
 
@@ -142,19 +145,23 @@ def build_mlb_report():
         home_pitcher_score = home_starter_quality.get('quality_score', home_pitching.get('quality_score', 40.0)) if home_pitcher else max(35.0, home_pitching.get('quality_score', 40.0) - 8.0)
         away_pitcher_score = away_starter_quality.get('quality_score', away_pitching.get('quality_score', 40.0)) if away_pitcher else max(35.0, away_pitching.get('quality_score', 40.0) - 8.0)
 
+        home_bullpen_score = home_bullpen.get('quality_score', 40.0)
+        away_bullpen_score = away_bullpen.get('quality_score', 40.0)
         home_score = weighted_score([
-            (home_recent_score, 0.25),
+            (home_recent_score, 0.20),
             (home_advantage_score, 0.15),
-            (home_strength_score, 0.20),
-            (home_pitcher_score, 0.20),
-            (home_matchup_score, 0.20),
+            (home_strength_score, 0.15),
+            (home_pitcher_score, 0.25),
+            (home_bullpen_score, 0.10),
+            (home_matchup_score, 0.15),
         ])
         away_score = weighted_score([
-            (away_recent_score, 0.25),
+            (away_recent_score, 0.20),
             (away_advantage_score, 0.15),
-            (away_strength_score, 0.20),
-            (away_pitcher_score, 0.20),
-            (away_matchup_score, 0.20),
+            (away_strength_score, 0.15),
+            (away_pitcher_score, 0.25),
+            (away_bullpen_score, 0.10),
+            (away_matchup_score, 0.15),
         ])
         edge = round(home_score - away_score, 2)
         if edge > 10:
@@ -195,8 +202,10 @@ def build_mlb_report():
             "away_whip": round(away_stats.get('whip', 9.0), 2),
             "home_weighted_score": home_score,
             "away_weighted_score": away_score,
-            "factors": ["recent form", "home/away advantage", "team strength", "starter presence", "matchup edge"],
-            "note": "Projection now uses an early weighted-score model. True starter quality and bullpen context are still major MLB gaps."
+            "home_bullpen_quality": home_bullpen.get('quality_score', 40.0),
+            "away_bullpen_quality": away_bullpen.get('quality_score', 40.0),
+            "factors": ["recent form", "home/away advantage", "team strength", "starter quality", "bullpen quality", "matchup edge"],
+            "note": "Projection now uses an upgraded weighted-score model with probable starter quality and bullpen quality inputs. Bullpen freshness is still not modeled yet."
         })
 
     return {

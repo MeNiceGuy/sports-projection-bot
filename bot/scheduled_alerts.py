@@ -63,12 +63,21 @@ def main():
         value_edge = None
         if lean == market.get("market_side_a", ""):
             value_edge = market.get("value_edge_a")
+            best_odds = market.get("odds_a")
+            best_book = market.get("line_source")
         elif lean == market.get("market_side_b", ""):
             value_edge = market.get("value_edge_b")
+            best_odds = market.get("odds_b")
+            best_book = market.get("line_source")
+        else:
+            best_odds = None
+            best_book = None
         if value_edge is None or float(value_edge) < min_value_edge:
             continue
         c = dict(c)
         c["value_edge"] = value_edge
+        c["best_odds"] = best_odds
+        c["best_book"] = best_book
         qualifying.append((key, c))
 
     if qualifying:
@@ -76,7 +85,7 @@ def main():
         for key, c in qualifying:
             body_lines.append(f"[{c.get('sport', '').upper()}] {c.get('matchup', '')}")
             body_lines.append(f"Lean: {c.get('lean', '')}")
-            body_lines.append(f"Confidence: {c.get('confidence', '')} | Edge band: {c.get('edge_band', '')} | Value edge: {c.get('value_edge', '')} | Start in ~{c.get('minutes_to_start', '')} min")
+            body_lines.append(f"Confidence: {c.get('confidence', '')} | Edge band: {c.get('edge_band', '')} | Value edge: {c.get('value_edge', '')} | Best odds: {c.get('best_odds', '')} @ {c.get('best_book', '')} | Start in ~{c.get('minutes_to_start', '')} min")
             body_lines.append("")
 
         subject = f"Pregame Sports Alert | {len(qualifying)} game(s) about 30 minutes out"
