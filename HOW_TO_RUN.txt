@@ -16,6 +16,9 @@ C:\Users\1bosw\.openclaw\workspace\sports-projection-bot
 5. To append the current projections into the prediction log and build a basic performance summary:
    python run_performance.py
 
+6. To build the current grading summary structure:
+   python run_grader.py
+
 Current active sports:
 - NBA
 - MLB
