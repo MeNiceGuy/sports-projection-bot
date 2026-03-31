@@ -3,5 +3,6 @@
   "min_confidence": ["Medium", "High"],
   "min_edge_band": ["strong"],
   "enabled_sports": ["nba", "mlb"],
-  "subject_prefix": "Sports Bot Alert"
+  "subject_prefix": "Sports Bot Alert",
+  "min_value_edge": 3.0
 }

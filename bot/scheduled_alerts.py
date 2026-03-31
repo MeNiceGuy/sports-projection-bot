@@ -8,6 +8,7 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 CANDIDATES = ROOT / "reports" / "pregame_alert_candidates.json"
+MARKET_COMPARE = ROOT / "reports" / "market_comparison_report.json"
 SENT_KEYS = ROOT / "logs" / "sent_alert_keys.csv"
 EMAIL_SENDER = ROOT.parent / "tools" / "email_send.py"
 ALERT_CONFIG = ROOT / "config.alerts.json"
@@ -37,8 +38,11 @@ def main():
     config = load_json(ALERT_CONFIG)
     sent = load_sent_keys()
     candidates = load_json(CANDIDATES).get("candidates", [])
+    market_rows = load_json(MARKET_COMPARE).get("comparisons", [])
+    market_map = {(r.get("sport", ""), str(r.get("game_id", ""))): r for r in market_rows}
     allowed_conf = set(config.get("min_confidence", []))
     allowed_edges = set(config.get("min_edge_band", []))
+    min_value_edge = float(config.get("min_value_edge", 0) or 0)
     email_to = config.get("email_to", "")
 
     if not EMAIL_SENDER.exists() or not email_to:
@@ -54,6 +58,17 @@ def main():
             continue
         if c.get("edge_band") not in allowed_edges:
             continue
+        market = market_map.get((c.get("sport", ""), str(c.get("game_id", ""))), {})
+        lean = c.get("lean", "")
+        value_edge = None
+        if lean == market.get("market_side_a", ""):
+            value_edge = market.get("value_edge_a")
+        elif lean == market.get("market_side_b", ""):
+            value_edge = market.get("value_edge_b")
+        if value_edge is None or float(value_edge) < min_value_edge:
+            continue
+        c = dict(c)
+        c["value_edge"] = value_edge
         qualifying.append((key, c))
 
     if qualifying:
@@ -61,7 +76,7 @@ def main():
         for key, c in qualifying:
             body_lines.append(f"[{c.get('sport', '').upper()}] {c.get('matchup', '')}")
             body_lines.append(f"Lean: {c.get('lean', '')}")
-            body_lines.append(f"Confidence: {c.get('confidence', '')} | Edge band: {c.get('edge_band', '')} | Start in ~{c.get('minutes_to_start', '')} min")
+            body_lines.append(f"Confidence: {c.get('confidence', '')} | Edge band: {c.get('edge_band', '')} | Value edge: {c.get('value_edge', '')} | Start in ~{c.get('minutes_to_start', '')} min")
             body_lines.append("")
 
         subject = f"Pregame Sports Alert | {len(qualifying)} game(s) about 30 minutes out"
