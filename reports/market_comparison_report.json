@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-31T19:37:36.845077",
+  "generated_at": "2026-03-31T19:38:47.317921",
   "comparisons": [
     {
       "sport": "nba",
@@ -156,10 +156,10 @@
       "odds_b": "180",
       "implied_prob_a": 0.6825,
       "implied_prob_b": 0.3571,
-      "value_edge_a": null,
+      "value_edge_a": -13.28,
       "value_edge_b": 9.32,
       "line_source": "FanDuel",
-      "market_agreement": "name_mismatch_or_no_clear_match",
+      "market_agreement": "leans_toward_model_side",
       "note": "Market comparison layer now estimates model-vs-implied probability value edge from weighted scores and live odds."
     },
     {

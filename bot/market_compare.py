@@ -23,8 +23,12 @@ def american_to_implied_prob(odds):
     return None
 
 
-def normalize_matchup(text: str):
+def normalize_team_name(text: str):
     return " ".join((text or "").lower().replace("los angeles clippers", "la clippers").replace("los angeles lakers", "la lakers").split())
+
+
+def normalize_matchup(text: str):
+    return normalize_team_name(text)
 
 
 def read_lines():
@@ -60,15 +64,19 @@ def main():
             side_b = market.get("side_b", "")
             home_team = matchup.split(" at ")[-1] if " at " in matchup else ""
             away_team = matchup.split(" at ")[0] if " at " in matchup else ""
+            home_team_norm = normalize_team_name(home_team)
+            away_team_norm = normalize_team_name(away_team)
+            side_a_norm = normalize_team_name(side_a)
+            side_b_norm = normalize_team_name(side_b)
             value_a = None
             value_b = None
-            if side_a == home_team and implied_a is not None:
+            if side_a_norm == home_team_norm and implied_a is not None:
                 value_a = round((model_prob_home - implied_a) * 100, 2)
-            elif side_a == away_team and implied_a is not None:
+            elif side_a_norm == away_team_norm and implied_a is not None:
                 value_a = round((model_prob_away - implied_a) * 100, 2)
-            if side_b == home_team and implied_b is not None:
+            if side_b_norm == home_team_norm and implied_b is not None:
                 value_b = round((model_prob_home - implied_b) * 100, 2)
-            elif side_b == away_team and implied_b is not None:
+            elif side_b_norm == away_team_norm and implied_b is not None:
                 value_b = round((model_prob_away - implied_b) * 100, 2)
             comparisons.append({
                 "sport": sport,
@@ -90,7 +98,7 @@ def main():
                 "value_edge_a": value_a,
                 "value_edge_b": value_b,
                 "line_source": market.get("line_source", ""),
-                "market_agreement": "leans_toward_model_side" if game.get("simple_projection_lean", "") in {side_a, side_b} else "name_mismatch_or_no_clear_match",
+                "market_agreement": "leans_toward_model_side" if normalize_team_name(game.get("simple_projection_lean", "")) in {side_a_norm, side_b_norm} else "name_mismatch_or_no_clear_match",
                 "note": "Market comparison layer now estimates model-vs-implied probability value edge from weighted scores and live odds."
             })
 
