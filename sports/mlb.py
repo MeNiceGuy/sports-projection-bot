@@ -4,7 +4,8 @@ from datetime import datetime
 import requests
 
 from sports.model_utils import scale_ratio, scale_diff, weighted_score, confidence_from_gap, edge_band_from_gap
-from sports.mlb_pitching import get_team_pitching_quality
+from sports.mlb_pitching import get_team_pitching_quality, get_probable_starter_quality
+from sports.mlb_schedule import build_probable_pitcher_map, today_date_str
 
 
 def get_recent_form(team_id: int):
@@ -87,6 +88,7 @@ def build_mlb_report():
             "note": f"MLB live feed error: {e}"
         }
 
+    pitcher_map = build_probable_pitcher_map(today_date_str())
     games = []
     for game in games_raw:
         comps = game.get("competitions", [])
@@ -119,10 +121,15 @@ def build_mlb_report():
         default_stats = {"ops":0.0,"obp":0.0,"slg":0.0,"runs":0.0,"era":99.0,"whip":9.0,"strikeout_walk_ratio":0.0,"hits_per_9":9.0}
         home_stats = get_team_stats(home_id) if home_id else default_stats
         away_stats = get_team_stats(away_id) if away_id else default_stats
-        home_pitcher = home.get("probablePitcher", {}).get("displayName", "") or home.get("probablePitcher", {}).get("fullName", "")
-        away_pitcher = away.get("probablePitcher", {}).get("displayName", "") or away.get("probablePitcher", {}).get("fullName", "")
+        pitcher_info = pitcher_map.get(f"{away_name} at {home_name}", {})
+        home_pitcher = pitcher_info.get("home_pitcher", "")
+        away_pitcher = pitcher_info.get("away_pitcher", "")
+        home_pitcher_id = pitcher_info.get("home_pitcher_id")
+        away_pitcher_id = pitcher_info.get("away_pitcher_id")
         home_pitching = get_team_pitching_quality(home_id) if home_id else {"quality_score": 40.0}
         away_pitching = get_team_pitching_quality(away_id) if away_id else {"quality_score": 40.0}
+        home_starter_quality = get_probable_starter_quality(home_pitcher_id)
+        away_starter_quality = get_probable_starter_quality(away_pitcher_id)
 
         home_recent_score = scale_ratio(home_form['last5_wins'], 5)
         away_recent_score = scale_ratio(away_form['last5_wins'], 5)
@@ -132,8 +139,8 @@ def build_mlb_report():
         away_matchup_score = scale_diff(((away_stats.get('ops', 0.0) - home_stats.get('ops', 0.0)) * 100) + ((home_stats.get('era', 99.0) - away_stats.get('era', 99.0)) * 8) + ((home_stats.get('whip', 9.0) - away_stats.get('whip', 9.0)) * 10), 40)
         home_advantage_score = 58.0
         away_advantage_score = 42.0
-        home_pitcher_score = home_pitching.get('quality_score', 40.0) if home_pitcher else max(35.0, home_pitching.get('quality_score', 40.0) - 8.0)
-        away_pitcher_score = away_pitching.get('quality_score', 40.0) if away_pitcher else max(35.0, away_pitching.get('quality_score', 40.0) - 8.0)
+        home_pitcher_score = home_starter_quality.get('quality_score', home_pitching.get('quality_score', 40.0)) if home_pitcher else max(35.0, home_pitching.get('quality_score', 40.0) - 8.0)
+        away_pitcher_score = away_starter_quality.get('quality_score', away_pitching.get('quality_score', 40.0)) if away_pitcher else max(35.0, away_pitching.get('quality_score', 40.0) - 8.0)
 
         home_score = weighted_score([
             (home_recent_score, 0.25),
@@ -174,6 +181,8 @@ def build_mlb_report():
             "away_recent_form": f"{away_form['last5_wins']}-{away_form['last5_losses']}",
             "home_probable_pitcher": home_pitcher or "Unknown",
             "away_probable_pitcher": away_pitcher or "Unknown",
+            "home_starter_quality_source": home_starter_quality.get('source', 'fallback'),
+            "away_starter_quality_source": away_starter_quality.get('source', 'fallback'),
             "home_ops": round(home_stats.get('ops', 0.0), 3),
             "away_ops": round(away_stats.get('ops', 0.0), 3),
             "home_obp": round(home_stats.get('obp', 0.0), 3),
