@@ -8,6 +8,7 @@ A multi-sport projection and edge-research bot scaffold using public/open data w
 - NFL, NHL, NCAAB, and NCAAF scaffolded
 - prediction logging and performance-summary layer added
 - grading and validation structure added
+- result-merge structure added
 
 ## Goal
 Collect public sports data, generate projection-style outputs, and track model performance over time.

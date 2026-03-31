@@ -19,6 +19,9 @@ C:\Users\1bosw\.openclaw\workspace\sports-projection-bot
 6. To build the current grading summary structure:
    python run_grader.py
 
+7. To merge completed game results from the template into graded results:
+   python run_merge_results.py
+
 Current active sports:
 - NBA
 - MLB
