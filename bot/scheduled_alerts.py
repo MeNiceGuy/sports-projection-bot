@@ -41,6 +41,10 @@ def main():
     allowed_edges = set(config.get("min_edge_band", []))
     email_to = config.get("email_to", "")
 
+    if not EMAIL_SENDER.exists() or not email_to:
+        print({"alerts_sent": 0, "reason": "email config missing"})
+        return
+
     qualifying = []
     for c in candidates:
         key = f"{c.get('sport')}|{c.get('game_id')}|{c.get('lean')}"
@@ -52,29 +56,46 @@ def main():
             continue
         qualifying.append((key, c))
 
-    if not qualifying or not EMAIL_SENDER.exists() or not email_to:
-        print({"alerts_sent": 0, "reason": "no qualifying games or email config missing"})
+    if qualifying:
+        body_lines = []
+        for key, c in qualifying:
+            body_lines.append(f"[{c.get('sport', '').upper()}] {c.get('matchup', '')}")
+            body_lines.append(f"Lean: {c.get('lean', '')}")
+            body_lines.append(f"Confidence: {c.get('confidence', '')} | Edge band: {c.get('edge_band', '')} | Start in ~{c.get('minutes_to_start', '')} min")
+            body_lines.append("")
+
+        subject = f"Pregame Sports Alert | {len(qualifying)} game(s) about 30 minutes out"
+        subprocess.run([
+            "python", str(EMAIL_SENDER),
+            "--to", email_to,
+            "--subject", subject,
+            "--body", "\n".join(body_lines).strip(),
+        ], check=False)
+
+        for key, _ in qualifying:
+            append_sent_key(key)
+
+        print({"alerts_sent": len(qualifying), "subject": subject})
         return
 
-    body_lines = []
-    for key, c in qualifying:
-        body_lines.append(f"[{c.get('sport', '').upper()}] {c.get('matchup', '')}")
-        body_lines.append(f"Lean: {c.get('lean', '')}")
-        body_lines.append(f"Confidence: {c.get('confidence', '')} | Edge band: {c.get('edge_band', '')} | Start in ~{c.get('minutes_to_start', '')} min")
-        body_lines.append("")
+    if candidates:
+        slate_key = "no-bet-slate|" + "|".join(sorted(f"{c.get('sport')}:{c.get('game_id')}" for c in candidates))
+        if slate_key in sent:
+            print({"alerts_sent": 0, "reason": "no-bet slate already sent"})
+            return
+        subject = "Pregame Sports Alert | No strong bets"
+        body = "it's all bullshit on the floor today, save your time and money!"
+        subprocess.run([
+            "python", str(EMAIL_SENDER),
+            "--to", email_to,
+            "--subject", subject,
+            "--body", body,
+        ], check=False)
+        append_sent_key(slate_key)
+        print({"alerts_sent": 1, "subject": subject, "mode": "no_bet_slate"})
+        return
 
-    subject = f"Pregame Sports Alert | {len(qualifying)} game(s) about 30 minutes out"
-    subprocess.run([
-        "python", str(EMAIL_SENDER),
-        "--to", email_to,
-        "--subject", subject,
-        "--body", "\n".join(body_lines).strip(),
-    ], check=False)
-
-    for key, _ in qualifying:
-        append_sent_key(key)
-
-    print({"alerts_sent": len(qualifying), "subject": subject})
+    print({"alerts_sent": 0, "reason": "no games in current pregame window"})
 
 
 if __name__ == "__main__":
