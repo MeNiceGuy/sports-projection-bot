@@ -1,5 +1,5 @@
 {
-  "active_sports": ["nba"],
+  "active_sports": ["nba", "mlb"],
   "enabled_sports": ["nba", "mlb", "nfl", "nhl", "ncaab", "ncaaf"],
   "output_report": "reports/daily_projection_report.json"
 }
