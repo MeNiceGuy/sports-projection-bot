@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-31T16:37:59.240660",
+  "generated_at": "2026-03-31T16:46:19.521756",
   "active_sports": [
     "nba",
     "mlb"
@@ -8,7 +8,7 @@
     "nba": {
       "status": "ok",
       "model": "nba_record_edge_v1",
-      "generated_at": "2026-03-31T16:38:20.492374",
+      "generated_at": "2026-03-31T16:46:42.094128",
       "games": [
         {
           "game_id": "0022501099",
@@ -17,20 +17,26 @@
           "home_record": "39-35",
           "away_record": "42-33",
           "simple_projection_lean": "Phoenix Suns",
-          "record_edge_pct": -4.77,
+          "record_edge_pct": -4.79,
           "confidence": "Medium",
           "home_recent_form": "1-4",
           "away_recent_form": "3-2",
           "home_ppg": 115.34,
           "away_ppg": 112.92,
+          "home_rebounds": 43.16,
+          "away_rebounds": 43.21,
+          "home_turnovers": 13.34,
+          "away_turnovers": 13.35,
           "factors": [
             "team record differential",
             "home court bonus",
             "recent form",
             "offensive production",
-            "scoring efficiency"
+            "scoring efficiency",
+            "rebounding",
+            "turnover control"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-court bonus, recent form, and basic offensive production/efficiency. Upgrade with injuries and pace next."
+          "note": "Projection is currently based on team record differential, a simple home-court bonus, recent form, offensive production, scoring efficiency, rebounding, and turnover control. Upgrade with injuries and pace next."
         },
         {
           "game_id": "0022501100",
@@ -39,20 +45,26 @@
           "home_record": "18-57",
           "away_record": "39-36",
           "simple_projection_lean": "Charlotte Hornets",
-          "record_edge_pct": -35.42,
+          "record_edge_pct": -39.12,
           "confidence": "Medium",
           "home_recent_form": "1-4",
           "away_recent_form": "3-2",
           "home_ppg": 106.31,
           "away_ppg": 116.08,
+          "home_rebounds": 39.69,
+          "away_rebounds": 46.17,
+          "home_turnovers": 15.27,
+          "away_turnovers": 14.61,
           "factors": [
             "team record differential",
             "home court bonus",
             "recent form",
             "offensive production",
-            "scoring efficiency"
+            "scoring efficiency",
+            "rebounding",
+            "turnover control"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-court bonus, recent form, and basic offensive production/efficiency. Upgrade with injuries and pace next."
+          "note": "Projection is currently based on team record differential, a simple home-court bonus, recent form, offensive production, scoring efficiency, rebounding, and turnover control. Upgrade with injuries and pace next."
         },
         {
           "game_id": "0022500652",
@@ -61,20 +73,26 @@
           "home_record": "29-45",
           "away_record": "24-51",
           "simple_projection_lean": "Milwaukee Bucks",
-          "record_edge_pct": 9.13,
+          "record_edge_pct": 7.08,
           "confidence": "Medium",
           "home_recent_form": "1-4",
           "away_recent_form": "1-4",
           "home_ppg": 110.43,
           "away_ppg": 113.59,
+          "home_rebounds": 40.51,
+          "away_rebounds": 44.64,
+          "home_turnovers": 14.27,
+          "away_turnovers": 14.29,
           "factors": [
             "team record differential",
             "home court bonus",
             "recent form",
             "offensive production",
-            "scoring efficiency"
+            "scoring efficiency",
+            "rebounding",
+            "turnover control"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-court bonus, recent form, and basic offensive production/efficiency. Upgrade with injuries and pace next."
+          "note": "Projection is currently based on team record differential, a simple home-court bonus, recent form, offensive production, scoring efficiency, rebounding, and turnover control. Upgrade with injuries and pace next."
         },
         {
           "game_id": "0022501101",
@@ -83,20 +101,26 @@
           "home_record": "54-21",
           "away_record": "42-32",
           "simple_projection_lean": "Detroit Pistons",
-          "record_edge_pct": 19.67,
+          "record_edge_pct": 20.55,
           "confidence": "Medium",
           "home_recent_form": "3-2",
           "away_recent_form": "3-2",
           "home_ppg": 117.41,
           "away_ppg": 114.32,
+          "home_rebounds": 45.75,
+          "away_rebounds": 42.32,
+          "home_turnovers": 14.15,
+          "away_turnovers": 12.96,
           "factors": [
             "team record differential",
             "home court bonus",
             "recent form",
             "offensive production",
-            "scoring efficiency"
+            "scoring efficiency",
+            "rebounding",
+            "turnover control"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-court bonus, recent form, and basic offensive production/efficiency. Upgrade with injuries and pace next."
+          "note": "Projection is currently based on team record differential, a simple home-court bonus, recent form, offensive production, scoring efficiency, rebounding, and turnover control. Upgrade with injuries and pace next."
         },
         {
           "game_id": "0022501102",
@@ -105,20 +129,26 @@
           "home_record": "45-29",
           "away_record": "48-27",
           "simple_projection_lean": "No strong lean",
-          "record_edge_pct": 0.09,
+          "record_edge_pct": 0.07,
           "confidence": "Low",
           "home_recent_form": "3-2",
           "away_recent_form": "0-0",
           "home_ppg": 114.41,
           "away_ppg": 116.81,
+          "home_rebounds": 48.26,
+          "away_rebounds": 45.91,
+          "home_turnovers": 14.69,
+          "away_turnovers": 12.97,
           "factors": [
             "team record differential",
             "home court bonus",
             "recent form",
             "offensive production",
-            "scoring efficiency"
+            "scoring efficiency",
+            "rebounding",
+            "turnover control"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-court bonus, recent form, and basic offensive production/efficiency. Upgrade with injuries and pace next."
+          "note": "Projection is currently based on team record differential, a simple home-court bonus, recent form, offensive production, scoring efficiency, rebounding, and turnover control. Upgrade with injuries and pace next."
         },
         {
           "game_id": "0022501103",
@@ -126,21 +156,27 @@
           "matchup": "Cleveland Cavaliers at Los Angeles Lakers",
           "home_record": "49-26",
           "away_record": "47-28",
-          "simple_projection_lean": "Los Angeles Lakers",
-          "record_edge_pct": 5.24,
-          "confidence": "Medium",
+          "simple_projection_lean": "No strong lean",
+          "record_edge_pct": 3.25,
+          "confidence": "Low",
           "home_recent_form": "4-1",
           "away_recent_form": "4-1",
           "home_ppg": 116.68,
           "away_ppg": 119.43,
+          "home_rebounds": 41.09,
+          "away_rebounds": 44.37,
+          "home_turnovers": 13.73,
+          "away_turnovers": 13.24,
           "factors": [
             "team record differential",
             "home court bonus",
             "recent form",
             "offensive production",
-            "scoring efficiency"
+            "scoring efficiency",
+            "rebounding",
+            "turnover control"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-court bonus, recent form, and basic offensive production/efficiency. Upgrade with injuries and pace next."
+          "note": "Projection is currently based on team record differential, a simple home-court bonus, recent form, offensive production, scoring efficiency, rebounding, and turnover control. Upgrade with injuries and pace next."
         },
         {
           "game_id": "0022501104",
@@ -149,20 +185,26 @@
           "home_record": "39-36",
           "away_record": "38-38",
           "simple_projection_lean": "LA Clippers",
-          "record_edge_pct": 11.34,
+          "record_edge_pct": 10.8,
           "confidence": "Medium",
           "home_recent_form": "5-0",
           "away_recent_form": "3-2",
           "home_ppg": 114.0,
           "away_ppg": 115.34,
+          "home_rebounds": 40.71,
+          "away_rebounds": 46.11,
+          "home_turnovers": 13.6,
+          "away_turnovers": 16.68,
           "factors": [
             "team record differential",
             "home court bonus",
             "recent form",
             "offensive production",
-            "scoring efficiency"
+            "scoring efficiency",
+            "rebounding",
+            "turnover control"
           ],
-          "note": "Projection is currently based on team record differential, a simple home-court bonus, recent form, and basic offensive production/efficiency. Upgrade with injuries and pace next."
+          "note": "Projection is currently based on team record differential, a simple home-court bonus, recent form, offensive production, scoring efficiency, rebounding, and turnover control. Upgrade with injuries and pace next."
         }
       ],
       "note": "NBA live data is connected. This is an early projection layer, not a finished betting model."
@@ -170,7 +212,7 @@
     "mlb": {
       "status": "ok",
       "model": "mlb_record_edge_v1",
-      "generated_at": "2026-03-31T16:38:54.778759",
+      "generated_at": "2026-03-31T16:47:16.863450",
       "games": [
         {
           "game_id": 824861,

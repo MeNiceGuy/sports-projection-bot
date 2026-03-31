@@ -49,6 +49,8 @@ def get_team_stats(team_abbr: str):
         "ppg": float(stats_map.get("avgPoints", 0) or 0),
         "fg_pct": float(stats_map.get("fieldGoalPct", 0) or 0),
         "scoring_efficiency": float(stats_map.get("scoringEfficiency", 0) or 0),
+        "rebounds": float(stats_map.get("avgRebounds", 0) or 0),
+        "turnovers": float(stats_map.get("avgTurnovers", 0) or 0),
     }
 
 
@@ -88,8 +90,9 @@ def build_nba_report():
         away_stats = get_team_stats(away_abbr)
         form_edge = (home_form['form_score'] - away_form['form_score']) * 1.5
         offense_edge = ((home_stats['ppg'] - away_stats['ppg']) * 0.4) + ((home_stats['scoring_efficiency'] - away_stats['scoring_efficiency']) * 10)
+        possession_edge = ((home_stats['rebounds'] - away_stats['rebounds']) * 0.5) - ((home_stats['turnovers'] - away_stats['turnovers']) * 0.7)
         home_court_bonus = 3.0
-        edge = round(((home_pct - away_pct) * 100) + home_court_bonus + form_edge + offense_edge, 2)
+        edge = round(((home_pct - away_pct) * 100) + home_court_bonus + form_edge + offense_edge + possession_edge, 2)
         if edge > 4:
             lean = home_name
             confidence = "Medium"
@@ -113,8 +116,12 @@ def build_nba_report():
             "away_recent_form": f"{away_form['last5_wins']}-{away_form['last5_losses']}",
             "home_ppg": round(home_stats['ppg'], 2),
             "away_ppg": round(away_stats['ppg'], 2),
-            "factors": ["team record differential", "home court bonus", "recent form", "offensive production", "scoring efficiency"],
-            "note": "Projection is currently based on team record differential, a simple home-court bonus, recent form, and basic offensive production/efficiency. Upgrade with injuries and pace next."
+            "home_rebounds": round(home_stats['rebounds'], 2),
+            "away_rebounds": round(away_stats['rebounds'], 2),
+            "home_turnovers": round(home_stats['turnovers'], 2),
+            "away_turnovers": round(away_stats['turnovers'], 2),
+            "factors": ["team record differential", "home court bonus", "recent form", "offensive production", "scoring efficiency", "rebounding", "turnover control"],
+            "note": "Projection is currently based on team record differential, a simple home-court bonus, recent form, offensive production, scoring efficiency, rebounding, and turnover control. Upgrade with injuries and pace next."
         })
 
     return {

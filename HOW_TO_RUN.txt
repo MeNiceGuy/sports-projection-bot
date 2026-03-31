@@ -22,6 +22,9 @@ C:\Users\1bosw\.openclaw\workspace\sports-projection-bot
 7. To merge completed game results from the template into graded results:
    python run_merge_results.py
 
+8. To build confidence-bucket reporting from graded results:
+   python run_confidence_report.py
+
 Current active sports:
 - NBA
 - MLB
