@@ -1,0 +1,33 @@
+Sports Projection Bot - Scheduled Pregame Email Setup
+
+Goal:
+Run the bot automatically and email only qualifying NBA/MLB alerts about 30 minutes before game start.
+
+Project folder:
+C:\Users\1bosw\.openclaw\workspace\sports-projection-bot
+
+Recommended command:
+python run_scheduled_cycle.py
+
+What it does:
+1. Runs the projections
+2. Fetches market lines from The Odds API
+3. Builds market comparison
+4. Filters for games about 20-40 minutes from start
+5. Emails qualifying strong alerts
+6. Prevents duplicate sends for the same game/lean
+
+Windows Task Scheduler idea:
+- Run every 15 minutes during the afternoon/evening game window
+- Program/script: powershell.exe
+- Arguments:
+  -ExecutionPolicy Bypass -Command "cd 'C:\Users\1bosw\.openclaw\workspace\sports-projection-bot'; python run_scheduled_cycle.py"
+
+Suggested schedule windows:
+- NBA-heavy nights: every 15 minutes from 5:00 PM to 10:30 PM
+- MLB-heavy days: every 30 minutes from 5:00 PM to 9:30 PM
+
+Important:
+- Keep your machine on
+- Keep internet on
+- Gmail and The Odds API key must remain configured

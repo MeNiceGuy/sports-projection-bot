@@ -37,6 +37,9 @@ C:\Users\1bosw\.openclaw\workspace\sports-projection-bot
 12. To build the current player-props output:
    python run_props_engine.py
 
+13. To run the full scheduled pregame email flow:
+   python run_scheduled_cycle.py
+
 Current active sports:
 - NBA
 - MLB
