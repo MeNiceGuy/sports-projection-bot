@@ -1,15 +1,93 @@
 {
-  "generated_at": "2026-03-31T16:10:31.145776",
+  "generated_at": "2026-03-31T16:15:02.982482",
   "active_sports": [
     "nba"
   ],
   "reports": {
     "nba": {
-      "status": "scaffold",
-      "model": "nba_scaffold_v1",
-      "generated_at": "2026-03-31T16:10:31.145776",
-      "games": [],
-      "note": "NBA module scaffold is active, but the live public feed needs a working source upgrade before real game projections can populate automatically."
+      "status": "ok",
+      "model": "nba_record_edge_v1",
+      "generated_at": "2026-03-31T16:15:03.683299",
+      "games": [
+        {
+          "game_id": "0022501099",
+          "start_time": "7:00 pm ET",
+          "matchup": "Phoenix Suns at Orlando Magic",
+          "home_record": "39-35",
+          "away_record": "42-33",
+          "simple_projection_lean": "Phoenix Suns",
+          "record_edge_pct": -3.3,
+          "confidence": "Medium",
+          "note": "Projection is currently based on team record differential only. Upgrade with pace, injuries, and recent form next."
+        },
+        {
+          "game_id": "0022501100",
+          "start_time": "7:30 pm ET",
+          "matchup": "Charlotte Hornets at Brooklyn Nets",
+          "home_record": "18-57",
+          "away_record": "39-36",
+          "simple_projection_lean": "Charlotte Hornets",
+          "record_edge_pct": -28.0,
+          "confidence": "Medium",
+          "note": "Projection is currently based on team record differential only. Upgrade with pace, injuries, and recent form next."
+        },
+        {
+          "game_id": "0022500652",
+          "start_time": "8:00 pm ET",
+          "matchup": "Dallas Mavericks at Milwaukee Bucks",
+          "home_record": "29-45",
+          "away_record": "24-51",
+          "simple_projection_lean": "Milwaukee Bucks",
+          "record_edge_pct": 7.19,
+          "confidence": "Medium",
+          "note": "Projection is currently based on team record differential only. Upgrade with pace, injuries, and recent form next."
+        },
+        {
+          "game_id": "0022501101",
+          "start_time": "8:00 pm ET",
+          "matchup": "Toronto Raptors at Detroit Pistons",
+          "home_record": "54-21",
+          "away_record": "42-32",
+          "simple_projection_lean": "Detroit Pistons",
+          "record_edge_pct": 15.24,
+          "confidence": "Medium",
+          "note": "Projection is currently based on team record differential only. Upgrade with pace, injuries, and recent form next."
+        },
+        {
+          "game_id": "0022501102",
+          "start_time": "8:00 pm ET",
+          "matchup": "New York Knicks at Houston Rockets",
+          "home_record": "45-29",
+          "away_record": "48-27",
+          "simple_projection_lean": "New York Knicks",
+          "record_edge_pct": -3.19,
+          "confidence": "Medium",
+          "note": "Projection is currently based on team record differential only. Upgrade with pace, injuries, and recent form next."
+        },
+        {
+          "game_id": "0022501103",
+          "start_time": "10:30 pm ET",
+          "matchup": "Cleveland Cavaliers at Los Angeles Lakers",
+          "home_record": "49-26",
+          "away_record": "47-28",
+          "simple_projection_lean": "No strong lean",
+          "record_edge_pct": 2.67,
+          "confidence": "Low",
+          "note": "Projection is currently based on team record differential only. Upgrade with pace, injuries, and recent form next."
+        },
+        {
+          "game_id": "0022501104",
+          "start_time": "11:00 pm ET",
+          "matchup": "Portland Trail Blazers at LA Clippers",
+          "home_record": "39-36",
+          "away_record": "38-38",
+          "simple_projection_lean": "No strong lean",
+          "record_edge_pct": 2.0,
+          "confidence": "Low",
+          "note": "Projection is currently based on team record differential only. Upgrade with pace, injuries, and recent form next."
+        }
+      ],
+      "note": "NBA live data is connected. This is an early projection layer, not a finished betting model."
     }
   }
 }
