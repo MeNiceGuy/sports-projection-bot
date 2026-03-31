@@ -58,8 +58,13 @@ def get_team_stats(team_id: int):
             return default
     return {
         "ops": f(hitting.get("ops", 0.0), 0.0),
+        "obp": f(hitting.get("obp", 0.0), 0.0),
+        "slg": f(hitting.get("slg", 0.0), 0.0),
+        "runs": f(hitting.get("runs", 0.0), 0.0),
         "era": f(pitching.get("era", 99.0), 99.0),
         "whip": f(pitching.get("whip", 9.0), 9.0),
+        "strikeout_walk_ratio": f(pitching.get("strikeoutWalkRatio", 0.0), 0.0),
+        "hits_per_9": f(pitching.get("hitsPer9Inn", 9.0), 9.0),
     }
 
 
@@ -116,12 +121,21 @@ def build_mlb_report():
         away_pitcher = away.get("probablePitcher", {}).get("displayName", "") or away.get("probablePitcher", {}).get("fullName", "")
         pitcher_bonus = 1.0 if home_pitcher else 0.0
         pitcher_penalty = 1.0 if away_pitcher else 0.0
-        stat_edge = ((home_stats['ops'] - away_stats['ops']) * 10) + ((away_stats['era'] - home_stats['era']) * 2) + ((away_stats['whip'] - home_stats['whip']) * 3)
+        stat_edge = (
+            ((home_stats['ops'] - away_stats['ops']) * 10)
+            + ((home_stats['obp'] - away_stats['obp']) * 8)
+            + ((home_stats['slg'] - away_stats['slg']) * 8)
+            + ((home_stats['runs'] - away_stats['runs']) * 0.25)
+            + ((away_stats['era'] - home_stats['era']) * 2)
+            + ((away_stats['whip'] - home_stats['whip']) * 3)
+            + ((home_stats['strikeout_walk_ratio'] - away_stats['strikeout_walk_ratio']) * 1.2)
+            + ((away_stats['hits_per_9'] - home_stats['hits_per_9']) * 1.0)
+        )
         edge = round(((home_pct - away_pct) * 100) + home_field_bonus + pitcher_bonus - pitcher_penalty + form_edge + stat_edge, 2)
-        if edge > 8:
+        if edge > 10:
             lean = home_name
             confidence = "Medium"
-        elif edge < -8:
+        elif edge < -10:
             lean = away_name
             confidence = "Medium"
         else:
@@ -130,6 +144,8 @@ def build_mlb_report():
 
         if not home_pitcher and not away_pitcher and confidence == "Medium":
             confidence = "Low"
+        if abs(edge) >= 18 and (home_pitcher or away_pitcher):
+            confidence = "High"
 
         games.append({
             "game_id": game.get("id", ""),
@@ -147,10 +163,16 @@ def build_mlb_report():
             "away_probable_pitcher": away_pitcher or "Unknown",
             "home_ops": round(home_stats['ops'], 3),
             "away_ops": round(away_stats['ops'], 3),
+            "home_obp": round(home_stats['obp'], 3),
+            "away_obp": round(away_stats['obp'], 3),
+            "home_slg": round(home_stats['slg'], 3),
+            "away_slg": round(away_stats['slg'], 3),
             "home_era": round(home_stats['era'], 2),
             "away_era": round(away_stats['era'], 2),
-            "factors": ["team record differential", "home field bonus", "probable pitcher presence", "recent form", "OPS", "ERA", "WHIP"],
-            "note": "Projection is currently based on team record differential, a simple home-field bonus, probable pitcher presence, recent form, and basic team hitting/pitching stats. Upgrade with starter quality and bullpen splits next."
+            "home_whip": round(home_stats['whip'], 2),
+            "away_whip": round(away_stats['whip'], 2),
+            "factors": ["team record differential", "home field bonus", "probable pitcher presence", "recent form", "OPS", "OBP", "SLG", "ERA", "WHIP", "K/BB ratio", "hits per 9"],
+            "note": "Projection is currently based on team record differential, home-field bonus, probable pitcher presence, recent form, and a wider team hitting/pitching stat set. Starter quality and bullpen context are still the biggest remaining MLB gaps."
         })
 
     return {
