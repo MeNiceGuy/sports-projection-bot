@@ -1,0 +1,10 @@
+{
+  "regions": "us",
+  "markets": "h2h,spreads,totals",
+  "odds_format": "american",
+  "date_format": "iso",
+  "sports": {
+    "nba": "basketball_nba",
+    "mlb": "baseball_mlb"
+  }
+}
