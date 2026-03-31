@@ -31,6 +31,27 @@ def get_recent_form(team_abbr: str):
     return {"last5_wins": wins, "last5_losses": losses, "form_score": wins - losses}
 
 
+def get_team_stats(team_abbr: str):
+    url = f"https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/{team_abbr.lower()}/statistics"
+    try:
+        resp = requests.get(url, timeout=20)
+        resp.raise_for_status()
+        payload = resp.json()
+        categories = payload.get("results", {}).get("stats", {}).get("categories", [])
+    except Exception:
+        return {"ppg": 0.0, "fg_pct": 0.0, "scoring_efficiency": 0.0}
+
+    stats_map = {}
+    for cat in categories:
+        for stat in cat.get("stats", []):
+            stats_map[stat.get("name")] = stat.get("value", 0)
+    return {
+        "ppg": float(stats_map.get("avgPoints", 0) or 0),
+        "fg_pct": float(stats_map.get("fieldGoalPct", 0) or 0),
+        "scoring_efficiency": float(stats_map.get("scoringEfficiency", 0) or 0),
+    }
+
+
 def build_nba_report():
     url = "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json"
     try:
@@ -63,9 +84,12 @@ def build_nba_report():
         away_pct = away_wins / max(away_wins + away_losses, 1)
         home_form = get_recent_form(home_abbr)
         away_form = get_recent_form(away_abbr)
+        home_stats = get_team_stats(home_abbr)
+        away_stats = get_team_stats(away_abbr)
         form_edge = (home_form['form_score'] - away_form['form_score']) * 1.5
+        offense_edge = ((home_stats['ppg'] - away_stats['ppg']) * 0.4) + ((home_stats['scoring_efficiency'] - away_stats['scoring_efficiency']) * 10)
         home_court_bonus = 3.0
-        edge = round(((home_pct - away_pct) * 100) + home_court_bonus + form_edge, 2)
+        edge = round(((home_pct - away_pct) * 100) + home_court_bonus + form_edge + offense_edge, 2)
         if edge > 4:
             lean = home_name
             confidence = "Medium"
@@ -87,8 +111,10 @@ def build_nba_report():
             "confidence": confidence,
             "home_recent_form": f"{home_form['last5_wins']}-{home_form['last5_losses']}",
             "away_recent_form": f"{away_form['last5_wins']}-{away_form['last5_losses']}",
-            "factors": ["team record differential", "home court bonus", "recent form"],
-            "note": "Projection is currently based on team record differential, a simple home-court bonus, and recent form. Upgrade with pace and injuries next."
+            "home_ppg": round(home_stats['ppg'], 2),
+            "away_ppg": round(away_stats['ppg'], 2),
+            "factors": ["team record differential", "home court bonus", "recent form", "offensive production", "scoring efficiency"],
+            "note": "Projection is currently based on team record differential, a simple home-court bonus, recent form, and basic offensive production/efficiency. Upgrade with injuries and pace next."
         })
 
     return {

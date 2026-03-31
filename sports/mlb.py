@@ -80,6 +80,9 @@ def build_mlb_report():
             lean = "No strong lean"
             confidence = "Low"
 
+        if not home_pitcher and not away_pitcher and confidence == "Medium":
+            confidence = "Low"
+
         games.append({
             "game_id": game.get("gamePk", ""),
             "start_time": game.get("status", {}).get("detailedState", "Scheduled"),
