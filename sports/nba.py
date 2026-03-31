@@ -4,6 +4,7 @@ from datetime import datetime
 import requests
 
 from sports.model_utils import scale_ratio, scale_diff, weighted_score, confidence_from_gap, edge_band_from_gap
+from sports.nba_injuries import get_team_injury_context
 
 
 def get_recent_form(team_abbr: str):
@@ -114,8 +115,10 @@ def build_nba_report():
         away_matchup_score = scale_diff(((away_stats['rebounds'] - home_stats['rebounds']) * 1.5) + ((home_stats['turnovers'] - away_stats['turnovers']) * 2.0), 20)
         home_advantage_score = 60.0
         away_advantage_score = 40.0
-        home_injury_score = 50.0
-        away_injury_score = 50.0
+        home_injury = get_team_injury_context(home_abbr)
+        away_injury = get_team_injury_context(away_abbr)
+        home_injury_score = float(home_injury.get('injury_score', 50.0) or 50.0)
+        away_injury_score = float(away_injury.get('injury_score', 50.0) or 50.0)
 
         home_score = weighted_score([
             (home_recent_score, 0.25),
@@ -160,8 +163,12 @@ def build_nba_report():
             "away_turnovers": round(away_stats['turnovers'], 2),
             "home_weighted_score": home_score,
             "away_weighted_score": away_score,
-            "factors": ["recent form", "home/away advantage", "team strength", "injury placeholder", "matchup edge"],
-            "note": "Projection now uses an early weighted-score model. Injury input is still a placeholder until a stronger feed is added."
+            "home_injury_count": home_injury.get('injury_count', 0),
+            "away_injury_count": away_injury.get('injury_count', 0),
+            "home_injury_status": home_injury.get('status', 'unknown'),
+            "away_injury_status": away_injury.get('status', 'unknown'),
+            "factors": ["recent form", "home/away advantage", "team strength", "injury context", "matchup edge"],
+            "note": f"Projection now uses an early weighted-score model. Injury status: home={home_injury.get('status', 'unknown')}, away={away_injury.get('status', 'unknown')}."
         })
 
     return {
