@@ -43,6 +43,8 @@ def main():
     allowed_conf = set(config.get("min_confidence", []))
     allowed_edges = set(config.get("min_edge_band", []))
     min_value_edge = float(config.get("min_value_edge", 0) or 0)
+    mlb_max_favorite_price = float(config.get("mlb_max_favorite_price", -150) or -150)
+    mlb_min_value_edge_favorite = float(config.get("mlb_min_value_edge_favorite", 0) or 0)
     email_to = config.get("email_to", "")
 
     if not EMAIL_SENDER.exists() or not email_to:
@@ -74,6 +76,13 @@ def main():
             best_book = None
         if value_edge is None or float(value_edge) < min_value_edge:
             continue
+        if c.get("sport") == "mlb" and best_odds is not None:
+            try:
+                best_odds_num = float(best_odds)
+            except Exception:
+                best_odds_num = None
+            if best_odds_num is not None and best_odds_num < 0 and best_odds_num < mlb_max_favorite_price and float(value_edge) < mlb_min_value_edge_favorite:
+                continue
         c = dict(c)
         c["value_edge"] = value_edge
         c["best_odds"] = best_odds

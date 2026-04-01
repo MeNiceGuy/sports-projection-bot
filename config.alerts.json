@@ -4,5 +4,7 @@
   "min_edge_band": ["strong"],
   "enabled_sports": ["nba", "mlb"],
   "subject_prefix": "Sports Bot Alert",
-  "min_value_edge": 5.0
+  "min_value_edge": 5.0,
+  "mlb_max_favorite_price": -150,
+  "mlb_min_value_edge_favorite": 7.0
 }
