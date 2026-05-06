@@ -1,816 +1,1540 @@
 {
-  "generated_at": "2026-03-31T20:28:30.692519",
+  "generated_at": "2026-05-06T23:34:35.541637+00:00",
   "active_sports": [
-    "nba",
-    "mlb"
+    "mlb",
+    "nba"
   ],
   "reports": {
-    "nba": {
-      "status": "ok",
-      "model": "nba_record_edge_v1",
-      "generated_at": "2026-03-31T20:29:19.885905",
-      "games": [
-        {
-          "game_id": "401810954",
-          "start_time": "3/31 - 7:00 PM EDT",
-          "matchup": "Phoenix Suns at Orlando Magic",
-          "home_record": "39-35",
-          "away_record": "42-33",
-          "simple_projection_lean": "No strong lean",
-          "record_edge_pct": -9.72,
-          "edge_band": "weak",
-          "confidence": "Low",
-          "home_recent_form": "1-4",
-          "away_recent_form": "3-2",
-          "home_ppg": 115.34,
-          "away_ppg": 112.92,
-          "home_rebounds": 43.16,
-          "away_rebounds": 43.21,
-          "home_turnovers": 13.34,
-          "away_turnovers": 13.35,
-          "home_weighted_score": 36.51,
-          "away_weighted_score": 46.23,
-          "home_injury_count": 5,
-          "away_injury_count": 3,
-          "home_injury_status": "live",
-          "away_injury_status": "live",
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "injury context",
-            "matchup edge"
-          ],
-          "note": "Projection now uses an early weighted-score model. Injury status: home=live, away=live."
-        },
-        {
-          "game_id": "401810955",
-          "start_time": "3/31 - 7:30 PM EDT",
-          "matchup": "Charlotte Hornets at Brooklyn Nets",
-          "home_record": "18-57",
-          "away_record": "39-36",
-          "simple_projection_lean": "Charlotte Hornets",
-          "record_edge_pct": -23.62,
-          "edge_band": "strong",
-          "confidence": "High",
-          "home_recent_form": "1-4",
-          "away_recent_form": "3-2",
-          "home_ppg": 106.31,
-          "away_ppg": 116.08,
-          "home_rebounds": 39.69,
-          "away_rebounds": 46.17,
-          "home_turnovers": 15.27,
-          "away_turnovers": 14.61,
-          "home_weighted_score": 25.29,
-          "away_weighted_score": 48.91,
-          "home_injury_count": 6,
-          "away_injury_count": 4,
-          "home_injury_status": "live",
-          "away_injury_status": "live",
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "injury context",
-            "matchup edge"
-          ],
-          "note": "Projection now uses an early weighted-score model. Injury status: home=live, away=live."
-        },
-        {
-          "game_id": "401810956",
-          "start_time": "3/31 - 8:00 PM EDT",
-          "matchup": "Toronto Raptors at Detroit Pistons",
-          "home_record": "54-21",
-          "away_record": "42-32",
-          "simple_projection_lean": "No strong lean",
-          "record_edge_pct": 8.81,
-          "edge_band": "weak",
-          "confidence": "Low",
-          "home_recent_form": "3-2",
-          "away_recent_form": "3-2",
-          "home_ppg": 117.41,
-          "away_ppg": 114.32,
-          "home_rebounds": 45.75,
-          "away_rebounds": 42.32,
-          "home_turnovers": 14.15,
-          "away_turnovers": 12.96,
-          "home_weighted_score": 51.78,
-          "away_weighted_score": 42.97,
-          "home_injury_count": 11,
-          "away_injury_count": 9,
-          "home_injury_status": "live",
-          "away_injury_status": "live",
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "injury context",
-            "matchup edge"
-          ],
-          "note": "Projection now uses an early weighted-score model. Injury status: home=live, away=live."
-        },
-        {
-          "game_id": "401810957",
-          "start_time": "3/31 - 8:00 PM EDT",
-          "matchup": "New York Knicks at Houston Rockets",
-          "home_record": "45-29",
-          "away_record": "48-27",
-          "simple_projection_lean": "No strong lean",
-          "record_edge_pct": -5.54,
-          "edge_band": "weak",
-          "confidence": "Low",
-          "home_recent_form": "3-2",
-          "away_recent_form": "3-2",
-          "home_ppg": 114.41,
-          "away_ppg": 116.81,
-          "home_rebounds": 48.26,
-          "away_rebounds": 45.91,
-          "home_turnovers": 14.69,
-          "away_turnovers": 12.97,
-          "home_weighted_score": 48.21,
-          "away_weighted_score": 53.75,
-          "home_injury_count": 4,
-          "away_injury_count": 0,
-          "home_injury_status": "live",
-          "away_injury_status": "unknown_team",
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "injury context",
-            "matchup edge"
-          ],
-          "note": "Projection now uses an early weighted-score model. Injury status: home=live, away=unknown_team."
-        },
-        {
-          "game_id": "401858694",
-          "start_time": "3/31 - 8:00 PM EDT",
-          "matchup": "Dallas Mavericks at Milwaukee Bucks",
-          "home_record": "29-45",
-          "away_record": "24-51",
-          "simple_projection_lean": "No strong lean",
-          "record_edge_pct": -1.7,
-          "edge_band": "weak",
-          "confidence": "Low",
-          "home_recent_form": "1-4",
-          "away_recent_form": "1-4",
-          "home_ppg": 110.43,
-          "away_ppg": 113.59,
-          "home_rebounds": 40.51,
-          "away_rebounds": 44.64,
-          "home_turnovers": 14.27,
-          "away_turnovers": 14.29,
-          "home_weighted_score": 30.77,
-          "away_weighted_score": 32.47,
-          "home_injury_count": 7,
-          "away_injury_count": 10,
-          "home_injury_status": "live",
-          "away_injury_status": "live",
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "injury context",
-            "matchup edge"
-          ],
-          "note": "Projection now uses an early weighted-score model. Injury status: home=live, away=live."
-        },
-        {
-          "game_id": "401810958",
-          "start_time": "3/31 - 10:30 PM EDT",
-          "matchup": "Cleveland Cavaliers at Los Angeles Lakers",
-          "home_record": "49-26",
-          "away_record": "47-28",
-          "simple_projection_lean": "No strong lean",
-          "record_edge_pct": 2.82,
-          "edge_band": "weak",
-          "confidence": "Low",
-          "home_recent_form": "4-1",
-          "away_recent_form": "4-1",
-          "home_ppg": 116.68,
-          "away_ppg": 119.43,
-          "home_rebounds": 41.09,
-          "away_rebounds": 44.37,
-          "home_turnovers": 13.73,
-          "away_turnovers": 13.24,
-          "home_weighted_score": 56.31,
-          "away_weighted_score": 53.49,
-          "home_injury_count": 2,
-          "away_injury_count": 6,
-          "home_injury_status": "live",
-          "away_injury_status": "live",
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "injury context",
-            "matchup edge"
-          ],
-          "note": "Projection now uses an early weighted-score model. Injury status: home=live, away=live."
-        },
-        {
-          "game_id": "401810959",
-          "start_time": "3/31 - 11:00 PM EDT",
-          "matchup": "Portland Trail Blazers at LA Clippers",
-          "home_record": "39-36",
-          "away_record": "38-38",
-          "simple_projection_lean": "LA Clippers",
-          "record_edge_pct": 13.48,
-          "edge_band": "moderate",
-          "confidence": "Medium",
-          "home_recent_form": "5-0",
-          "away_recent_form": "3-2",
-          "home_ppg": 114.0,
-          "away_ppg": 115.34,
-          "home_rebounds": 40.71,
-          "away_rebounds": 46.11,
-          "home_turnovers": 13.6,
-          "away_turnovers": 16.68,
-          "home_weighted_score": 57.44,
-          "away_weighted_score": 43.96,
-          "home_injury_count": 3,
-          "away_injury_count": 5,
-          "home_injury_status": "live",
-          "away_injury_status": "live",
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "injury context",
-            "matchup edge"
-          ],
-          "note": "Projection now uses an early weighted-score model. Injury status: home=live, away=live."
-        }
-      ],
-      "note": "NBA live data is connected. This is an early projection layer, not a finished betting model."
-    },
     "mlb": {
       "status": "ok",
-      "model": "mlb_record_edge_v1",
-      "generated_at": "2026-03-31T20:30:59.501991",
+      "model": "market_consensus_projection_v1",
+      "generated_at": "2026-05-06T23:34:35.541637+00:00",
       "games": [
         {
-          "game_id": "401814754",
-          "start_time": "3/31 - 6:35 PM EDT",
-          "matchup": "Texas Rangers at Baltimore Orioles",
-          "home_record": "2-2",
-          "away_record": "3-1",
-          "simple_projection_lean": "No strong lean",
-          "record_edge_pct": -7.96,
-          "edge_band": "weak",
+          "sport": "mlb",
+          "game_id": "8379550b6a949466b56d6ddffad2b2fe",
+          "matchup": "Athletics at Philadelphia Phillies",
+          "away_team": "Athletics",
+          "home_team": "Philadelphia Phillies",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "Athletics",
+              "side_b": "Philadelphia Phillies",
+              "fair_a": 0.5074246924056003,
+              "fair_b": 0.4925753075943997
+            },
+            {
+              "book": "MyBookie.ag",
+              "side_a": "Athletics",
+              "side_b": "Philadelphia Phillies",
+              "fair_a": 0.5715249662618084,
+              "fair_b": 0.42847503373819157
+            },
+            {
+              "book": "DraftKings",
+              "side_a": "Athletics",
+              "side_b": "Philadelphia Phillies",
+              "fair_a": 0.5164392569455861,
+              "fair_b": 0.483560743054414
+            },
+            {
+              "book": "Bovada",
+              "side_a": "Athletics",
+              "side_b": "Philadelphia Phillies",
+              "fair_a": 0.554140127388535,
+              "fair_b": 0.4458598726114649
+            },
+            {
+              "book": "BetRivers",
+              "side_a": "Athletics",
+              "side_b": "Philadelphia Phillies",
+              "fair_a": 0.5502357635110628,
+              "fair_b": 0.44976423648893726
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "Athletics",
+              "side_b": "Philadelphia Phillies",
+              "fair_a": 0.5157232704402516,
+              "fair_b": 0.48427672955974843
+            }
+          ],
+          "simple_projection_lean": "Athletics",
+          "lean": "Athletics",
+          "model_gap": 1.5,
+          "model_probability": 0.5209,
+          "model_prob_home": 0.4791,
+          "model_prob_away": 0.5209,
+          "market_prob_home": 0.4641,
+          "market_prob_away": 0.5359,
           "confidence": "Low",
-          "home_recent_form": "0-0",
-          "away_recent_form": "0-0",
-          "home_probable_pitcher": "Zach Eflin",
-          "away_probable_pitcher": "Jacob deGrom",
-          "home_starter_quality_source": "season_2025",
-          "away_starter_quality_source": "season_2025",
-          "home_ops": 0.0,
-          "away_ops": 0.0,
-          "home_obp": 0.0,
-          "away_obp": 0.0,
-          "home_slg": 0.0,
-          "away_slg": 0.0,
-          "home_era": 99.0,
-          "away_era": 99.0,
-          "home_whip": 9.0,
-          "away_whip": 9.0,
-          "home_weighted_score": 42.34,
-          "away_weighted_score": 50.3,
-          "home_bullpen_quality": 40.0,
-          "away_bullpen_quality": 40.0,
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "starter quality",
-            "bullpen quality",
-            "matchup edge"
-          ],
-          "note": "Projection now uses an upgraded weighted-score model with probable starter quality and bullpen quality inputs. Bullpen freshness is still not modeled yet."
-        },
-        {
-          "game_id": "401814751",
-          "start_time": "3/31 - 6:40 PM EDT",
-          "matchup": "Chicago White Sox at Miami Marlins",
-          "home_record": "3-1",
-          "away_record": "1-3",
-          "simple_projection_lean": "Miami Marlins",
-          "record_edge_pct": 15.63,
-          "edge_band": "moderate",
-          "confidence": "Medium",
-          "home_recent_form": "0-0",
-          "away_recent_form": "0-0",
-          "home_probable_pitcher": "Janson Junk",
-          "away_probable_pitcher": "Erick Fedde",
-          "home_starter_quality_source": "season_2025",
-          "away_starter_quality_source": "season_2025",
-          "home_ops": 0.0,
-          "away_ops": 0.0,
-          "home_obp": 0.0,
-          "away_obp": 0.0,
-          "home_slg": 0.0,
-          "away_slg": 0.0,
-          "home_era": 99.0,
-          "away_era": 99.0,
-          "home_whip": 9.0,
-          "away_whip": 9.0,
-          "home_weighted_score": 50.76,
-          "away_weighted_score": 35.13,
-          "home_bullpen_quality": 40.0,
-          "away_bullpen_quality": 40.0,
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "starter quality",
-            "bullpen quality",
-            "matchup edge"
-          ],
-          "note": "Projection now uses an upgraded weighted-score model with probable starter quality and bullpen quality inputs. Bullpen freshness is still not modeled yet."
-        },
-        {
-          "game_id": "401814753",
-          "start_time": "3/31 - 6:40 PM EDT",
-          "matchup": "Pittsburgh Pirates at Cincinnati Reds",
-          "home_record": "3-1",
-          "away_record": "1-3",
-          "simple_projection_lean": "No strong lean",
-          "record_edge_pct": 6.79,
           "edge_band": "weak",
-          "confidence": "Low",
-          "home_recent_form": "0-0",
-          "away_recent_form": "0-0",
-          "home_probable_pitcher": "Brandon Williamson",
-          "away_probable_pitcher": "Bubba Chandler",
-          "home_starter_quality_source": "career",
-          "away_starter_quality_source": "season_2025",
-          "home_ops": 0.0,
-          "away_ops": 0.0,
-          "home_obp": 0.0,
-          "away_obp": 0.0,
-          "home_slg": 0.0,
-          "away_slg": 0.0,
-          "home_era": 99.0,
-          "away_era": 99.0,
-          "home_whip": 9.0,
-          "away_whip": 9.0,
-          "home_weighted_score": 49.59,
-          "away_weighted_score": 42.8,
-          "home_bullpen_quality": 40.0,
-          "away_bullpen_quality": 40.0,
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "starter quality",
-            "bullpen quality",
-            "matchup edge"
-          ],
-          "note": "Projection now uses an upgraded weighted-score model with probable starter quality and bullpen quality inputs. Bullpen freshness is still not modeled yet."
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
         },
         {
-          "game_id": "401814755",
-          "start_time": "3/31 - 6:40 PM EDT",
-          "matchup": "Washington Nationals at Philadelphia Phillies",
-          "home_record": "1-3",
-          "away_record": "3-1",
+          "sport": "mlb",
+          "game_id": "7dd3ac6bd80317fdd884080b8d94dd77",
+          "matchup": "Baltimore Orioles at Miami Marlins",
+          "away_team": "Baltimore Orioles",
+          "home_team": "Miami Marlins",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "Baltimore Orioles",
+              "side_b": "Miami Marlins",
+              "fair_a": 0.6134299307958478,
+              "fair_b": 0.3865700692041523
+            },
+            {
+              "book": "MyBookie.ag",
+              "side_a": "Baltimore Orioles",
+              "side_b": "Miami Marlins",
+              "fair_a": 0.4341138266962912,
+              "fair_b": 0.5658861733037088
+            },
+            {
+              "book": "DraftKings",
+              "side_a": "Baltimore Orioles",
+              "side_b": "Miami Marlins",
+              "fair_a": 0.5972171365800073,
+              "fair_b": 0.40278286341999264
+            },
+            {
+              "book": "Bovada",
+              "side_a": "Baltimore Orioles",
+              "side_b": "Miami Marlins",
+              "fair_a": 0.6090534979423868,
+              "fair_b": 0.39094650205761317
+            },
+            {
+              "book": "BetRivers",
+              "side_a": "Baltimore Orioles",
+              "side_b": "Miami Marlins",
+              "fair_a": 0.5887850467289719,
+              "fair_b": 0.41121495327102797
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "Baltimore Orioles",
+              "side_b": "Miami Marlins",
+              "fair_a": 0.5967139656460044,
+              "fair_b": 0.4032860343539955
+            }
+          ],
+          "simple_projection_lean": "Baltimore Orioles",
+          "lean": "Baltimore Orioles",
+          "model_gap": 1.5,
+          "model_probability": 0.5582,
+          "model_prob_home": 0.4418,
+          "model_prob_away": 0.5582,
+          "market_prob_home": 0.4268,
+          "market_prob_away": 0.5732,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
+        },
+        {
+          "sport": "mlb",
+          "game_id": "4a14bd2383b640b8cf105c59c99fa882",
+          "matchup": "Boston Red Sox at Detroit Tigers",
+          "away_team": "Boston Red Sox",
+          "home_team": "Detroit Tigers",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "Boston Red Sox",
+              "side_b": "Detroit Tigers",
+              "fair_a": 0.6955128205128205,
+              "fair_b": 0.30448717948717946
+            },
+            {
+              "book": "BetRivers",
+              "side_a": "Boston Red Sox",
+              "side_b": "Detroit Tigers",
+              "fair_a": 0.7017606899029823,
+              "fair_b": 0.2982393100970176
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "Boston Red Sox",
+              "side_b": "Detroit Tigers",
+              "fair_a": 0.6744186046511629,
+              "fair_b": 0.32558139534883723
+            },
+            {
+              "book": "DraftKings",
+              "side_a": "Boston Red Sox",
+              "side_b": "Detroit Tigers",
+              "fair_a": 0.686868686868687,
+              "fair_b": 0.31313131313131315
+            },
+            {
+              "book": "Bovada",
+              "side_a": "Boston Red Sox",
+              "side_b": "Detroit Tigers",
+              "fair_a": 0.6640316205533597,
+              "fair_b": 0.3359683794466403
+            },
+            {
+              "book": "MyBookie.ag",
+              "side_a": "Boston Red Sox",
+              "side_b": "Detroit Tigers",
+              "fair_a": 0.7065754465982516,
+              "fair_b": 0.2934245534017484
+            }
+          ],
+          "simple_projection_lean": "Boston Red Sox",
+          "lean": "Boston Red Sox",
+          "model_gap": 1.5,
+          "model_probability": 0.6732,
+          "model_prob_home": 0.3268,
+          "model_prob_away": 0.6732,
+          "market_prob_home": 0.3118,
+          "market_prob_away": 0.6882,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
+        },
+        {
+          "sport": "mlb",
+          "game_id": "50bf885c9e829f1de48161f3ec47e5dc",
+          "matchup": "Minnesota Twins at Washington Nationals",
+          "away_team": "Minnesota Twins",
+          "home_team": "Washington Nationals",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "Minnesota Twins",
+              "side_b": "Washington Nationals",
+              "fair_a": 0.5783762583344229,
+              "fair_b": 0.42162374166557726
+            },
+            {
+              "book": "MyBookie.ag",
+              "side_a": "Minnesota Twins",
+              "side_b": "Washington Nationals",
+              "fair_a": 0.5845974329054843,
+              "fair_b": 0.41540256709451573
+            },
+            {
+              "book": "DraftKings",
+              "side_a": "Minnesota Twins",
+              "side_b": "Washington Nationals",
+              "fair_a": 0.586198313680346,
+              "fair_b": 0.413801686319654
+            },
+            {
+              "book": "Bovada",
+              "side_a": "Minnesota Twins",
+              "side_b": "Washington Nationals",
+              "fair_a": 0.5633187772925764,
+              "fair_b": 0.43668122270742354
+            },
+            {
+              "book": "BetRivers",
+              "side_a": "Minnesota Twins",
+              "side_b": "Washington Nationals",
+              "fair_a": 0.5944380069524914,
+              "fair_b": 0.4055619930475087
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "Minnesota Twins",
+              "side_b": "Washington Nationals",
+              "fair_a": 0.5967139656460044,
+              "fair_b": 0.4032860343539955
+            }
+          ],
+          "simple_projection_lean": "Minnesota Twins",
+          "lean": "Minnesota Twins",
+          "model_gap": 1.5,
+          "model_probability": 0.5689,
+          "model_prob_home": 0.4311,
+          "model_prob_away": 0.5689,
+          "market_prob_home": 0.4161,
+          "market_prob_away": 0.5839,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
+        },
+        {
+          "sport": "mlb",
+          "game_id": "895be7e0cbc697eeffc1f4c9fb60613b",
+          "matchup": "Texas Rangers at New York Yankees",
+          "away_team": "Texas Rangers",
+          "home_team": "New York Yankees",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "New York Yankees",
+              "side_b": "Texas Rangers",
+              "fair_a": 0.4896023956080519,
+              "fair_b": 0.510397604391948
+            },
+            {
+              "book": "MyBookie.ag",
+              "side_a": "New York Yankees",
+              "side_b": "Texas Rangers",
+              "fair_a": 0.5203045685279188,
+              "fair_b": 0.4796954314720812
+            },
+            {
+              "book": "DraftKings",
+              "side_a": "New York Yankees",
+              "side_b": "Texas Rangers",
+              "fair_a": 0.4948402542722694,
+              "fair_b": 0.5051597457277305
+            },
+            {
+              "book": "Bovada",
+              "side_a": "New York Yankees",
+              "side_b": "Texas Rangers",
+              "fair_a": 0.48987854251012153,
+              "fair_b": 0.5101214574898786
+            },
+            {
+              "book": "BetRivers",
+              "side_a": "New York Yankees",
+              "side_b": "Texas Rangers",
+              "fair_a": 0.4911889097744361,
+              "fair_b": 0.5088110902255639
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "New York Yankees",
+              "side_b": "Texas Rangers",
+              "fair_a": 0.5,
+              "fair_b": 0.5
+            }
+          ],
+          "simple_projection_lean": "New York Yankees",
+          "lean": "New York Yankees",
+          "model_gap": 1.5,
+          "model_probability": 0.5126,
+          "model_prob_home": 0.5126,
+          "model_prob_away": 0.4874,
+          "market_prob_home": 0.4976,
+          "market_prob_away": 0.5024,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
+        },
+        {
+          "sport": "mlb",
+          "game_id": "a524558d8c67f4e0116d63123b26e426",
+          "matchup": "Cincinnati Reds at Chicago Cubs",
+          "away_team": "Cincinnati Reds",
+          "home_team": "Chicago Cubs",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "Chicago Cubs",
+              "side_b": "Cincinnati Reds",
+              "fair_a": 0.6027039848197344,
+              "fair_b": 0.3972960151802657
+            },
+            {
+              "book": "BetOnline.ag",
+              "side_a": "Chicago Cubs",
+              "side_b": "Cincinnati Reds",
+              "fair_a": 0.6079011615003329,
+              "fair_b": 0.3920988384996671
+            },
+            {
+              "book": "LowVig.ag",
+              "side_a": "Chicago Cubs",
+              "side_b": "Cincinnati Reds",
+              "fair_a": 0.6079011615003329,
+              "fair_b": 0.3920988384996671
+            },
+            {
+              "book": "MyBookie.ag",
+              "side_a": "Chicago Cubs",
+              "side_b": "Cincinnati Reds",
+              "fair_a": 0.6032331337207587,
+              "fair_b": 0.39676686627924124
+            },
+            {
+              "book": "DraftKings",
+              "side_a": "Chicago Cubs",
+              "side_b": "Cincinnati Reds",
+              "fair_a": 0.6012451823302698,
+              "fair_b": 0.39875481766973025
+            },
+            {
+              "book": "BetUS",
+              "side_a": "Chicago Cubs",
+              "side_b": "Cincinnati Reds",
+              "fair_a": 0.597688651402653,
+              "fair_b": 0.4023113485973469
+            },
+            {
+              "book": "BetRivers",
+              "side_a": "Chicago Cubs",
+              "side_b": "Cincinnati Reds",
+              "fair_a": 0.6082646264371879,
+              "fair_b": 0.39173537356281196
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "Chicago Cubs",
+              "side_b": "Cincinnati Reds",
+              "fair_a": 0.6092362344582594,
+              "fair_b": 0.39076376554174075
+            },
+            {
+              "book": "Bovada",
+              "side_a": "Chicago Cubs",
+              "side_b": "Cincinnati Reds",
+              "fair_a": 0.5965276928719893,
+              "fair_b": 0.4034723071280108
+            }
+          ],
+          "simple_projection_lean": "Chicago Cubs",
+          "lean": "Chicago Cubs",
+          "model_gap": 1.5,
+          "model_probability": 0.6189,
+          "model_prob_home": 0.6189,
+          "model_prob_away": 0.3811,
+          "market_prob_home": 0.6039,
+          "market_prob_away": 0.3961,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
+        },
+        {
+          "sport": "mlb",
+          "game_id": "30d2a93f1ca79f37c19806e74ed1cdab",
+          "matchup": "Cleveland Guardians at Kansas City Royals",
+          "away_team": "Cleveland Guardians",
+          "home_team": "Kansas City Royals",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "Cleveland Guardians",
+              "side_b": "Kansas City Royals",
+              "fair_a": 0.4470426409903714,
+              "fair_b": 0.5529573590096286
+            },
+            {
+              "book": "BetOnline.ag",
+              "side_a": "Cleveland Guardians",
+              "side_b": "Kansas City Royals",
+              "fair_a": 0.43762053107847504,
+              "fair_b": 0.562379468921525
+            },
+            {
+              "book": "LowVig.ag",
+              "side_a": "Cleveland Guardians",
+              "side_b": "Kansas City Royals",
+              "fair_a": 0.43762053107847504,
+              "fair_b": 0.562379468921525
+            },
+            {
+              "book": "MyBookie.ag",
+              "side_a": "Cleveland Guardians",
+              "side_b": "Kansas City Royals",
+              "fair_a": 0.4372278664731495,
+              "fair_b": 0.5627721335268505
+            },
+            {
+              "book": "DraftKings",
+              "side_a": "Cleveland Guardians",
+              "side_b": "Kansas City Royals",
+              "fair_a": 0.44060917417774287,
+              "fair_b": 0.5593908258222572
+            },
+            {
+              "book": "BetUS",
+              "side_a": "Cleveland Guardians",
+              "side_b": "Kansas City Royals",
+              "fair_a": 0.43949878436506445,
+              "fair_b": 0.5605012156349355
+            },
+            {
+              "book": "Bovada",
+              "side_a": "Cleveland Guardians",
+              "side_b": "Kansas City Royals",
+              "fair_a": 0.43579626972740315,
+              "fair_b": 0.5642037302725968
+            },
+            {
+              "book": "BetRivers",
+              "side_a": "Cleveland Guardians",
+              "side_b": "Kansas City Royals",
+              "fair_a": 0.4403131115459883,
+              "fair_b": 0.5596868884540117
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "Cleveland Guardians",
+              "side_b": "Kansas City Royals",
+              "fair_a": 0.447405997144217,
+              "fair_b": 0.552594002855783
+            }
+          ],
+          "simple_projection_lean": "Kansas City Royals",
+          "lean": "Kansas City Royals",
+          "model_gap": 1.5,
+          "model_probability": 0.5747,
+          "model_prob_home": 0.5747,
+          "model_prob_away": 0.4253,
+          "market_prob_home": 0.5597,
+          "market_prob_away": 0.4403,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
+        },
+        {
+          "sport": "mlb",
+          "game_id": "3d9ff7b926b247cb73447ca5c7a7428e",
+          "matchup": "New York Mets at Colorado Rockies",
+          "away_team": "New York Mets",
+          "home_team": "Colorado Rockies",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "Colorado Rockies",
+              "side_b": "New York Mets",
+              "fair_a": 0.4110112789141655,
+              "fair_b": 0.5889887210858344
+            },
+            {
+              "book": "BetRivers",
+              "side_a": "Colorado Rockies",
+              "side_b": "New York Mets",
+              "fair_a": 0.3967003694898748,
+              "fair_b": 0.6032996305101251
+            },
+            {
+              "book": "BetOnline.ag",
+              "side_a": "Colorado Rockies",
+              "side_b": "New York Mets",
+              "fair_a": 0.4172836182527931,
+              "fair_b": 0.582716381747207
+            },
+            {
+              "book": "LowVig.ag",
+              "side_a": "Colorado Rockies",
+              "side_b": "New York Mets",
+              "fair_a": 0.4172836182527931,
+              "fair_b": 0.582716381747207
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "Colorado Rockies",
+              "side_b": "New York Mets",
+              "fair_a": 0.4088050314465409,
+              "fair_b": 0.5911949685534592
+            },
+            {
+              "book": "DraftKings",
+              "side_a": "Colorado Rockies",
+              "side_b": "New York Mets",
+              "fair_a": 0.4102934934683162,
+              "fair_b": 0.5897065065316837
+            },
+            {
+              "book": "Bovada",
+              "side_a": "Colorado Rockies",
+              "side_b": "New York Mets",
+              "fair_a": 0.4147368760792034,
+              "fair_b": 0.5852631239207966
+            },
+            {
+              "book": "MyBookie.ag",
+              "side_a": "Colorado Rockies",
+              "side_b": "New York Mets",
+              "fair_a": 0.4104205622286312,
+              "fair_b": 0.5895794377713689
+            },
+            {
+              "book": "BetUS",
+              "side_a": "Colorado Rockies",
+              "side_b": "New York Mets",
+              "fair_a": 0.415973377703827,
+              "fair_b": 0.5840266222961731
+            }
+          ],
+          "simple_projection_lean": "New York Mets",
+          "lean": "New York Mets",
+          "model_gap": 1.5,
+          "model_probability": 0.5736,
+          "model_prob_home": 0.4264,
+          "model_prob_away": 0.5736,
+          "market_prob_home": 0.4114,
+          "market_prob_away": 0.5886,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
+        },
+        {
+          "sport": "mlb",
+          "game_id": "de899b461227924fc52c2f9492e9fe56",
+          "matchup": "Pittsburgh Pirates at Arizona Diamondbacks",
+          "away_team": "Pittsburgh Pirates",
+          "home_team": "Arizona Diamondbacks",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "Arizona Diamondbacks",
+              "side_b": "Pittsburgh Pirates",
+              "fair_a": 0.4572564612326044,
+              "fair_b": 0.5427435387673957
+            },
+            {
+              "book": "BetOnline.ag",
+              "side_a": "Arizona Diamondbacks",
+              "side_b": "Pittsburgh Pirates",
+              "fair_a": 0.4630595302657377,
+              "fair_b": 0.5369404697342622
+            },
+            {
+              "book": "LowVig.ag",
+              "side_a": "Arizona Diamondbacks",
+              "side_b": "Pittsburgh Pirates",
+              "fair_a": 0.4630595302657377,
+              "fair_b": 0.5369404697342622
+            },
+            {
+              "book": "MyBookie.ag",
+              "side_a": "Arizona Diamondbacks",
+              "side_b": "Pittsburgh Pirates",
+              "fair_a": 0.4572564612326044,
+              "fair_b": 0.5427435387673957
+            },
+            {
+              "book": "DraftKings",
+              "side_a": "Arizona Diamondbacks",
+              "side_b": "Pittsburgh Pirates",
+              "fair_a": 0.4568008190911239,
+              "fair_b": 0.5431991809088762
+            },
+            {
+              "book": "BetRivers",
+              "side_a": "Arizona Diamondbacks",
+              "side_b": "Pittsburgh Pirates",
+              "fair_a": 0.4403131115459883,
+              "fair_b": 0.5596868884540117
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "Arizona Diamondbacks",
+              "side_b": "Pittsburgh Pirates",
+              "fair_a": 0.4572564612326044,
+              "fair_b": 0.5427435387673957
+            },
+            {
+              "book": "BetUS",
+              "side_a": "Arizona Diamondbacks",
+              "side_b": "Pittsburgh Pirates",
+              "fair_a": 0.46516522837297414,
+              "fair_b": 0.534834771627026
+            },
+            {
+              "book": "Bovada",
+              "side_a": "Arizona Diamondbacks",
+              "side_b": "Pittsburgh Pirates",
+              "fair_a": 0.4625121713729309,
+              "fair_b": 0.5374878286270691
+            }
+          ],
+          "simple_projection_lean": "Pittsburgh Pirates",
+          "lean": "Pittsburgh Pirates",
+          "model_gap": 1.5,
+          "model_probability": 0.5269,
+          "model_prob_home": 0.4731,
+          "model_prob_away": 0.5269,
+          "market_prob_home": 0.4581,
+          "market_prob_away": 0.5419,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
+        },
+        {
+          "sport": "mlb",
+          "game_id": "1c3063ee80bf14181773650f89724edd",
+          "matchup": "Texas Rangers at New York Yankees",
+          "away_team": "Texas Rangers",
+          "home_team": "New York Yankees",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "New York Yankees",
+              "side_b": "Texas Rangers",
+              "fair_a": 0.6274448928904066,
+              "fair_b": 0.3725551071095933
+            },
+            {
+              "book": "LowVig.ag",
+              "side_a": "New York Yankees",
+              "side_b": "Texas Rangers",
+              "fair_a": 0.6274614156466205,
+              "fair_b": 0.37253858435337944
+            },
+            {
+              "book": "BetOnline.ag",
+              "side_a": "New York Yankees",
+              "side_b": "Texas Rangers",
+              "fair_a": 0.6274614156466205,
+              "fair_b": 0.37253858435337944
+            },
+            {
+              "book": "DraftKings",
+              "side_a": "New York Yankees",
+              "side_b": "Texas Rangers",
+              "fair_a": 0.6308665846370188,
+              "fair_b": 0.3691334153629812
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "New York Yankees",
+              "side_b": "Texas Rangers",
+              "fair_a": 0.6385542168674698,
+              "fair_b": 0.3614457831325302
+            },
+            {
+              "book": "Bovada",
+              "side_a": "New York Yankees",
+              "side_b": "Texas Rangers",
+              "fair_a": 0.6360260888682611,
+              "fair_b": 0.363973911131739
+            }
+          ],
+          "simple_projection_lean": "New York Yankees",
+          "lean": "New York Yankees",
+          "model_gap": 0.0,
+          "model_probability": 0.6313,
+          "model_prob_home": 0.6313,
+          "model_prob_away": 0.3687,
+          "market_prob_home": 0.6313,
+          "market_prob_away": 0.3687,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
+        },
+        {
+          "sport": "mlb",
+          "game_id": "ba055e6ad1137117eef850d15d9c8c97",
+          "matchup": "Minnesota Twins at Washington Nationals",
+          "away_team": "Minnesota Twins",
+          "home_team": "Washington Nationals",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "Minnesota Twins",
+              "side_b": "Washington Nationals",
+              "fair_a": 0.5089094796863863,
+              "fair_b": 0.4910905203136137
+            },
+            {
+              "book": "BetOnline.ag",
+              "side_a": "Minnesota Twins",
+              "side_b": "Washington Nationals",
+              "fair_a": 0.5046466242274987,
+              "fair_b": 0.4953533757725013
+            },
+            {
+              "book": "LowVig.ag",
+              "side_a": "Minnesota Twins",
+              "side_b": "Washington Nationals",
+              "fair_a": 0.5046466242274987,
+              "fair_b": 0.4953533757725013
+            },
+            {
+              "book": "DraftKings",
+              "side_a": "Minnesota Twins",
+              "side_b": "Washington Nationals",
+              "fair_a": 0.5,
+              "fair_b": 0.5
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "Minnesota Twins",
+              "side_b": "Washington Nationals",
+              "fair_a": 0.5,
+              "fair_b": 0.5
+            },
+            {
+              "book": "Bovada",
+              "side_a": "Minnesota Twins",
+              "side_b": "Washington Nationals",
+              "fair_a": 0.5,
+              "fair_b": 0.5
+            }
+          ],
           "simple_projection_lean": "Washington Nationals",
-          "record_edge_pct": -13.43,
-          "edge_band": "moderate",
-          "confidence": "Medium",
-          "home_recent_form": "0-0",
-          "away_recent_form": "0-0",
-          "home_probable_pitcher": "Andrew Painter",
-          "away_probable_pitcher": "PJ Poulin",
-          "home_starter_quality_source": "fallback",
-          "away_starter_quality_source": "season_2026",
-          "home_ops": 0.0,
-          "away_ops": 0.0,
-          "home_obp": 0.0,
-          "away_obp": 0.0,
-          "home_slg": 0.0,
-          "away_slg": 0.0,
-          "home_era": 99.0,
-          "away_era": 99.0,
-          "home_whip": 9.0,
-          "away_whip": 9.0,
-          "home_weighted_score": 33.95,
-          "away_weighted_score": 47.38,
-          "home_bullpen_quality": 40.0,
-          "away_bullpen_quality": 40.0,
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "starter quality",
-            "bullpen quality",
-            "matchup edge"
-          ],
-          "note": "Projection now uses an upgraded weighted-score model with probable starter quality and bullpen quality inputs. Bullpen freshness is still not modeled yet."
-        },
-        {
-          "game_id": "401814752",
-          "start_time": "3/31 - 7:07 PM EDT",
-          "matchup": "Colorado Rockies at Toronto Blue Jays",
-          "home_record": "3-1",
-          "away_record": "1-3",
-          "simple_projection_lean": "Toronto Blue Jays",
-          "record_edge_pct": 11.27,
-          "edge_band": "moderate",
-          "confidence": "Medium",
-          "home_recent_form": "0-0",
-          "away_recent_form": "0-0",
-          "home_probable_pitcher": "Max Scherzer",
-          "away_probable_pitcher": "Ryan Feltner",
-          "home_starter_quality_source": "season_2025",
-          "away_starter_quality_source": "season_2025",
-          "home_ops": 0.0,
-          "away_ops": 0.0,
-          "home_obp": 0.0,
-          "away_obp": 0.0,
-          "home_slg": 0.0,
-          "away_slg": 0.0,
-          "home_era": 99.0,
-          "away_era": 99.0,
-          "home_whip": 9.0,
-          "away_whip": 9.0,
-          "home_weighted_score": 48.74,
-          "away_weighted_score": 37.47,
-          "home_bullpen_quality": 40.0,
-          "away_bullpen_quality": 40.0,
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "starter quality",
-            "bullpen quality",
-            "matchup edge"
-          ],
-          "note": "Projection now uses an upgraded weighted-score model with probable starter quality and bullpen quality inputs. Bullpen freshness is still not modeled yet."
-        },
-        {
-          "game_id": "401814750",
-          "start_time": "3/31 - 7:15 PM EDT",
-          "matchup": "Athletics at Atlanta Braves",
-          "home_record": "3-1",
-          "away_record": "0-4",
-          "simple_projection_lean": "Atlanta Braves",
-          "record_edge_pct": 17.36,
-          "edge_band": "moderate",
-          "confidence": "Medium",
-          "home_recent_form": "0-0",
-          "away_recent_form": "0-0",
-          "home_probable_pitcher": "Jos\u00e9 Suarez",
-          "away_probable_pitcher": "Aaron Civale",
-          "home_starter_quality_source": "season_2025",
-          "away_starter_quality_source": "season_2025",
-          "home_ops": 0.0,
-          "away_ops": 0.0,
-          "home_obp": 0.0,
-          "away_obp": 0.0,
-          "home_slg": 0.0,
-          "away_slg": 0.0,
-          "home_era": 99.0,
-          "away_era": 99.0,
-          "home_whip": 9.0,
-          "away_whip": 9.0,
-          "home_weighted_score": 52.7,
-          "away_weighted_score": 35.34,
-          "home_bullpen_quality": 40.0,
-          "away_bullpen_quality": 40.0,
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "starter quality",
-            "bullpen quality",
-            "matchup edge"
-          ],
-          "note": "Projection now uses an upgraded weighted-score model with probable starter quality and bullpen quality inputs. Bullpen freshness is still not modeled yet."
-        },
-        {
-          "game_id": "401814756",
-          "start_time": "3/31 - 7:40 PM EDT",
-          "matchup": "Los Angeles Angels at Chicago Cubs",
-          "home_record": "2-2",
-          "away_record": "2-3",
-          "simple_projection_lean": "No strong lean",
-          "record_edge_pct": 3.22,
-          "edge_band": "weak",
+          "lean": "Washington Nationals",
+          "model_gap": 1.5,
+          "model_probability": 0.512,
+          "model_prob_home": 0.512,
+          "model_prob_away": 0.488,
+          "market_prob_home": 0.497,
+          "market_prob_away": 0.503,
           "confidence": "Low",
-          "home_recent_form": "0-0",
-          "away_recent_form": "0-0",
-          "home_probable_pitcher": "Jameson Taillon",
-          "away_probable_pitcher": "Jos\u00e9 Soriano",
-          "home_starter_quality_source": "season_2025",
-          "away_starter_quality_source": "season_2026",
-          "home_ops": 0.0,
-          "away_ops": 0.0,
-          "home_obp": 0.0,
-          "away_obp": 0.0,
-          "home_slg": 0.0,
-          "away_slg": 0.0,
-          "home_era": 99.0,
-          "away_era": 99.0,
-          "home_whip": 9.0,
-          "away_whip": 9.0,
-          "home_weighted_score": 48.27,
-          "away_weighted_score": 45.05,
-          "home_bullpen_quality": 40.0,
-          "away_bullpen_quality": 40.0,
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "starter quality",
-            "bullpen quality",
-            "matchup edge"
-          ],
-          "note": "Projection now uses an upgraded weighted-score model with probable starter quality and bullpen quality inputs. Bullpen freshness is still not modeled yet."
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
         },
         {
-          "game_id": "401814759",
-          "start_time": "3/31 - 7:40 PM EDT",
-          "matchup": "Tampa Bay Rays at Milwaukee Brewers",
-          "home_record": "3-1",
-          "away_record": "2-2",
-          "simple_projection_lean": "No strong lean",
-          "record_edge_pct": 6.15,
-          "edge_band": "weak",
-          "confidence": "Low",
-          "home_recent_form": "0-0",
-          "away_recent_form": "0-0",
-          "home_probable_pitcher": "Brandon Woodruff",
-          "away_probable_pitcher": "Shane McClanahan",
-          "home_starter_quality_source": "season_2025",
-          "away_starter_quality_source": "career",
-          "home_ops": 0.0,
-          "away_ops": 0.0,
-          "home_obp": 0.0,
-          "away_obp": 0.0,
-          "home_slg": 0.0,
-          "away_slg": 0.0,
-          "home_era": 99.0,
-          "away_era": 99.0,
-          "home_whip": 9.0,
-          "away_whip": 9.0,
-          "home_weighted_score": 52.7,
-          "away_weighted_score": 46.55,
-          "home_bullpen_quality": 40.0,
-          "away_bullpen_quality": 40.0,
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "starter quality",
-            "bullpen quality",
-            "matchup edge"
+          "sport": "mlb",
+          "game_id": "6ea660d6d55e2a5168fd92eb01e16b87",
+          "matchup": "Cleveland Guardians at Kansas City Royals",
+          "away_team": "Cleveland Guardians",
+          "home_team": "Kansas City Royals",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "Cleveland Guardians",
+              "side_b": "Kansas City Royals",
+              "fair_a": 0.42928940388105546,
+              "fair_b": 0.5707105961189446
+            },
+            {
+              "book": "BetOnline.ag",
+              "side_a": "Cleveland Guardians",
+              "side_b": "Kansas City Royals",
+              "fair_a": 0.4357578877693609,
+              "fair_b": 0.5642421122306391
+            },
+            {
+              "book": "LowVig.ag",
+              "side_a": "Cleveland Guardians",
+              "side_b": "Kansas City Royals",
+              "fair_a": 0.4357578877693609,
+              "fair_b": 0.5642421122306391
+            },
+            {
+              "book": "DraftKings",
+              "side_a": "Cleveland Guardians",
+              "side_b": "Kansas City Royals",
+              "fair_a": 0.43691677005232216,
+              "fair_b": 0.5630832299476779
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "Cleveland Guardians",
+              "side_b": "Kansas City Royals",
+              "fair_a": 0.43439716312056736,
+              "fair_b": 0.5656028368794326
+            },
+            {
+              "book": "Bovada",
+              "side_a": "Cleveland Guardians",
+              "side_b": "Kansas City Royals",
+              "fair_a": 0.43762884733625085,
+              "fair_b": 0.5623711526637492
+            }
           ],
-          "note": "Projection now uses an upgraded weighted-score model with probable starter quality and bullpen quality inputs. Bullpen freshness is still not modeled yet."
+          "simple_projection_lean": "Kansas City Royals",
+          "lean": "Kansas City Royals",
+          "model_gap": 1.5,
+          "model_probability": 0.58,
+          "model_prob_home": 0.58,
+          "model_prob_away": 0.42,
+          "market_prob_home": 0.565,
+          "market_prob_away": 0.435,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
         },
         {
-          "game_id": "401814758",
-          "start_time": "3/31 - 7:45 PM EDT",
-          "matchup": "New York Mets at St. Louis Cardinals",
-          "home_record": "2-2",
-          "away_record": "3-1",
-          "simple_projection_lean": "No strong lean",
-          "record_edge_pct": -6.37,
-          "edge_band": "weak",
-          "confidence": "Low",
-          "home_recent_form": "0-0",
-          "away_recent_form": "0-0",
-          "home_probable_pitcher": "Andre Pallante",
-          "away_probable_pitcher": "Kodai Senga",
-          "home_starter_quality_source": "season_2025",
-          "away_starter_quality_source": "season_2025",
-          "home_ops": 0.0,
-          "away_ops": 0.0,
-          "home_obp": 0.0,
-          "away_obp": 0.0,
-          "home_slg": 0.0,
-          "away_slg": 0.0,
-          "home_era": 99.0,
-          "away_era": 99.0,
-          "home_whip": 9.0,
-          "away_whip": 9.0,
-          "home_weighted_score": 42.6,
-          "away_weighted_score": 48.97,
-          "home_bullpen_quality": 40.0,
-          "away_bullpen_quality": 40.0,
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "starter quality",
-            "bullpen quality",
-            "matchup edge"
+          "sport": "mlb",
+          "game_id": "d995ce8d9df4c182c1ecade37bac292d",
+          "matchup": "Cincinnati Reds at Chicago Cubs",
+          "away_team": "Cincinnati Reds",
+          "home_team": "Chicago Cubs",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "Chicago Cubs",
+              "side_b": "Cincinnati Reds",
+              "fair_a": 0.6464178066311151,
+              "fair_b": 0.35358219336888475
+            },
+            {
+              "book": "BetOnline.ag",
+              "side_a": "Chicago Cubs",
+              "side_b": "Cincinnati Reds",
+              "fair_a": 0.6274614156466205,
+              "fair_b": 0.37253858435337944
+            },
+            {
+              "book": "LowVig.ag",
+              "side_a": "Chicago Cubs",
+              "side_b": "Cincinnati Reds",
+              "fair_a": 0.6274614156466205,
+              "fair_b": 0.37253858435337944
+            },
+            {
+              "book": "Bovada",
+              "side_a": "Chicago Cubs",
+              "side_b": "Cincinnati Reds",
+              "fair_a": 0.6334637673980881,
+              "fair_b": 0.3665362326019119
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "Chicago Cubs",
+              "side_b": "Cincinnati Reds",
+              "fair_a": 0.6385542168674698,
+              "fair_b": 0.3614457831325302
+            }
           ],
-          "note": "Projection now uses an upgraded weighted-score model with probable starter quality and bullpen quality inputs. Bullpen freshness is still not modeled yet."
+          "simple_projection_lean": "Chicago Cubs",
+          "lean": "Chicago Cubs",
+          "model_gap": 0.0,
+          "model_probability": 0.6347,
+          "model_prob_home": 0.6347,
+          "model_prob_away": 0.3653,
+          "market_prob_home": 0.6347,
+          "market_prob_away": 0.3653,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
         },
         {
-          "game_id": "401814757",
-          "start_time": "3/31 - 8:10 PM EDT",
-          "matchup": "Boston Red Sox at Houston Astros",
-          "home_record": "3-2",
-          "away_record": "1-3",
-          "simple_projection_lean": "No strong lean",
-          "record_edge_pct": 9.42,
-          "edge_band": "weak",
-          "confidence": "Low",
-          "home_recent_form": "0-0",
-          "away_recent_form": "0-0",
-          "home_probable_pitcher": "Hunter Brown",
-          "away_probable_pitcher": "Brayan Bello",
-          "home_starter_quality_source": "season_2026",
-          "away_starter_quality_source": "season_2025",
-          "home_ops": 0.0,
-          "away_ops": 0.0,
-          "home_obp": 0.0,
-          "away_obp": 0.0,
-          "home_slg": 0.0,
-          "away_slg": 0.0,
-          "home_era": 99.0,
-          "away_era": 99.0,
-          "home_whip": 9.0,
-          "away_whip": 9.0,
-          "home_weighted_score": 50.45,
-          "away_weighted_score": 41.03,
-          "home_bullpen_quality": 40.0,
-          "away_bullpen_quality": 40.0,
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "starter quality",
-            "bullpen quality",
-            "matchup edge"
+          "sport": "mlb",
+          "game_id": "db06eeec096bc60532c3b1aa5d4235a0",
+          "matchup": "New York Mets at Colorado Rockies",
+          "away_team": "New York Mets",
+          "home_team": "Colorado Rockies",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "Colorado Rockies",
+              "side_b": "New York Mets",
+              "fair_a": 0.4328697133125177,
+              "fair_b": 0.5671302866874822
+            },
+            {
+              "book": "BetOnline.ag",
+              "side_a": "Colorado Rockies",
+              "side_b": "New York Mets",
+              "fair_a": 0.43026174256005734,
+              "fair_b": 0.5697382574399427
+            },
+            {
+              "book": "LowVig.ag",
+              "side_a": "Colorado Rockies",
+              "side_b": "New York Mets",
+              "fair_a": 0.43026174256005734,
+              "fair_b": 0.5697382574399427
+            },
+            {
+              "book": "DraftKings",
+              "side_a": "Colorado Rockies",
+              "side_b": "New York Mets",
+              "fair_a": 0.42837235708018645,
+              "fair_b": 0.5716276429198135
+            },
+            {
+              "book": "Bovada",
+              "side_a": "Colorado Rockies",
+              "side_b": "New York Mets",
+              "fair_a": 0.42444821731748733,
+              "fair_b": 0.5755517826825127
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "Colorado Rockies",
+              "side_b": "New York Mets",
+              "fair_a": 0.4255319148936171,
+              "fair_b": 0.574468085106383
+            }
           ],
-          "note": "Projection now uses an upgraded weighted-score model with probable starter quality and bullpen quality inputs. Bullpen freshness is still not modeled yet."
+          "simple_projection_lean": "New York Mets",
+          "lean": "New York Mets",
+          "model_gap": 1.5,
+          "model_probability": 0.5564,
+          "model_prob_home": 0.4436,
+          "model_prob_away": 0.5564,
+          "market_prob_home": 0.4286,
+          "market_prob_away": 0.5714,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
         },
         {
-          "game_id": "401814761",
-          "start_time": "3/31 - 9:40 PM EDT",
-          "matchup": "Detroit Tigers at Arizona Diamondbacks",
-          "home_record": "1-3",
-          "away_record": "2-2",
-          "simple_projection_lean": "No strong lean",
-          "record_edge_pct": -4.1,
-          "edge_band": "weak",
-          "confidence": "Low",
-          "home_recent_form": "0-0",
-          "away_recent_form": "0-0",
-          "home_probable_pitcher": "Brandon Pfaadt",
-          "away_probable_pitcher": "Casey Mize",
-          "home_starter_quality_source": "season_2025",
-          "away_starter_quality_source": "season_2025",
-          "home_ops": 0.0,
-          "away_ops": 0.0,
-          "home_obp": 0.0,
-          "away_obp": 0.0,
-          "home_slg": 0.0,
-          "away_slg": 0.0,
-          "home_era": 99.0,
-          "away_era": 99.0,
-          "home_whip": 9.0,
-          "away_whip": 9.0,
-          "home_weighted_score": 40.59,
-          "away_weighted_score": 44.69,
-          "home_bullpen_quality": 40.0,
-          "away_bullpen_quality": 40.0,
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "starter quality",
-            "bullpen quality",
-            "matchup edge"
+          "sport": "mlb",
+          "game_id": "4d8a7d6f10d4e381df3410c93345b071",
+          "matchup": "Pittsburgh Pirates at Arizona Diamondbacks",
+          "away_team": "Pittsburgh Pirates",
+          "home_team": "Arizona Diamondbacks",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "Arizona Diamondbacks",
+              "side_b": "Pittsburgh Pirates",
+              "fair_a": 0.4910905203136137,
+              "fair_b": 0.5089094796863863
+            },
+            {
+              "book": "LowVig.ag",
+              "side_a": "Arizona Diamondbacks",
+              "side_b": "Pittsburgh Pirates",
+              "fair_a": 0.5023229882921391,
+              "fair_b": 0.497677011707861
+            },
+            {
+              "book": "BetOnline.ag",
+              "side_a": "Arizona Diamondbacks",
+              "side_b": "Pittsburgh Pirates",
+              "fair_a": 0.5023229882921391,
+              "fair_b": 0.497677011707861
+            },
+            {
+              "book": "DraftKings",
+              "side_a": "Arizona Diamondbacks",
+              "side_b": "Pittsburgh Pirates",
+              "fair_a": 0.4956702459300312,
+              "fair_b": 0.5043297540699688
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "Arizona Diamondbacks",
+              "side_b": "Pittsburgh Pirates",
+              "fair_a": 0.4891657638136511,
+              "fair_b": 0.5108342361863488
+            }
           ],
-          "note": "Projection now uses an upgraded weighted-score model with probable starter quality and bullpen quality inputs. Bullpen freshness is still not modeled yet."
+          "simple_projection_lean": "Arizona Diamondbacks",
+          "lean": "Arizona Diamondbacks",
+          "model_gap": 1.5,
+          "model_probability": 0.5111,
+          "model_prob_home": 0.5111,
+          "model_prob_away": 0.4889,
+          "market_prob_home": 0.4961,
+          "market_prob_away": 0.5039,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
         },
         {
-          "game_id": "401814762",
-          "start_time": "3/31 - 9:40 PM EDT",
-          "matchup": "New York Yankees at Seattle Mariners",
-          "home_record": "3-2",
-          "away_record": "3-1",
-          "simple_projection_lean": "No strong lean",
-          "record_edge_pct": 0.15,
-          "edge_band": "weak",
-          "confidence": "Low",
-          "home_recent_form": "0-0",
-          "away_recent_form": "0-0",
-          "home_probable_pitcher": "Logan Gilbert",
-          "away_probable_pitcher": "Max Fried",
-          "home_starter_quality_source": "season_2026",
-          "away_starter_quality_source": "season_2026",
-          "home_ops": 0.0,
-          "away_ops": 0.0,
-          "home_obp": 0.0,
-          "away_obp": 0.0,
-          "home_slg": 0.0,
-          "away_slg": 0.0,
-          "home_era": 99.0,
-          "away_era": 99.0,
-          "home_whip": 9.0,
-          "away_whip": 9.0,
-          "home_weighted_score": 50.45,
-          "away_weighted_score": 50.3,
-          "home_bullpen_quality": 40.0,
-          "away_bullpen_quality": 40.0,
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "starter quality",
-            "bullpen quality",
-            "matchup edge"
+          "sport": "mlb",
+          "game_id": "b24e92041f215692dc57c17a67275bcf",
+          "matchup": "Athletics at Philadelphia Phillies",
+          "away_team": "Athletics",
+          "home_team": "Philadelphia Phillies",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "Athletics",
+              "side_b": "Philadelphia Phillies",
+              "fair_a": 0.4470426409903714,
+              "fair_b": 0.5529573590096286
+            },
+            {
+              "book": "BetOnline.ag",
+              "side_a": "Athletics",
+              "side_b": "Philadelphia Phillies",
+              "fair_a": 0.4479937670432412,
+              "fair_b": 0.5520062329567589
+            },
+            {
+              "book": "LowVig.ag",
+              "side_a": "Athletics",
+              "side_b": "Philadelphia Phillies",
+              "fair_a": 0.4479937670432412,
+              "fair_b": 0.5520062329567589
+            },
+            {
+              "book": "DraftKings",
+              "side_a": "Athletics",
+              "side_b": "Philadelphia Phillies",
+              "fair_a": 0.44894232232536907,
+              "fair_b": 0.551057677674631
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "Athletics",
+              "side_b": "Philadelphia Phillies",
+              "fair_a": 0.44362292051756,
+              "fair_b": 0.5563770794824399
+            },
+            {
+              "book": "Bovada",
+              "side_a": "Athletics",
+              "side_b": "Philadelphia Phillies",
+              "fair_a": 0.44510940714419295,
+              "fair_b": 0.554890592855807
+            }
           ],
-          "note": "Projection now uses an upgraded weighted-score model with probable starter quality and bullpen quality inputs. Bullpen freshness is still not modeled yet."
+          "simple_projection_lean": "Philadelphia Phillies",
+          "lean": "Philadelphia Phillies",
+          "model_gap": 1.5,
+          "model_probability": 0.5682,
+          "model_prob_home": 0.5682,
+          "model_prob_away": 0.4318,
+          "market_prob_home": 0.5532,
+          "market_prob_away": 0.4468,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
         },
         {
-          "game_id": "401814763",
-          "start_time": "3/31 - 9:40 PM EDT",
-          "matchup": "San Francisco Giants at San Diego Padres",
-          "home_record": "1-3",
-          "away_record": "1-3",
-          "simple_projection_lean": "No strong lean",
-          "record_edge_pct": 7.6,
-          "edge_band": "weak",
-          "confidence": "Low",
-          "home_recent_form": "0-0",
-          "away_recent_form": "0-0",
-          "home_probable_pitcher": "Germ\u00e1n M\u00e1rquez",
-          "away_probable_pitcher": "Logan Webb",
-          "home_starter_quality_source": "season_2025",
-          "away_starter_quality_source": "season_2026",
-          "home_ops": 0.0,
-          "away_ops": 0.0,
-          "home_obp": 0.0,
-          "away_obp": 0.0,
-          "home_slg": 0.0,
-          "away_slg": 0.0,
-          "home_era": 99.0,
-          "away_era": 99.0,
-          "home_whip": 9.0,
-          "away_whip": 9.0,
-          "home_weighted_score": 34.87,
-          "away_weighted_score": 27.27,
-          "home_bullpen_quality": 40.0,
-          "away_bullpen_quality": 40.0,
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "starter quality",
-            "bullpen quality",
-            "matchup edge"
+          "sport": "mlb",
+          "game_id": "01ce87afc3b701c0bae09b62dc95f87c",
+          "matchup": "Baltimore Orioles at Miami Marlins",
+          "away_team": "Baltimore Orioles",
+          "home_team": "Miami Marlins",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "Baltimore Orioles",
+              "side_b": "Miami Marlins",
+              "fair_a": 0.48017621145374445,
+              "fair_b": 0.5198237885462554
+            },
+            {
+              "book": "LowVig.ag",
+              "side_a": "Baltimore Orioles",
+              "side_b": "Miami Marlins",
+              "fair_a": 0.4715960714749275,
+              "fair_b": 0.5284039285250725
+            },
+            {
+              "book": "BetOnline.ag",
+              "side_a": "Baltimore Orioles",
+              "side_b": "Miami Marlins",
+              "fair_a": 0.4715960714749275,
+              "fair_b": 0.5284039285250725
+            },
+            {
+              "book": "DraftKings",
+              "side_a": "Baltimore Orioles",
+              "side_b": "Miami Marlins",
+              "fair_a": 0.4739134147382802,
+              "fair_b": 0.5260865852617197
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "Baltimore Orioles",
+              "side_b": "Miami Marlins",
+              "fair_a": 0.4675324675324675,
+              "fair_b": 0.5324675324675325
+            },
+            {
+              "book": "Bovada",
+              "side_a": "Baltimore Orioles",
+              "side_b": "Miami Marlins",
+              "fair_a": 0.46964106004696404,
+              "fair_b": 0.5303589399530358
+            }
           ],
-          "note": "Projection now uses an upgraded weighted-score model with probable starter quality and bullpen quality inputs. Bullpen freshness is still not modeled yet."
+          "simple_projection_lean": "Miami Marlins",
+          "lean": "Miami Marlins",
+          "model_gap": 1.5,
+          "model_probability": 0.5426,
+          "model_prob_home": 0.5426,
+          "model_prob_away": 0.4574,
+          "market_prob_home": 0.5276,
+          "market_prob_away": 0.4724,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
         },
         {
-          "game_id": "401814760",
-          "start_time": "3/31 - 10:10 PM EDT",
-          "matchup": "Cleveland Guardians at Los Angeles Dodgers",
-          "home_record": "3-1",
-          "away_record": "3-2",
-          "simple_projection_lean": "No strong lean",
-          "record_edge_pct": 7.12,
-          "edge_band": "weak",
-          "confidence": "Low",
-          "home_recent_form": "0-0",
-          "away_recent_form": "0-0",
-          "home_probable_pitcher": "Shohei Ohtani",
-          "away_probable_pitcher": "Tanner Bibee",
-          "home_starter_quality_source": "season_2025",
-          "away_starter_quality_source": "season_2026",
-          "home_ops": 0.0,
-          "away_ops": 0.0,
-          "home_obp": 0.0,
-          "away_obp": 0.0,
-          "home_slg": 0.0,
-          "away_slg": 0.0,
-          "home_era": 99.0,
-          "away_era": 99.0,
-          "home_whip": 9.0,
-          "away_whip": 9.0,
-          "home_weighted_score": 52.7,
-          "away_weighted_score": 45.58,
-          "home_bullpen_quality": 40.0,
-          "away_bullpen_quality": 40.0,
-          "factors": [
-            "recent form",
-            "home/away advantage",
-            "team strength",
-            "starter quality",
-            "bullpen quality",
-            "matchup edge"
+          "sport": "mlb",
+          "game_id": "587e3aa8ddaf7a5719f0d0f55b446db9",
+          "matchup": "Tampa Bay Rays at Boston Red Sox",
+          "away_team": "Tampa Bay Rays",
+          "home_team": "Boston Red Sox",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "Boston Red Sox",
+              "side_b": "Tampa Bay Rays",
+              "fair_a": 0.515396797466127,
+              "fair_b": 0.4846032025338729
+            },
+            {
+              "book": "BetOnline.ag",
+              "side_a": "Boston Red Sox",
+              "side_b": "Tampa Bay Rays",
+              "fair_a": 0.5327102803738317,
+              "fair_b": 0.4672897196261682
+            },
+            {
+              "book": "LowVig.ag",
+              "side_a": "Boston Red Sox",
+              "side_b": "Tampa Bay Rays",
+              "fair_a": 0.5327102803738317,
+              "fair_b": 0.4672897196261682
+            },
+            {
+              "book": "DraftKings",
+              "side_a": "Boston Red Sox",
+              "side_b": "Tampa Bay Rays",
+              "fair_a": 0.5260865852617197,
+              "fair_b": 0.4739134147382802
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "Boston Red Sox",
+              "side_b": "Tampa Bay Rays",
+              "fair_a": 0.5217391304347826,
+              "fair_b": 0.4782608695652174
+            },
+            {
+              "book": "Bovada",
+              "side_a": "Boston Red Sox",
+              "side_b": "Tampa Bay Rays",
+              "fair_a": 0.5239223627237674,
+              "fair_b": 0.47607763727623276
+            }
           ],
-          "note": "Projection now uses an upgraded weighted-score model with probable starter quality and bullpen quality inputs. Bullpen freshness is still not modeled yet."
+          "simple_projection_lean": "Boston Red Sox",
+          "lean": "Boston Red Sox",
+          "model_gap": 1.5,
+          "model_probability": 0.5404,
+          "model_prob_home": 0.5404,
+          "model_prob_away": 0.4596,
+          "market_prob_home": 0.5254,
+          "market_prob_away": 0.4746,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
+        },
+        {
+          "sport": "mlb",
+          "game_id": "fb98c375df55f7f70d2f35b2209bdd61",
+          "matchup": "St. Louis Cardinals at San Diego Padres",
+          "away_team": "St. Louis Cardinals",
+          "home_team": "San Diego Padres",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "San Diego Padres",
+              "side_b": "St. Louis Cardinals",
+              "fair_a": 0.6154910096818811,
+              "fair_b": 0.38450899031811897
+            }
+          ],
+          "simple_projection_lean": "San Diego Padres",
+          "lean": "San Diego Padres",
+          "model_gap": 1.5,
+          "model_probability": 0.6305,
+          "model_prob_home": 0.6305,
+          "model_prob_away": 0.3695,
+          "market_prob_home": 0.6155,
+          "market_prob_away": 0.3845,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
         }
-      ],
-      "note": "MLB live data is connected. This is an early projection layer, not a finished betting model."
+      ]
+    },
+    "nba": {
+      "status": "ok",
+      "model": "market_consensus_projection_v1",
+      "generated_at": "2026-05-06T23:34:35.541637+00:00",
+      "games": [
+        {
+          "sport": "nba",
+          "game_id": "d146e10295545e18ac8915a1f5860317",
+          "matchup": "Philadelphia 76ers at New York Knicks",
+          "away_team": "Philadelphia 76ers",
+          "home_team": "New York Knicks",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "New York Knicks",
+              "side_b": "Philadelphia 76ers",
+              "fair_a": 0.7549019607843138,
+              "fair_b": 0.24509803921568626
+            },
+            {
+              "book": "DraftKings",
+              "side_a": "New York Knicks",
+              "side_b": "Philadelphia 76ers",
+              "fair_a": 0.7640449438202247,
+              "fair_b": 0.23595505617977527
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "New York Knicks",
+              "side_b": "Philadelphia 76ers",
+              "fair_a": 0.7594501718213058,
+              "fair_b": 0.24054982817869414
+            },
+            {
+              "book": "MyBookie.ag",
+              "side_a": "New York Knicks",
+              "side_b": "Philadelphia 76ers",
+              "fair_a": 0.7319134445717116,
+              "fair_b": 0.2680865554282884
+            },
+            {
+              "book": "Bovada",
+              "side_a": "New York Knicks",
+              "side_b": "Philadelphia 76ers",
+              "fair_a": 0.7353279631760645,
+              "fair_b": 0.2646720368239356
+            },
+            {
+              "book": "BetRivers",
+              "side_a": "New York Knicks",
+              "side_b": "Philadelphia 76ers",
+              "fair_a": 0.7485418016850292,
+              "fair_b": 0.25145819831497085
+            }
+          ],
+          "simple_projection_lean": "New York Knicks",
+          "lean": "New York Knicks",
+          "model_gap": 1.0,
+          "model_probability": 0.759,
+          "model_prob_home": 0.759,
+          "model_prob_away": 0.241,
+          "market_prob_home": 0.749,
+          "market_prob_away": 0.251,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
+        },
+        {
+          "sport": "nba",
+          "game_id": "246001ab42d44857430f7fe63f423461",
+          "matchup": "Minnesota Timberwolves at San Antonio Spurs",
+          "away_team": "Minnesota Timberwolves",
+          "home_team": "San Antonio Spurs",
+          "books": [
+            {
+              "book": "DraftKings",
+              "side_a": "Minnesota Timberwolves",
+              "side_b": "San Antonio Spurs",
+              "fair_a": 0.22849462365591394,
+              "fair_b": 0.771505376344086
+            },
+            {
+              "book": "LowVig.ag",
+              "side_a": "Minnesota Timberwolves",
+              "side_b": "San Antonio Spurs",
+              "fair_a": 0.22156255377731887,
+              "fair_b": 0.7784374462226811
+            },
+            {
+              "book": "BetOnline.ag",
+              "side_a": "Minnesota Timberwolves",
+              "side_b": "San Antonio Spurs",
+              "fair_a": 0.2235597592433362,
+              "fair_b": 0.7764402407566638
+            },
+            {
+              "book": "FanDuel",
+              "side_a": "Minnesota Timberwolves",
+              "side_b": "San Antonio Spurs",
+              "fair_a": 0.2235597592433362,
+              "fair_b": 0.7764402407566638
+            },
+            {
+              "book": "BetRivers",
+              "side_a": "Minnesota Timberwolves",
+              "side_b": "San Antonio Spurs",
+              "fair_a": 0.218999704054454,
+              "fair_b": 0.781000295945546
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "Minnesota Timberwolves",
+              "side_b": "San Antonio Spurs",
+              "fair_a": 0.22727272727272724,
+              "fair_b": 0.7727272727272727
+            },
+            {
+              "book": "MyBookie.ag",
+              "side_a": "Minnesota Timberwolves",
+              "side_b": "San Antonio Spurs",
+              "fair_a": 0.23305504967633747,
+              "fair_b": 0.7669449503236626
+            },
+            {
+              "book": "Bovada",
+              "side_a": "Minnesota Timberwolves",
+              "side_b": "San Antonio Spurs",
+              "fair_a": 0.22688356164383558,
+              "fair_b": 0.7731164383561644
+            },
+            {
+              "book": "BetUS",
+              "side_a": "Minnesota Timberwolves",
+              "side_b": "San Antonio Spurs",
+              "fair_a": 0.22935779816513757,
+              "fair_b": 0.7706422018348623
+            }
+          ],
+          "simple_projection_lean": "San Antonio Spurs",
+          "lean": "San Antonio Spurs",
+          "model_gap": 1.0,
+          "model_probability": 0.7841,
+          "model_prob_home": 0.7841,
+          "model_prob_away": 0.2159,
+          "market_prob_home": 0.7741,
+          "market_prob_away": 0.2259,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
+        },
+        {
+          "sport": "nba",
+          "game_id": "862af0717b53a01b5e93a188a655d663",
+          "matchup": "Cleveland Cavaliers at Detroit Pistons",
+          "away_team": "Cleveland Cavaliers",
+          "home_team": "Detroit Pistons",
+          "books": [
+            {
+              "book": "FanDuel",
+              "side_a": "Cleveland Cavaliers",
+              "side_b": "Detroit Pistons",
+              "fair_a": 0.4142931123770068,
+              "fair_b": 0.5857068876229934
+            },
+            {
+              "book": "DraftKings",
+              "side_a": "Cleveland Cavaliers",
+              "side_b": "Detroit Pistons",
+              "fair_a": 0.42794036443953615,
+              "fair_b": 0.5720596355604638
+            },
+            {
+              "book": "BetRivers",
+              "side_a": "Cleveland Cavaliers",
+              "side_b": "Detroit Pistons",
+              "fair_a": 0.42236024844720504,
+              "fair_b": 0.5776397515527951
+            },
+            {
+              "book": "LowVig.ag",
+              "side_a": "Cleveland Cavaliers",
+              "side_b": "Detroit Pistons",
+              "fair_a": 0.3949918020569385,
+              "fair_b": 0.6050081979430616
+            },
+            {
+              "book": "BetOnline.ag",
+              "side_a": "Cleveland Cavaliers",
+              "side_b": "Detroit Pistons",
+              "fair_a": 0.39596563317146055,
+              "fair_b": 0.6040343668285393
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "Cleveland Cavaliers",
+              "side_b": "Detroit Pistons",
+              "fair_a": 0.4088050314465409,
+              "fair_b": 0.5911949685534592
+            },
+            {
+              "book": "MyBookie.ag",
+              "side_a": "Cleveland Cavaliers",
+              "side_b": "Detroit Pistons",
+              "fair_a": 0.4134325993980675,
+              "fair_b": 0.5865674006019325
+            },
+            {
+              "book": "Bovada",
+              "side_a": "Cleveland Cavaliers",
+              "side_b": "Detroit Pistons",
+              "fair_a": 0.40090771558245086,
+              "fair_b": 0.5990922844175491
+            },
+            {
+              "book": "BetUS",
+              "side_a": "Cleveland Cavaliers",
+              "side_b": "Detroit Pistons",
+              "fair_a": 0.40574282147315854,
+              "fair_b": 0.5942571785268415
+            }
+          ],
+          "simple_projection_lean": "Detroit Pistons",
+          "lean": "Detroit Pistons",
+          "model_gap": 2.5,
+          "model_probability": 0.6156,
+          "model_prob_home": 0.6156,
+          "model_prob_away": 0.3844,
+          "market_prob_home": 0.5906,
+          "market_prob_away": 0.4094,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
+        },
+        {
+          "sport": "nba",
+          "game_id": "a306b74e13d87d2f8d64b1e01c2cf958",
+          "matchup": "Los Angeles Lakers at Oklahoma City Thunder",
+          "away_team": "Los Angeles Lakers",
+          "home_team": "Oklahoma City Thunder",
+          "books": [
+            {
+              "book": "DraftKings",
+              "side_a": "Los Angeles Lakers",
+              "side_b": "Oklahoma City Thunder",
+              "fair_a": 0.136986301369863,
+              "fair_b": 0.863013698630137
+            },
+            {
+              "book": "BetMGM",
+              "side_a": "Los Angeles Lakers",
+              "side_b": "Oklahoma City Thunder",
+              "fair_a": 0.12790697674418605,
+              "fair_b": 0.8720930232558138
+            },
+            {
+              "book": "FanDuel",
+              "side_a": "Los Angeles Lakers",
+              "side_b": "Oklahoma City Thunder",
+              "fair_a": 0.12995049504950495,
+              "fair_b": 0.870049504950495
+            },
+            {
+              "book": "BetRivers",
+              "side_a": "Los Angeles Lakers",
+              "side_b": "Oklahoma City Thunder",
+              "fair_a": 0.11894273127753302,
+              "fair_b": 0.8810572687224668
+            },
+            {
+              "book": "LowVig.ag",
+              "side_a": "Los Angeles Lakers",
+              "side_b": "Oklahoma City Thunder",
+              "fair_a": 0.14002154177565782,
+              "fair_b": 0.8599784582243423
+            },
+            {
+              "book": "BetOnline.ag",
+              "side_a": "Los Angeles Lakers",
+              "side_b": "Oklahoma City Thunder",
+              "fair_a": 0.14262585768252253,
+              "fair_b": 0.8573741423174774
+            },
+            {
+              "book": "MyBookie.ag",
+              "side_a": "Los Angeles Lakers",
+              "side_b": "Oklahoma City Thunder",
+              "fair_a": 0.1375,
+              "fair_b": 0.8624999999999999
+            },
+            {
+              "book": "Bovada",
+              "side_a": "Los Angeles Lakers",
+              "side_b": "Oklahoma City Thunder",
+              "fair_a": 0.13636363636363635,
+              "fair_b": 0.8636363636363636
+            }
+          ],
+          "simple_projection_lean": "Oklahoma City Thunder",
+          "lean": "Oklahoma City Thunder",
+          "model_gap": -4.62,
+          "model_probability": 0.82,
+          "model_prob_home": 0.82,
+          "model_prob_away": 0.18,
+          "market_prob_home": 0.8662,
+          "market_prob_away": 0.1338,
+          "confidence": "Low",
+          "edge_band": "weak",
+          "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration."
+        }
+      ]
     }
   }
 }

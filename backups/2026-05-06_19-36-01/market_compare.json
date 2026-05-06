@@ -1,0 +1,2493 @@
+{
+  "comparisons": [
+    {
+      "sport": "nba",
+      "matchup": "Philadelphia 76ers at New York Knicks",
+      "decision_tier": "pass",
+      "model_lean": "New York Knicks",
+      "best_value_side": "New York Knicks",
+      "line_source": "FanDuel",
+      "best_value_odds": "-400",
+      "best_value_expected_value": -0.3375,
+      "best_value_edge": -27.0,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Philadelphia 76ers at New York Knicks",
+      "decision_tier": "pass",
+      "model_lean": "New York Knicks",
+      "best_value_side": "New York Knicks",
+      "line_source": "DraftKings",
+      "best_value_odds": "-425",
+      "best_value_expected_value": -0.3453,
+      "best_value_edge": -27.95,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Philadelphia 76ers at New York Knicks",
+      "decision_tier": "pass",
+      "model_lean": "New York Knicks",
+      "best_value_side": "New York Knicks",
+      "line_source": "BetMGM",
+      "best_value_odds": "-425",
+      "best_value_expected_value": -0.3453,
+      "best_value_edge": -27.95,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Philadelphia 76ers at New York Knicks",
+      "decision_tier": "pass",
+      "model_lean": "New York Knicks",
+      "best_value_side": "New York Knicks",
+      "line_source": "MyBookie.ag",
+      "best_value_odds": "-333",
+      "best_value_expected_value": -0.3108,
+      "best_value_edge": -23.91,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Philadelphia 76ers at New York Knicks",
+      "decision_tier": "pass",
+      "model_lean": "New York Knicks",
+      "best_value_side": "New York Knicks",
+      "line_source": "Bovada",
+      "best_value_odds": "-360",
+      "best_value_expected_value": -0.3228,
+      "best_value_edge": -25.26,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Philadelphia 76ers at New York Knicks",
+      "decision_tier": "pass",
+      "model_lean": "New York Knicks",
+      "best_value_side": "New York Knicks",
+      "line_source": "BetRivers",
+      "best_value_odds": "-385",
+      "best_value_expected_value": -0.3323,
+      "best_value_edge": -26.38,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Minnesota Timberwolves at San Antonio Spurs",
+      "decision_tier": "pass",
+      "model_lean": "San Antonio Spurs",
+      "best_value_side": "San Antonio Spurs",
+      "line_source": "DraftKings",
+      "best_value_odds": "-410",
+      "best_value_expected_value": -0.3407,
+      "best_value_edge": -27.39,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Minnesota Timberwolves at San Antonio Spurs",
+      "decision_tier": "pass",
+      "model_lean": "San Antonio Spurs",
+      "best_value_side": "San Antonio Spurs",
+      "line_source": "LowVig.ag",
+      "best_value_odds": "-415",
+      "best_value_expected_value": -0.3423,
+      "best_value_edge": -27.58,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Minnesota Timberwolves at San Antonio Spurs",
+      "decision_tier": "pass",
+      "model_lean": "San Antonio Spurs",
+      "best_value_side": "San Antonio Spurs",
+      "line_source": "BetOnline.ag",
+      "best_value_odds": "-420",
+      "best_value_expected_value": -0.3438,
+      "best_value_edge": -27.77,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Minnesota Timberwolves at San Antonio Spurs",
+      "decision_tier": "pass",
+      "model_lean": "San Antonio Spurs",
+      "best_value_side": "San Antonio Spurs",
+      "line_source": "FanDuel",
+      "best_value_odds": "-420",
+      "best_value_expected_value": -0.3438,
+      "best_value_edge": -27.77,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Minnesota Timberwolves at San Antonio Spurs",
+      "decision_tier": "pass",
+      "model_lean": "San Antonio Spurs",
+      "best_value_side": "San Antonio Spurs",
+      "line_source": "BetRivers",
+      "best_value_odds": "-455",
+      "best_value_expected_value": -0.3535,
+      "best_value_edge": -28.98,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Minnesota Timberwolves at San Antonio Spurs",
+      "decision_tier": "pass",
+      "model_lean": "San Antonio Spurs",
+      "best_value_side": "San Antonio Spurs",
+      "line_source": "BetMGM",
+      "best_value_odds": "-425",
+      "best_value_expected_value": -0.3453,
+      "best_value_edge": -27.95,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Minnesota Timberwolves at San Antonio Spurs",
+      "decision_tier": "pass",
+      "model_lean": "San Antonio Spurs",
+      "best_value_side": "San Antonio Spurs",
+      "line_source": "MyBookie.ag",
+      "best_value_odds": "-417",
+      "best_value_expected_value": -0.3429,
+      "best_value_edge": -27.66,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Minnesota Timberwolves at San Antonio Spurs",
+      "decision_tier": "pass",
+      "model_lean": "San Antonio Spurs",
+      "best_value_side": "San Antonio Spurs",
+      "line_source": "Bovada",
+      "best_value_odds": "-430",
+      "best_value_expected_value": -0.3467,
+      "best_value_edge": -28.13,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Minnesota Timberwolves at San Antonio Spurs",
+      "decision_tier": "pass",
+      "model_lean": "San Antonio Spurs",
+      "best_value_side": "San Antonio Spurs",
+      "line_source": "BetUS",
+      "best_value_odds": "-400",
+      "best_value_expected_value": -0.3375,
+      "best_value_edge": -27.0,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Cleveland Cavaliers at Detroit Pistons",
+      "decision_tier": "pass",
+      "model_lean": "Detroit Pistons",
+      "best_value_side": "Detroit Pistons",
+      "line_source": "FanDuel",
+      "best_value_odds": "-156",
+      "best_value_expected_value": -0.1303,
+      "best_value_edge": -7.94,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Cleveland Cavaliers at Detroit Pistons",
+      "decision_tier": "pass",
+      "model_lean": "Detroit Pistons",
+      "best_value_side": "Detroit Pistons",
+      "line_source": "DraftKings",
+      "best_value_odds": "-148",
+      "best_value_expected_value": -0.1119,
+      "best_value_edge": -6.68,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Cleveland Cavaliers at Detroit Pistons",
+      "decision_tier": "pass",
+      "model_lean": "Detroit Pistons",
+      "best_value_side": "Detroit Pistons",
+      "line_source": "BetRivers",
+      "best_value_odds": "-155",
+      "best_value_expected_value": -0.1281,
+      "best_value_edge": -7.78,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Cleveland Cavaliers at Detroit Pistons",
+      "decision_tier": "pass",
+      "model_lean": "Detroit Pistons",
+      "best_value_side": "Detroit Pistons",
+      "line_source": "LowVig.ag",
+      "best_value_odds": "-165",
+      "best_value_expected_value": -0.1488,
+      "best_value_edge": -9.26,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Cleveland Cavaliers at Detroit Pistons",
+      "decision_tier": "pass",
+      "model_lean": "Detroit Pistons",
+      "best_value_side": "Detroit Pistons",
+      "line_source": "BetOnline.ag",
+      "best_value_odds": "-165",
+      "best_value_expected_value": -0.1488,
+      "best_value_edge": -9.26,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Cleveland Cavaliers at Detroit Pistons",
+      "decision_tier": "pass",
+      "model_lean": "Detroit Pistons",
+      "best_value_side": "Detroit Pistons",
+      "line_source": "BetMGM",
+      "best_value_odds": "-160",
+      "best_value_expected_value": -0.1387,
+      "best_value_edge": -8.54,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Cleveland Cavaliers at Detroit Pistons",
+      "decision_tier": "pass",
+      "model_lean": "Detroit Pistons",
+      "best_value_side": "Detroit Pistons",
+      "line_source": "MyBookie.ag",
+      "best_value_odds": "-161",
+      "best_value_expected_value": -0.1408,
+      "best_value_edge": -8.69,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Cleveland Cavaliers at Detroit Pistons",
+      "decision_tier": "pass",
+      "model_lean": "Detroit Pistons",
+      "best_value_side": "Detroit Pistons",
+      "line_source": "Bovada",
+      "best_value_odds": "-165",
+      "best_value_expected_value": -0.1488,
+      "best_value_edge": -9.26,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Cleveland Cavaliers at Detroit Pistons",
+      "decision_tier": "pass",
+      "model_lean": "Detroit Pistons",
+      "best_value_side": "Detroit Pistons",
+      "line_source": "BetUS",
+      "best_value_odds": "-160",
+      "best_value_expected_value": -0.1387,
+      "best_value_edge": -8.54,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Los Angeles Lakers at Oklahoma City Thunder",
+      "decision_tier": "pass",
+      "model_lean": "Oklahoma City Thunder",
+      "best_value_side": "Oklahoma City Thunder",
+      "line_source": "DraftKings",
+      "best_value_odds": "-900",
+      "best_value_expected_value": -0.4111,
+      "best_value_edge": -37.0,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Los Angeles Lakers at Oklahoma City Thunder",
+      "decision_tier": "pass",
+      "model_lean": "Oklahoma City Thunder",
+      "best_value_side": "Oklahoma City Thunder",
+      "line_source": "BetMGM",
+      "best_value_odds": "-1000",
+      "best_value_expected_value": -0.417,
+      "best_value_edge": -37.91,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Los Angeles Lakers at Oklahoma City Thunder",
+      "decision_tier": "pass",
+      "model_lean": "Oklahoma City Thunder",
+      "best_value_side": "Oklahoma City Thunder",
+      "line_source": "FanDuel",
+      "best_value_odds": "-950",
+      "best_value_expected_value": -0.4142,
+      "best_value_edge": -37.48,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Los Angeles Lakers at Oklahoma City Thunder",
+      "decision_tier": "pass",
+      "model_lean": "Oklahoma City Thunder",
+      "best_value_side": "Oklahoma City Thunder",
+      "line_source": "BetRivers",
+      "best_value_odds": "-1250",
+      "best_value_expected_value": -0.4276,
+      "best_value_edge": -39.59,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Los Angeles Lakers at Oklahoma City Thunder",
+      "decision_tier": "pass",
+      "model_lean": "Oklahoma City Thunder",
+      "best_value_side": "Oklahoma City Thunder",
+      "line_source": "LowVig.ag",
+      "best_value_odds": "-810",
+      "best_value_expected_value": -0.4046,
+      "best_value_edge": -36.01,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Los Angeles Lakers at Oklahoma City Thunder",
+      "decision_tier": "pass",
+      "model_lean": "Oklahoma City Thunder",
+      "best_value_side": "Oklahoma City Thunder",
+      "line_source": "BetOnline.ag",
+      "best_value_odds": "-825",
+      "best_value_expected_value": -0.4058,
+      "best_value_edge": -36.19,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Los Angeles Lakers at Oklahoma City Thunder",
+      "decision_tier": "pass",
+      "model_lean": "Oklahoma City Thunder",
+      "best_value_side": "Oklahoma City Thunder",
+      "line_source": "MyBookie.ag",
+      "best_value_odds": "-1000",
+      "best_value_expected_value": -0.417,
+      "best_value_edge": -37.91,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "nba",
+      "matchup": "Los Angeles Lakers at Oklahoma City Thunder",
+      "decision_tier": "pass",
+      "model_lean": "Oklahoma City Thunder",
+      "best_value_side": "Oklahoma City Thunder",
+      "line_source": "Bovada",
+      "best_value_odds": "-950",
+      "best_value_expected_value": -0.4142,
+      "best_value_edge": -37.48,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Athletics at Philadelphia Phillies",
+      "decision_tier": "watchlist",
+      "model_lean": "Philadelphia Phillies",
+      "best_value_side": "Philadelphia Phillies",
+      "line_source": "FanDuel",
+      "best_value_odds": "-108",
+      "best_value_expected_value": 0.0207,
+      "best_value_edge": 1.08,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Athletics at Philadelphia Phillies",
+      "decision_tier": "watchlist",
+      "model_lean": "Philadelphia Phillies",
+      "best_value_side": "Philadelphia Phillies",
+      "line_source": "MyBookie.ag",
+      "best_value_odds": "120",
+      "best_value_expected_value": 0.166,
+      "best_value_edge": 7.55,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Athletics at Philadelphia Phillies",
+      "decision_tier": "watchlist",
+      "model_lean": "Philadelphia Phillies",
+      "best_value_side": "Philadelphia Phillies",
+      "line_source": "DraftKings",
+      "best_value_odds": "-106",
+      "best_value_expected_value": 0.03,
+      "best_value_edge": 1.54,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Athletics at Philadelphia Phillies",
+      "decision_tier": "watchlist",
+      "model_lean": "Philadelphia Phillies",
+      "best_value_side": "Philadelphia Phillies",
+      "line_source": "Bovada",
+      "best_value_odds": "110",
+      "best_value_expected_value": 0.113,
+      "best_value_edge": 5.38,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Athletics at Philadelphia Phillies",
+      "decision_tier": "watchlist",
+      "model_lean": "Philadelphia Phillies",
+      "best_value_side": "Philadelphia Phillies",
+      "line_source": "BetRivers",
+      "best_value_odds": "105",
+      "best_value_expected_value": 0.0865,
+      "best_value_edge": 4.22,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Athletics at Philadelphia Phillies",
+      "decision_tier": "watchlist",
+      "model_lean": "Philadelphia Phillies",
+      "best_value_side": "Philadelphia Phillies",
+      "line_source": "BetMGM",
+      "best_value_odds": "-105",
+      "best_value_expected_value": 0.0348,
+      "best_value_edge": 1.78,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Baltimore Orioles at Miami Marlins",
+      "decision_tier": "watchlist",
+      "model_lean": "Miami Marlins",
+      "best_value_side": "Miami Marlins",
+      "line_source": "FanDuel",
+      "best_value_odds": "144",
+      "best_value_expected_value": 0.2932,
+      "best_value_edge": 12.02,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Baltimore Orioles at Miami Marlins",
+      "decision_tier": "pass",
+      "model_lean": "Miami Marlins",
+      "best_value_side": "Miami Marlins",
+      "line_source": "MyBookie.ag",
+      "best_value_odds": "-154",
+      "best_value_expected_value": -0.1258,
+      "best_value_edge": -7.63,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Baltimore Orioles at Miami Marlins",
+      "decision_tier": "watchlist",
+      "model_lean": "Miami Marlins",
+      "best_value_side": "Miami Marlins",
+      "line_source": "DraftKings",
+      "best_value_odds": "133",
+      "best_value_expected_value": 0.2349,
+      "best_value_edge": 10.08,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Baltimore Orioles at Miami Marlins",
+      "decision_tier": "watchlist",
+      "model_lean": "Miami Marlins",
+      "best_value_side": "Miami Marlins",
+      "line_source": "Bovada",
+      "best_value_odds": "140",
+      "best_value_expected_value": 0.272,
+      "best_value_edge": 11.33,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Baltimore Orioles at Miami Marlins",
+      "decision_tier": "watchlist",
+      "model_lean": "Miami Marlins",
+      "best_value_side": "Miami Marlins",
+      "line_source": "BetRivers",
+      "best_value_odds": "125",
+      "best_value_expected_value": 0.1925,
+      "best_value_edge": 8.56,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Baltimore Orioles at Miami Marlins",
+      "decision_tier": "watchlist",
+      "model_lean": "Miami Marlins",
+      "best_value_side": "Miami Marlins",
+      "line_source": "BetMGM",
+      "best_value_odds": "135",
+      "best_value_expected_value": 0.2455,
+      "best_value_edge": 10.45,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Boston Red Sox at Detroit Tigers",
+      "decision_tier": "pass",
+      "model_lean": "Boston Red Sox",
+      "best_value_side": "Boston Red Sox",
+      "line_source": "FanDuel",
+      "best_value_odds": "-280",
+      "best_value_expected_value": -0.2807,
+      "best_value_edge": -20.68,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Boston Red Sox at Detroit Tigers",
+      "decision_tier": "pass",
+      "model_lean": "Boston Red Sox",
+      "best_value_side": "Boston Red Sox",
+      "line_source": "BetRivers",
+      "best_value_odds": "-315",
+      "best_value_expected_value": -0.3017,
+      "best_value_edge": -22.9,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Boston Red Sox at Detroit Tigers",
+      "decision_tier": "pass",
+      "model_lean": "Boston Red Sox",
+      "best_value_side": "Boston Red Sox",
+      "line_source": "BetMGM",
+      "best_value_odds": "-250",
+      "best_value_expected_value": -0.258,
+      "best_value_edge": -18.43,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Boston Red Sox at Detroit Tigers",
+      "decision_tier": "pass",
+      "model_lean": "Boston Red Sox",
+      "best_value_side": "Boston Red Sox",
+      "line_source": "DraftKings",
+      "best_value_odds": "-272",
+      "best_value_expected_value": -0.2751,
+      "best_value_edge": -20.12,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Boston Red Sox at Detroit Tigers",
+      "decision_tier": "pass",
+      "model_lean": "Boston Red Sox",
+      "best_value_side": "Boston Red Sox",
+      "line_source": "Bovada",
+      "best_value_odds": "-240",
+      "best_value_expected_value": -0.2492,
+      "best_value_edge": -17.59,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Boston Red Sox at Detroit Tigers",
+      "decision_tier": "pass",
+      "model_lean": "Boston Red Sox",
+      "best_value_side": "Boston Red Sox",
+      "line_source": "MyBookie.ag",
+      "best_value_odds": "-286",
+      "best_value_expected_value": -0.2847,
+      "best_value_edge": -21.09,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Minnesota Twins at Washington Nationals",
+      "decision_tier": "watchlist",
+      "model_lean": "Washington Nationals",
+      "best_value_side": "Washington Nationals",
+      "line_source": "FanDuel",
+      "best_value_odds": "124",
+      "best_value_expected_value": 0.1872,
+      "best_value_edge": 8.36,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Minnesota Twins at Washington Nationals",
+      "decision_tier": "watchlist",
+      "model_lean": "Washington Nationals",
+      "best_value_side": "Washington Nationals",
+      "line_source": "MyBookie.ag",
+      "best_value_odds": "125",
+      "best_value_expected_value": 0.1925,
+      "best_value_edge": 8.56,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Minnesota Twins at Washington Nationals",
+      "decision_tier": "watchlist",
+      "model_lean": "Washington Nationals",
+      "best_value_side": "Washington Nationals",
+      "line_source": "DraftKings",
+      "best_value_odds": "127",
+      "best_value_expected_value": 0.2031,
+      "best_value_edge": 8.95,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Minnesota Twins at Washington Nationals",
+      "decision_tier": "watchlist",
+      "model_lean": "Washington Nationals",
+      "best_value_side": "Washington Nationals",
+      "line_source": "Bovada",
+      "best_value_odds": "115",
+      "best_value_expected_value": 0.1395,
+      "best_value_edge": 6.49,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Minnesota Twins at Washington Nationals",
+      "decision_tier": "watchlist",
+      "model_lean": "Washington Nationals",
+      "best_value_side": "Washington Nationals",
+      "line_source": "BetRivers",
+      "best_value_odds": "128",
+      "best_value_expected_value": 0.2084,
+      "best_value_edge": 9.14,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Minnesota Twins at Washington Nationals",
+      "decision_tier": "watchlist",
+      "model_lean": "Washington Nationals",
+      "best_value_side": "Washington Nationals",
+      "line_source": "BetMGM",
+      "best_value_odds": "135",
+      "best_value_expected_value": 0.2455,
+      "best_value_edge": 10.45,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Texas Rangers at New York Yankees",
+      "decision_tier": "watchlist",
+      "model_lean": "New York Yankees",
+      "best_value_side": "New York Yankees",
+      "line_source": "FanDuel",
+      "best_value_odds": "-108",
+      "best_value_expected_value": 0.0207,
+      "best_value_edge": 1.08,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Texas Rangers at New York Yankees",
+      "decision_tier": "pass",
+      "model_lean": "New York Yankees",
+      "best_value_side": "New York Yankees",
+      "line_source": "MyBookie.ag",
+      "best_value_odds": "-125",
+      "best_value_expected_value": -0.046,
+      "best_value_edge": -2.56,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Texas Rangers at New York Yankees",
+      "decision_tier": "watchlist",
+      "model_lean": "New York Yankees",
+      "best_value_side": "New York Yankees",
+      "line_source": "DraftKings",
+      "best_value_odds": "-111",
+      "best_value_expected_value": 0.0075,
+      "best_value_edge": 0.39,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Texas Rangers at New York Yankees",
+      "decision_tier": "watchlist",
+      "model_lean": "New York Yankees",
+      "best_value_side": "New York Yankees",
+      "line_source": "Bovada",
+      "best_value_odds": "-110",
+      "best_value_expected_value": 0.0118,
+      "best_value_edge": 0.62,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Texas Rangers at New York Yankees",
+      "decision_tier": "pass",
+      "model_lean": "New York Yankees",
+      "best_value_side": "New York Yankees",
+      "line_source": "BetRivers",
+      "best_value_odds": "-113",
+      "best_value_expected_value": -0.001,
+      "best_value_edge": -0.05,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Texas Rangers at New York Yankees",
+      "decision_tier": "watchlist",
+      "model_lean": "New York Yankees",
+      "best_value_side": "New York Yankees",
+      "line_source": "BetMGM",
+      "best_value_odds": "-110",
+      "best_value_expected_value": 0.0118,
+      "best_value_edge": 0.62,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cincinnati Reds at Chicago Cubs",
+      "decision_tier": "pass",
+      "model_lean": "Chicago Cubs",
+      "best_value_side": "Chicago Cubs",
+      "line_source": "FanDuel",
+      "best_value_odds": "-168",
+      "best_value_expected_value": -0.1545,
+      "best_value_edge": -9.69,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cincinnati Reds at Chicago Cubs",
+      "decision_tier": "pass",
+      "model_lean": "Chicago Cubs",
+      "best_value_side": "Chicago Cubs",
+      "line_source": "BetOnline.ag",
+      "best_value_odds": "-165",
+      "best_value_expected_value": -0.1488,
+      "best_value_edge": -9.26,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cincinnati Reds at Chicago Cubs",
+      "decision_tier": "pass",
+      "model_lean": "Chicago Cubs",
+      "best_value_side": "Chicago Cubs",
+      "line_source": "LowVig.ag",
+      "best_value_odds": "-165",
+      "best_value_expected_value": -0.1488,
+      "best_value_edge": -9.26,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cincinnati Reds at Chicago Cubs",
+      "decision_tier": "pass",
+      "model_lean": "Chicago Cubs",
+      "best_value_side": "Chicago Cubs",
+      "line_source": "MyBookie.ag",
+      "best_value_odds": "-169",
+      "best_value_expected_value": -0.1564,
+      "best_value_edge": -9.83,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cincinnati Reds at Chicago Cubs",
+      "decision_tier": "pass",
+      "model_lean": "Chicago Cubs",
+      "best_value_side": "Chicago Cubs",
+      "line_source": "DraftKings",
+      "best_value_odds": "-169",
+      "best_value_expected_value": -0.1564,
+      "best_value_edge": -9.83,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cincinnati Reds at Chicago Cubs",
+      "decision_tier": "pass",
+      "model_lean": "Chicago Cubs",
+      "best_value_side": "Chicago Cubs",
+      "line_source": "BetUS",
+      "best_value_odds": "-159",
+      "best_value_expected_value": -0.1367,
+      "best_value_edge": -8.39,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cincinnati Reds at Chicago Cubs",
+      "decision_tier": "pass",
+      "model_lean": "Chicago Cubs",
+      "best_value_side": "Chicago Cubs",
+      "line_source": "BetRivers",
+      "best_value_odds": "-177",
+      "best_value_expected_value": -0.1706,
+      "best_value_edge": -10.9,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cincinnati Reds at Chicago Cubs",
+      "decision_tier": "pass",
+      "model_lean": "Chicago Cubs",
+      "best_value_side": "Chicago Cubs",
+      "line_source": "BetMGM",
+      "best_value_odds": "-175",
+      "best_value_expected_value": -0.1671,
+      "best_value_edge": -10.64,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cincinnati Reds at Chicago Cubs",
+      "decision_tier": "pass",
+      "model_lean": "Chicago Cubs",
+      "best_value_side": "Chicago Cubs",
+      "line_source": "Bovada",
+      "best_value_odds": "-164",
+      "best_value_expected_value": -0.1468,
+      "best_value_edge": -9.12,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cleveland Guardians at Kansas City Royals",
+      "decision_tier": "pass",
+      "model_lean": "Kansas City Royals",
+      "best_value_side": "Kansas City Royals",
+      "line_source": "FanDuel",
+      "best_value_odds": "-134",
+      "best_value_expected_value": -0.0745,
+      "best_value_edge": -4.26,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cleveland Guardians at Kansas City Royals",
+      "decision_tier": "pass",
+      "model_lean": "Kansas City Royals",
+      "best_value_side": "Kansas City Royals",
+      "line_source": "BetOnline.ag",
+      "best_value_odds": "-136",
+      "best_value_expected_value": -0.0803,
+      "best_value_edge": -4.63,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cleveland Guardians at Kansas City Royals",
+      "decision_tier": "pass",
+      "model_lean": "Kansas City Royals",
+      "best_value_side": "Kansas City Royals",
+      "line_source": "LowVig.ag",
+      "best_value_odds": "-136",
+      "best_value_expected_value": -0.0803,
+      "best_value_edge": -4.63,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cleveland Guardians at Kansas City Royals",
+      "decision_tier": "pass",
+      "model_lean": "Kansas City Royals",
+      "best_value_side": "Kansas City Royals",
+      "line_source": "MyBookie.ag",
+      "best_value_odds": "-141",
+      "best_value_expected_value": -0.0941,
+      "best_value_edge": -5.51,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cleveland Guardians at Kansas City Royals",
+      "decision_tier": "pass",
+      "model_lean": "Kansas City Royals",
+      "best_value_side": "Kansas City Royals",
+      "line_source": "DraftKings",
+      "best_value_odds": "-141",
+      "best_value_expected_value": -0.0941,
+      "best_value_edge": -5.51,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cleveland Guardians at Kansas City Royals",
+      "decision_tier": "pass",
+      "model_lean": "Kansas City Royals",
+      "best_value_side": "Kansas City Royals",
+      "line_source": "BetUS",
+      "best_value_odds": "-135",
+      "best_value_expected_value": -0.0774,
+      "best_value_edge": -4.45,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cleveland Guardians at Kansas City Royals",
+      "decision_tier": "pass",
+      "model_lean": "Kansas City Royals",
+      "best_value_side": "Kansas City Royals",
+      "line_source": "Bovada",
+      "best_value_odds": "-143",
+      "best_value_expected_value": -0.0994,
+      "best_value_edge": -5.85,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cleveland Guardians at Kansas City Royals",
+      "decision_tier": "pass",
+      "model_lean": "Kansas City Royals",
+      "best_value_side": "Kansas City Royals",
+      "line_source": "BetRivers",
+      "best_value_odds": "-143",
+      "best_value_expected_value": -0.0994,
+      "best_value_edge": -5.85,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cleveland Guardians at Kansas City Royals",
+      "decision_tier": "pass",
+      "model_lean": "Kansas City Royals",
+      "best_value_side": "Kansas City Royals",
+      "line_source": "BetMGM",
+      "best_value_odds": "-135",
+      "best_value_expected_value": -0.0774,
+      "best_value_edge": -4.45,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "New York Mets at Colorado Rockies",
+      "decision_tier": "pass",
+      "model_lean": "New York Mets",
+      "best_value_side": "New York Mets",
+      "line_source": "FanDuel",
+      "best_value_odds": "-158",
+      "best_value_expected_value": -0.1346,
+      "best_value_edge": -8.24,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "New York Mets at Colorado Rockies",
+      "decision_tier": "pass",
+      "model_lean": "New York Mets",
+      "best_value_side": "New York Mets",
+      "line_source": "BetRivers",
+      "best_value_odds": "-177",
+      "best_value_expected_value": -0.1706,
+      "best_value_edge": -10.9,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "New York Mets at Colorado Rockies",
+      "decision_tier": "pass",
+      "model_lean": "New York Mets",
+      "best_value_side": "New York Mets",
+      "line_source": "BetOnline.ag",
+      "best_value_odds": "-148",
+      "best_value_expected_value": -0.1119,
+      "best_value_edge": -6.68,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "New York Mets at Colorado Rockies",
+      "decision_tier": "pass",
+      "model_lean": "New York Mets",
+      "best_value_side": "New York Mets",
+      "line_source": "LowVig.ag",
+      "best_value_odds": "-148",
+      "best_value_expected_value": -0.1119,
+      "best_value_edge": -6.68,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "New York Mets at Colorado Rockies",
+      "decision_tier": "pass",
+      "model_lean": "New York Mets",
+      "best_value_side": "New York Mets",
+      "line_source": "BetMGM",
+      "best_value_odds": "-160",
+      "best_value_expected_value": -0.1387,
+      "best_value_edge": -8.54,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "New York Mets at Colorado Rockies",
+      "decision_tier": "pass",
+      "model_lean": "New York Mets",
+      "best_value_side": "New York Mets",
+      "line_source": "DraftKings",
+      "best_value_odds": "-161",
+      "best_value_expected_value": -0.1408,
+      "best_value_edge": -8.69,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "New York Mets at Colorado Rockies",
+      "decision_tier": "pass",
+      "model_lean": "New York Mets",
+      "best_value_side": "New York Mets",
+      "line_source": "Bovada",
+      "best_value_odds": "-157",
+      "best_value_expected_value": -0.1324,
+      "best_value_edge": -8.09,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "New York Mets at Colorado Rockies",
+      "decision_tier": "pass",
+      "model_lean": "New York Mets",
+      "best_value_side": "New York Mets",
+      "line_source": "MyBookie.ag",
+      "best_value_odds": "-159",
+      "best_value_expected_value": -0.1367,
+      "best_value_edge": -8.39,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "New York Mets at Colorado Rockies",
+      "decision_tier": "pass",
+      "model_lean": "New York Mets",
+      "best_value_side": "New York Mets",
+      "line_source": "BetUS",
+      "best_value_odds": "-150",
+      "best_value_expected_value": -0.1167,
+      "best_value_edge": -7.0,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Pittsburgh Pirates at Arizona Diamondbacks",
+      "decision_tier": "watchlist",
+      "model_lean": "Arizona Diamondbacks",
+      "best_value_side": "Arizona Diamondbacks",
+      "line_source": "FanDuel",
+      "best_value_odds": "110",
+      "best_value_expected_value": 0.113,
+      "best_value_edge": 5.38,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Pittsburgh Pirates at Arizona Diamondbacks",
+      "decision_tier": "watchlist",
+      "model_lean": "Arizona Diamondbacks",
+      "best_value_side": "Arizona Diamondbacks",
+      "line_source": "BetOnline.ag",
+      "best_value_odds": "111",
+      "best_value_expected_value": 0.1183,
+      "best_value_edge": 5.61,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Pittsburgh Pirates at Arizona Diamondbacks",
+      "decision_tier": "watchlist",
+      "model_lean": "Arizona Diamondbacks",
+      "best_value_side": "Arizona Diamondbacks",
+      "line_source": "LowVig.ag",
+      "best_value_odds": "111",
+      "best_value_expected_value": 0.1183,
+      "best_value_edge": 5.61,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Pittsburgh Pirates at Arizona Diamondbacks",
+      "decision_tier": "watchlist",
+      "model_lean": "Arizona Diamondbacks",
+      "best_value_side": "Arizona Diamondbacks",
+      "line_source": "MyBookie.ag",
+      "best_value_odds": "110",
+      "best_value_expected_value": 0.113,
+      "best_value_edge": 5.38,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Pittsburgh Pirates at Arizona Diamondbacks",
+      "decision_tier": "watchlist",
+      "model_lean": "Arizona Diamondbacks",
+      "best_value_side": "Arizona Diamondbacks",
+      "line_source": "DraftKings",
+      "best_value_odds": "109",
+      "best_value_expected_value": 0.1077,
+      "best_value_edge": 5.15,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Pittsburgh Pirates at Arizona Diamondbacks",
+      "decision_tier": "watchlist",
+      "model_lean": "Arizona Diamondbacks",
+      "best_value_side": "Arizona Diamondbacks",
+      "line_source": "BetRivers",
+      "best_value_odds": "116",
+      "best_value_expected_value": 0.1448,
+      "best_value_edge": 6.7,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Pittsburgh Pirates at Arizona Diamondbacks",
+      "decision_tier": "watchlist",
+      "model_lean": "Arizona Diamondbacks",
+      "best_value_side": "Arizona Diamondbacks",
+      "line_source": "BetMGM",
+      "best_value_odds": "110",
+      "best_value_expected_value": 0.113,
+      "best_value_edge": 5.38,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Pittsburgh Pirates at Arizona Diamondbacks",
+      "decision_tier": "watchlist",
+      "model_lean": "Arizona Diamondbacks",
+      "best_value_side": "Arizona Diamondbacks",
+      "line_source": "BetUS",
+      "best_value_odds": "110",
+      "best_value_expected_value": 0.113,
+      "best_value_edge": 5.38,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Pittsburgh Pirates at Arizona Diamondbacks",
+      "decision_tier": "watchlist",
+      "model_lean": "Arizona Diamondbacks",
+      "best_value_side": "Arizona Diamondbacks",
+      "line_source": "Bovada",
+      "best_value_odds": "107",
+      "best_value_expected_value": 0.0971,
+      "best_value_edge": 4.69,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Texas Rangers at New York Yankees",
+      "decision_tier": "pass",
+      "model_lean": "New York Yankees",
+      "best_value_side": "New York Yankees",
+      "line_source": "FanDuel",
+      "best_value_odds": "-188",
+      "best_value_expected_value": -0.1881,
+      "best_value_edge": -12.28,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Texas Rangers at New York Yankees",
+      "decision_tier": "pass",
+      "model_lean": "New York Yankees",
+      "best_value_side": "New York Yankees",
+      "line_source": "LowVig.ag",
+      "best_value_odds": "-180",
+      "best_value_expected_value": -0.1756,
+      "best_value_edge": -11.29,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Texas Rangers at New York Yankees",
+      "decision_tier": "pass",
+      "model_lean": "New York Yankees",
+      "best_value_side": "New York Yankees",
+      "line_source": "BetOnline.ag",
+      "best_value_odds": "-180",
+      "best_value_expected_value": -0.1756,
+      "best_value_edge": -11.29,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Texas Rangers at New York Yankees",
+      "decision_tier": "pass",
+      "model_lean": "New York Yankees",
+      "best_value_side": "New York Yankees",
+      "line_source": "DraftKings",
+      "best_value_odds": "-194",
+      "best_value_expected_value": -0.1968,
+      "best_value_edge": -12.99,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Texas Rangers at New York Yankees",
+      "decision_tier": "pass",
+      "model_lean": "New York Yankees",
+      "best_value_side": "New York Yankees",
+      "line_source": "BetMGM",
+      "best_value_odds": "-200",
+      "best_value_expected_value": -0.205,
+      "best_value_edge": -13.67,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Texas Rangers at New York Yankees",
+      "decision_tier": "pass",
+      "model_lean": "New York Yankees",
+      "best_value_side": "New York Yankees",
+      "line_source": "Bovada",
+      "best_value_odds": "-198",
+      "best_value_expected_value": -0.2023,
+      "best_value_edge": -13.44,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Minnesota Twins at Washington Nationals",
+      "decision_tier": "watchlist",
+      "model_lean": "Washington Nationals",
+      "best_value_side": "Washington Nationals",
+      "line_source": "FanDuel",
+      "best_value_odds": "-104",
+      "best_value_expected_value": 0.0396,
+      "best_value_edge": 2.02,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Minnesota Twins at Washington Nationals",
+      "decision_tier": "watchlist",
+      "model_lean": "Washington Nationals",
+      "best_value_side": "Washington Nationals",
+      "line_source": "BetOnline.ag",
+      "best_value_odds": "-103",
+      "best_value_expected_value": 0.0446,
+      "best_value_edge": 2.26,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Minnesota Twins at Washington Nationals",
+      "decision_tier": "watchlist",
+      "model_lean": "Washington Nationals",
+      "best_value_side": "Washington Nationals",
+      "line_source": "LowVig.ag",
+      "best_value_odds": "-103",
+      "best_value_expected_value": 0.0446,
+      "best_value_edge": 2.26,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Minnesota Twins at Washington Nationals",
+      "decision_tier": "watchlist",
+      "model_lean": "Washington Nationals",
+      "best_value_side": "Washington Nationals",
+      "line_source": "DraftKings",
+      "best_value_odds": "-110",
+      "best_value_expected_value": 0.0118,
+      "best_value_edge": 0.62,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Minnesota Twins at Washington Nationals",
+      "decision_tier": "watchlist",
+      "model_lean": "Washington Nationals",
+      "best_value_side": "Washington Nationals",
+      "line_source": "BetMGM",
+      "best_value_odds": "-110",
+      "best_value_expected_value": 0.0118,
+      "best_value_edge": 0.62,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Minnesota Twins at Washington Nationals",
+      "decision_tier": "watchlist",
+      "model_lean": "Washington Nationals",
+      "best_value_side": "Washington Nationals",
+      "line_source": "Bovada",
+      "best_value_odds": "-110",
+      "best_value_expected_value": 0.0118,
+      "best_value_edge": 0.62,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cleveland Guardians at Kansas City Royals",
+      "decision_tier": "pass",
+      "model_lean": "Kansas City Royals",
+      "best_value_side": "Kansas City Royals",
+      "line_source": "FanDuel",
+      "best_value_odds": "-146",
+      "best_value_expected_value": -0.107,
+      "best_value_edge": -6.35,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cleveland Guardians at Kansas City Royals",
+      "decision_tier": "pass",
+      "model_lean": "Kansas City Royals",
+      "best_value_side": "Kansas City Royals",
+      "line_source": "BetOnline.ag",
+      "best_value_odds": "-137",
+      "best_value_expected_value": -0.0831,
+      "best_value_edge": -4.81,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cleveland Guardians at Kansas City Royals",
+      "decision_tier": "pass",
+      "model_lean": "Kansas City Royals",
+      "best_value_side": "Kansas City Royals",
+      "line_source": "LowVig.ag",
+      "best_value_odds": "-137",
+      "best_value_expected_value": -0.0831,
+      "best_value_edge": -4.81,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cleveland Guardians at Kansas City Royals",
+      "decision_tier": "pass",
+      "model_lean": "Kansas City Royals",
+      "best_value_side": "Kansas City Royals",
+      "line_source": "DraftKings",
+      "best_value_odds": "-143",
+      "best_value_expected_value": -0.0994,
+      "best_value_edge": -5.85,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cleveland Guardians at Kansas City Royals",
+      "decision_tier": "pass",
+      "model_lean": "Kansas City Royals",
+      "best_value_side": "Kansas City Royals",
+      "line_source": "BetMGM",
+      "best_value_odds": "-145",
+      "best_value_expected_value": -0.1045,
+      "best_value_edge": -6.18,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cleveland Guardians at Kansas City Royals",
+      "decision_tier": "pass",
+      "model_lean": "Kansas City Royals",
+      "best_value_side": "Kansas City Royals",
+      "line_source": "Bovada",
+      "best_value_odds": "-142",
+      "best_value_expected_value": -0.0968,
+      "best_value_edge": -5.68,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cincinnati Reds at Chicago Cubs",
+      "decision_tier": "pass",
+      "model_lean": "Chicago Cubs",
+      "best_value_side": "Chicago Cubs",
+      "line_source": "FanDuel",
+      "best_value_odds": "-205",
+      "best_value_expected_value": -0.2115,
+      "best_value_edge": -14.21,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cincinnati Reds at Chicago Cubs",
+      "decision_tier": "pass",
+      "model_lean": "Chicago Cubs",
+      "best_value_side": "Chicago Cubs",
+      "line_source": "BetOnline.ag",
+      "best_value_odds": "-180",
+      "best_value_expected_value": -0.1756,
+      "best_value_edge": -11.29,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cincinnati Reds at Chicago Cubs",
+      "decision_tier": "pass",
+      "model_lean": "Chicago Cubs",
+      "best_value_side": "Chicago Cubs",
+      "line_source": "LowVig.ag",
+      "best_value_odds": "-180",
+      "best_value_expected_value": -0.1756,
+      "best_value_edge": -11.29,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cincinnati Reds at Chicago Cubs",
+      "decision_tier": "pass",
+      "model_lean": "Chicago Cubs",
+      "best_value_side": "Chicago Cubs",
+      "line_source": "Bovada",
+      "best_value_odds": "-196",
+      "best_value_expected_value": -0.1996,
+      "best_value_edge": -13.22,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Cincinnati Reds at Chicago Cubs",
+      "decision_tier": "pass",
+      "model_lean": "Chicago Cubs",
+      "best_value_side": "Chicago Cubs",
+      "line_source": "BetMGM",
+      "best_value_odds": "-200",
+      "best_value_expected_value": -0.205,
+      "best_value_edge": -13.67,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "New York Mets at Colorado Rockies",
+      "decision_tier": "pass",
+      "model_lean": "New York Mets",
+      "best_value_side": "New York Mets",
+      "line_source": "FanDuel",
+      "best_value_odds": "-144",
+      "best_value_expected_value": -0.1019,
+      "best_value_edge": -6.02,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "New York Mets at Colorado Rockies",
+      "decision_tier": "pass",
+      "model_lean": "New York Mets",
+      "best_value_side": "New York Mets",
+      "line_source": "BetOnline.ag",
+      "best_value_odds": "-140",
+      "best_value_expected_value": -0.0914,
+      "best_value_edge": -5.33,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "New York Mets at Colorado Rockies",
+      "decision_tier": "pass",
+      "model_lean": "New York Mets",
+      "best_value_side": "New York Mets",
+      "line_source": "LowVig.ag",
+      "best_value_odds": "-140",
+      "best_value_expected_value": -0.0914,
+      "best_value_edge": -5.33,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "New York Mets at Colorado Rockies",
+      "decision_tier": "pass",
+      "model_lean": "New York Mets",
+      "best_value_side": "New York Mets",
+      "line_source": "DraftKings",
+      "best_value_odds": "-149",
+      "best_value_expected_value": -0.1143,
+      "best_value_edge": -6.84,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "New York Mets at Colorado Rockies",
+      "decision_tier": "pass",
+      "model_lean": "New York Mets",
+      "best_value_side": "New York Mets",
+      "line_source": "Bovada",
+      "best_value_odds": "-150",
+      "best_value_expected_value": -0.1167,
+      "best_value_edge": -7.0,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "New York Mets at Colorado Rockies",
+      "decision_tier": "pass",
+      "model_lean": "New York Mets",
+      "best_value_side": "New York Mets",
+      "line_source": "BetMGM",
+      "best_value_odds": "-150",
+      "best_value_expected_value": -0.1167,
+      "best_value_edge": -7.0,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Pittsburgh Pirates at Arizona Diamondbacks",
+      "decision_tier": "watchlist",
+      "model_lean": "Arizona Diamondbacks",
+      "best_value_side": "Arizona Diamondbacks",
+      "line_source": "FanDuel",
+      "best_value_odds": "-104",
+      "best_value_expected_value": 0.0396,
+      "best_value_edge": 2.02,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Pittsburgh Pirates at Arizona Diamondbacks",
+      "decision_tier": "watchlist",
+      "model_lean": "Arizona Diamondbacks",
+      "best_value_side": "Arizona Diamondbacks",
+      "line_source": "LowVig.ag",
+      "best_value_odds": "-106",
+      "best_value_expected_value": 0.03,
+      "best_value_edge": 1.54,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Pittsburgh Pirates at Arizona Diamondbacks",
+      "decision_tier": "watchlist",
+      "model_lean": "Arizona Diamondbacks",
+      "best_value_side": "Arizona Diamondbacks",
+      "line_source": "BetOnline.ag",
+      "best_value_odds": "-106",
+      "best_value_expected_value": 0.03,
+      "best_value_edge": 1.54,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Pittsburgh Pirates at Arizona Diamondbacks",
+      "decision_tier": "watchlist",
+      "model_lean": "Arizona Diamondbacks",
+      "best_value_side": "Arizona Diamondbacks",
+      "line_source": "DraftKings",
+      "best_value_odds": "-108",
+      "best_value_expected_value": 0.0207,
+      "best_value_edge": 1.08,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Pittsburgh Pirates at Arizona Diamondbacks",
+      "decision_tier": "watchlist",
+      "model_lean": "Arizona Diamondbacks",
+      "best_value_side": "Arizona Diamondbacks",
+      "line_source": "BetMGM",
+      "best_value_odds": "-105",
+      "best_value_expected_value": 0.0348,
+      "best_value_edge": 1.78,
+      "quarter_kelly_bankroll_pct": 1.0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": []
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Athletics at Philadelphia Phillies",
+      "decision_tier": "pass",
+      "model_lean": "Philadelphia Phillies",
+      "best_value_side": "Philadelphia Phillies",
+      "line_source": "FanDuel",
+      "best_value_odds": "-134",
+      "best_value_expected_value": -0.0745,
+      "best_value_edge": -4.26,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Athletics at Philadelphia Phillies",
+      "decision_tier": "pass",
+      "model_lean": "Philadelphia Phillies",
+      "best_value_side": "Philadelphia Phillies",
+      "line_source": "BetOnline.ag",
+      "best_value_odds": "-130",
+      "best_value_expected_value": -0.0623,
+      "best_value_edge": -3.52,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Athletics at Philadelphia Phillies",
+      "decision_tier": "pass",
+      "model_lean": "Philadelphia Phillies",
+      "best_value_side": "Philadelphia Phillies",
+      "line_source": "LowVig.ag",
+      "best_value_odds": "-130",
+      "best_value_expected_value": -0.0623,
+      "best_value_edge": -3.52,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Athletics at Philadelphia Phillies",
+      "decision_tier": "pass",
+      "model_lean": "Philadelphia Phillies",
+      "best_value_side": "Philadelphia Phillies",
+      "line_source": "DraftKings",
+      "best_value_odds": "-136",
+      "best_value_expected_value": -0.0803,
+      "best_value_edge": -4.63,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Athletics at Philadelphia Phillies",
+      "decision_tier": "pass",
+      "model_lean": "Philadelphia Phillies",
+      "best_value_side": "Philadelphia Phillies",
+      "line_source": "BetMGM",
+      "best_value_odds": "-140",
+      "best_value_expected_value": -0.0914,
+      "best_value_edge": -5.33,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Athletics at Philadelphia Phillies",
+      "decision_tier": "pass",
+      "model_lean": "Philadelphia Phillies",
+      "best_value_side": "Philadelphia Phillies",
+      "line_source": "Bovada",
+      "best_value_odds": "-138",
+      "best_value_expected_value": -0.0859,
+      "best_value_edge": -4.98,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Baltimore Orioles at Miami Marlins",
+      "decision_tier": "pass",
+      "model_lean": "Miami Marlins",
+      "best_value_side": "Miami Marlins",
+      "line_source": "FanDuel",
+      "best_value_odds": "-118",
+      "best_value_expected_value": -0.0208,
+      "best_value_edge": -1.13,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Baltimore Orioles at Miami Marlins",
+      "decision_tier": "pass",
+      "model_lean": "Miami Marlins",
+      "best_value_side": "Miami Marlins",
+      "line_source": "LowVig.ag",
+      "best_value_odds": "-118",
+      "best_value_expected_value": -0.0208,
+      "best_value_edge": -1.13,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Baltimore Orioles at Miami Marlins",
+      "decision_tier": "pass",
+      "model_lean": "Miami Marlins",
+      "best_value_side": "Miami Marlins",
+      "line_source": "BetOnline.ag",
+      "best_value_odds": "-118",
+      "best_value_expected_value": -0.0208,
+      "best_value_edge": -1.13,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Baltimore Orioles at Miami Marlins",
+      "decision_tier": "pass",
+      "model_lean": "Miami Marlins",
+      "best_value_side": "Miami Marlins",
+      "line_source": "DraftKings",
+      "best_value_odds": "-122",
+      "best_value_expected_value": -0.0356,
+      "best_value_edge": -1.95,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Baltimore Orioles at Miami Marlins",
+      "decision_tier": "pass",
+      "model_lean": "Miami Marlins",
+      "best_value_side": "Miami Marlins",
+      "line_source": "BetMGM",
+      "best_value_odds": "-125",
+      "best_value_expected_value": -0.046,
+      "best_value_edge": -2.56,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Baltimore Orioles at Miami Marlins",
+      "decision_tier": "pass",
+      "model_lean": "Miami Marlins",
+      "best_value_side": "Miami Marlins",
+      "line_source": "Bovada",
+      "best_value_odds": "-124",
+      "best_value_expected_value": -0.0426,
+      "best_value_edge": -2.36,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Tampa Bay Rays at Boston Red Sox",
+      "decision_tier": "pass",
+      "model_lean": "Boston Red Sox",
+      "best_value_side": "Boston Red Sox",
+      "line_source": "FanDuel",
+      "best_value_odds": "-116",
+      "best_value_expected_value": -0.0131,
+      "best_value_edge": -0.7,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Tampa Bay Rays at Boston Red Sox",
+      "decision_tier": "pass",
+      "model_lean": "Boston Red Sox",
+      "best_value_side": "Boston Red Sox",
+      "line_source": "BetOnline.ag",
+      "best_value_odds": "-120",
+      "best_value_expected_value": -0.0283,
+      "best_value_edge": -1.55,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Tampa Bay Rays at Boston Red Sox",
+      "decision_tier": "pass",
+      "model_lean": "Boston Red Sox",
+      "best_value_side": "Boston Red Sox",
+      "line_source": "LowVig.ag",
+      "best_value_odds": "-120",
+      "best_value_expected_value": -0.0283,
+      "best_value_edge": -1.55,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Tampa Bay Rays at Boston Red Sox",
+      "decision_tier": "pass",
+      "model_lean": "Boston Red Sox",
+      "best_value_side": "Boston Red Sox",
+      "line_source": "DraftKings",
+      "best_value_odds": "-122",
+      "best_value_expected_value": -0.0356,
+      "best_value_edge": -1.95,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Tampa Bay Rays at Boston Red Sox",
+      "decision_tier": "pass",
+      "model_lean": "Boston Red Sox",
+      "best_value_side": "Boston Red Sox",
+      "line_source": "BetMGM",
+      "best_value_odds": "-120",
+      "best_value_expected_value": -0.0283,
+      "best_value_edge": -1.55,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "Tampa Bay Rays at Boston Red Sox",
+      "decision_tier": "pass",
+      "model_lean": "Boston Red Sox",
+      "best_value_side": "Boston Red Sox",
+      "line_source": "Bovada",
+      "best_value_odds": "-121",
+      "best_value_expected_value": -0.032,
+      "best_value_edge": -1.75,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    },
+    {
+      "sport": "mlb",
+      "matchup": "St. Louis Cardinals at San Diego Padres",
+      "decision_tier": "pass",
+      "model_lean": "San Diego Padres",
+      "best_value_side": "San Diego Padres",
+      "line_source": "FanDuel",
+      "best_value_odds": "-178",
+      "best_value_expected_value": -0.1722,
+      "best_value_edge": -11.03,
+      "quarter_kelly_bankroll_pct": 0,
+      "line_is_fresh": true,
+      "available_books": "",
+      "decision_reasons": [
+        "expected_value_not_positive"
+      ]
+    }
+  ],
+  "summary": {
+    "watchlist": 41,
+    "pass": 110
+  }
+}

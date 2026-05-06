@@ -1,0 +1,16 @@
+matchup,side_a,best_book_a,best_odds_a,side_b,best_book_b,best_odds_b,implied_probability_sum,arbitrage,edge_pct
+Athletics at Philadelphia Phillies,Athletics,BetOnline.ag,118,Philadelphia Phillies,MyBookie.ag,120,0.9133,True,8.67
+Baltimore Orioles at Miami Marlins,Baltimore Orioles,MyBookie.ag,115,Miami Marlins,FanDuel,144,0.875,True,12.5
+Boston Red Sox at Detroit Tigers,Boston Red Sox,Bovada,-240,Detroit Tigers,MyBookie.ag,225,1.0136,False,-1.36
+Cincinnati Reds at Chicago Cubs,Chicago Cubs,BetUS,-159,Cincinnati Reds,FanDuel,172,0.9815,True,1.85
+Cleveland Cavaliers at Detroit Pistons,Cleveland Cavaliers,LowVig.ag,146,Detroit Pistons,DraftKings,-148,1.0033,False,-0.33
+Cleveland Guardians at Kansas City Royals,Cleveland Guardians,FanDuel,124,Kansas City Royals,FanDuel,-134,1.0191,False,-1.91
+Los Angeles Lakers at Oklahoma City Thunder,Los Angeles Lakers,BetRivers,700,Oklahoma City Thunder,LowVig.ag,-810,1.0151,False,-1.51
+Minnesota Timberwolves at San Antonio Spurs,Minnesota Timberwolves,LowVig.ag,336,San Antonio Spurs,BetUS,-400,1.0294,False,-2.94
+Minnesota Twins at Washington Nationals,Minnesota Twins,BetOnline.ag,-107,Washington Nationals,BetMGM,135,0.9424,True,5.76
+New York Mets at Colorado Rockies,Colorado Rockies,BetRivers,138,New York Mets,BetOnline.ag,-140,1.0035,False,-0.35
+Philadelphia 76ers at New York Knicks,New York Knicks,MyBookie.ag,-333,Philadelphia 76ers,DraftKings,300,1.0191,False,-1.91
+Pittsburgh Pirates at Arizona Diamondbacks,Arizona Diamondbacks,BetRivers,116,Pittsburgh Pirates,LowVig.ag,-104,0.9728,True,2.72
+St. Louis Cardinals at San Diego Padres,San Diego Padres,FanDuel,-178,St. Louis Cardinals,FanDuel,150,1.0403,False,-4.03
+Tampa Bay Rays at Boston Red Sox,Boston Red Sox,FanDuel,-116,Tampa Bay Rays,BetOnline.ag,109,1.0155,False,-1.55
+Texas Rangers at New York Yankees,New York Yankees,FanDuel,-108,Texas Rangers,BetMGM,165,0.8966,True,10.34

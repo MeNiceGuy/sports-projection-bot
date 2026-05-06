@@ -3,7 +3,7 @@ from __future__ import annotations
 import csv
 import json
 import os
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 import requests
@@ -42,26 +42,27 @@ def main():
             bookmakers = game.get("bookmakers", [])
             if not bookmakers:
                 continue
-            book = bookmakers[0]
-            for market in book.get("markets", []):
-                outcomes = market.get("outcomes", [])
-                if len(outcomes) >= 2:
-                    a = outcomes[0]
-                    b = outcomes[1]
-                    rows.append({
-                        "sport": local_sport,
-                        "market": market.get("key", ""),
-                        "game_id": game_id,
-                        "matchup": matchup,
-                        "line_source": book.get("title", ""),
-                        "side_a": a.get("name", ""),
-                        "side_b": b.get("name", ""),
-                        "line_a": a.get("point", ""),
-                        "line_b": b.get("point", ""),
-                        "odds_a": a.get("price", ""),
-                        "odds_b": b.get("price", ""),
-                        "timestamp": datetime.utcnow().isoformat(),
-                    })
+            fetch_time = datetime.now(UTC).isoformat()
+            for book in bookmakers:
+                for market in book.get("markets", []):
+                    outcomes = market.get("outcomes", [])
+                    if len(outcomes) >= 2:
+                        a = outcomes[0]
+                        b = outcomes[1]
+                        rows.append({
+                            "sport": local_sport,
+                            "market": market.get("key", ""),
+                            "game_id": game_id,
+                            "matchup": matchup,
+                            "line_source": book.get("title", ""),
+                            "side_a": a.get("name", ""),
+                            "side_b": b.get("name", ""),
+                            "line_a": a.get("point", ""),
+                            "line_b": b.get("point", ""),
+                            "odds_a": a.get("price", ""),
+                            "odds_b": b.get("price", ""),
+                            "timestamp": market.get("last_update") or fetch_time,
+                        })
 
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     with OUT_PATH.open("w", encoding="utf-8", newline="") as f:

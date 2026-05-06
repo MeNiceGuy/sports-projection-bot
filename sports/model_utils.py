@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 
 def clamp(value, low=0.0, high=100.0):
     return max(low, min(high, value))
@@ -40,3 +42,13 @@ def edge_band_from_gap(gap):
     if gap >= 10:
         return "moderate"
     return "weak"
+
+
+def probability_from_score_gap(gap, scale=22.0, low=0.18, high=0.82):
+    """Convert a model score gap into a conservative win-probability estimate."""
+    try:
+        gap = float(gap)
+    except (TypeError, ValueError):
+        gap = 0.0
+    probability = 1 / (1 + math.exp(-(gap / scale)))
+    return round(clamp(probability, low, high), 4)

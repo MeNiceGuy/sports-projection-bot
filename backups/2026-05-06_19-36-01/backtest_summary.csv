@@ -1,0 +1,3 @@
+grade,bets,wins,losses,hit_rate_pct,total_profit,avg_profit_per_bet
+A,4,1,3,25.0,-1.98,-0.12
+B,6,1,5,16.67,-4.0,-0.17
