@@ -1,0 +1,31 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+pytest-cache-files-*/
+logs/streamlit.*.log
+.env
+
+# Local/generated model artifacts
+logs/
+data/*
+!data/manual_market_lines.example.csv
+reports/*.json
+reports/*.csv
+outputs/
+backups/
+*.db
+*.sqlite
+*.sqlite3
+
+# Local secrets
+.env.*
+!.env.example
+config.odds.json
+
+# Notebooks/build/editor
+.ipynb_checkpoints/
+dist/
+build/
+.DS_Store
+Thumbs.db
