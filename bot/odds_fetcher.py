@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import argparse
 import csv
 import json
 import os
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -10,16 +12,178 @@ import requests
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT / "config.odds.json"
+CONFIG_EXAMPLE_PATH = ROOT / "config.odds.example.json"
 OUT_PATH = ROOT / "logs" / "market_lines.csv"
+HISTORY_PATH = ROOT / "logs" / "market_line_history.csv"
+STATUS_PATH = ROOT / "logs" / "odds_fetch_status.json"
+FIELDNAMES = ["sport", "market", "game_id", "matchup", "line_source", "side_a", "side_b", "line_a", "line_b", "odds_a", "odds_b", "timestamp"]
+API_KEY_RE = re.compile(r"(?i)(apiKey=)[^&\s]+")
+DEFAULT_MAX_FETCH_AGE_MINUTES = 10
 
 
-def main():
-    api_key = os.environ.get("THE_ODDS_API_KEY", "").strip()
+def load_config():
+    path = CONFIG_PATH if CONFIG_PATH.exists() else CONFIG_EXAMPLE_PATH
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+
+
+def load_api_key(config: dict):
+    return (
+        os.environ.get("THE_ODDS_API_KEY", "").strip()
+        or os.environ.get("SPORTSBOOK_ODDS_API_KEY", "").strip()
+        or str(config.get("api_key") or config.get("sportsbook_odds_api_key") or "").strip()
+    )
+
+
+def sanitize_reason(reason: str):
+    return API_KEY_RE.sub(r"\1***", str(reason))
+
+
+def _load_json(path: Path):
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+
+
+def _load_current_rows():
+    if not OUT_PATH.exists():
+        return []
+    with OUT_PATH.open("r", encoding="utf-8", newline="") as f:
+        return list(csv.DictReader(f))
+
+
+def _status_age_minutes(status: dict):
+    timestamp = status.get("generated_at", "")
+    if not timestamp:
+        return None
+    try:
+        generated_at = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    now = datetime.now(UTC)
+    if generated_at.tzinfo is None:
+        now = now.replace(tzinfo=None)
+    return round(max(0.0, (now - generated_at).total_seconds() / 60), 2)
+
+
+def current_fetch_is_fresh(max_age_minutes: int):
+    status = _load_json(STATUS_PATH)
+    rows = _load_current_rows()
+    age = _status_age_minutes(status)
+    if not status.get("ok") or not rows or age is None:
+        return False, status, rows, age
+    if any(is_placeholder_market_row(row) for row in rows):
+        return False, status, rows, age
+    return age <= max_age_minutes, status, rows, age
+
+
+def write_current_lines(rows: list[dict]):
+    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with OUT_PATH.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def write_status(ok: bool, reason: str, rows: int = 0, source: str = "api", extra: dict | None = None):
+    STATUS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "ok": ok,
+        "reason": sanitize_reason(reason),
+        "rows": rows,
+        "source": source,
+        "generated_at": datetime.now(UTC).isoformat(),
+        "market_lines": str(OUT_PATH),
+    }
+    if extra:
+        payload.update(extra)
+    STATUS_PATH.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    return payload
+
+
+def fail_current_lines(reason: str):
+    write_current_lines([])
+    payload = write_status(False, reason, rows=0)
+    print(payload)
+    raise SystemExit(1)
+
+
+def is_placeholder_market_row(row: dict) -> bool:
+    matchup = row.get("matchup", "").lower()
+    game_id = row.get("game_id", "").lower()
+    sides = f"{row.get('side_a', '')} {row.get('side_b', '')}".lower()
+    return (
+        "away team at home team" in matchup
+        or game_id.startswith("example")
+        or "away team" in sides
+        or "home team" in sides
+    )
+
+
+def append_line_history(rows: list[dict]):
+    real_rows = [row for row in rows if not is_placeholder_market_row(row)]
+    if not real_rows:
+        return 0
+    HISTORY_PATH.parent.mkdir(parents=True, exist_ok=True)
+    needs_header = not HISTORY_PATH.exists() or HISTORY_PATH.stat().st_size == 0
+    with HISTORY_PATH.open("a", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
+        if needs_header:
+            writer.writeheader()
+        writer.writerows(real_rows)
+    return len(real_rows)
+
+
+def main(argv: list[str] | None = None):
+    parser = argparse.ArgumentParser(description="Fetch sportsbook odds without burning API quota.")
+    parser.add_argument("--force", action="store_true", help="Call the odds API even if the current odds snapshot is fresh.")
+    parser.add_argument(
+        "--max-age-minutes",
+        type=int,
+        default=None,
+        help=f"Reuse current odds when the last successful fetch is this fresh. Default: config max_fetch_age_minutes or {DEFAULT_MAX_FETCH_AGE_MINUTES}.",
+    )
+    args = parser.parse_args(argv)
+    config = load_config()
+    max_age_minutes = args.max_age_minutes
+    if max_age_minutes is None:
+        max_age_minutes = int(config.get("max_fetch_age_minutes", DEFAULT_MAX_FETCH_AGE_MINUTES))
+
+    if not args.force:
+        is_fresh, status, rows, age = current_fetch_is_fresh(max_age_minutes)
+        if is_fresh:
+            print({
+                "market_lines_written": len(rows),
+                "line_history_appended": 0,
+                "cache_hit": True,
+                "age_minutes": age,
+                "output": str(OUT_PATH),
+                "history": str(HISTORY_PATH),
+                "status": {
+                    **status,
+                    "cache_hit": True,
+                    "age_minutes": age,
+                    "max_age_minutes": max_age_minutes,
+                    "reason": f"reused fresh sportsbook odds snapshot from {age} minutes ago",
+                },
+            })
+            return
+
+    api_key = load_api_key(config)
     if not api_key:
-        raise SystemExit("THE_ODDS_API_KEY is not set")
+        fail_current_lines("sportsbook odds API key is not set")
+    if not config.get("sports"):
+        fail_current_lines("sportsbook odds sports mapping is not configured")
 
-    config = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
     rows = []
+    quota_headers = {}
 
     for local_sport, odds_sport in config.get("sports", {}).items():
         url = f"https://api.the-odds-api.com/v4/sports/{odds_sport}/odds"
@@ -30,14 +194,21 @@ def main():
             "oddsFormat": config.get("odds_format", "american"),
             "dateFormat": config.get("date_format", "iso"),
         }
-        resp = requests.get(url, params=params, timeout=30)
-        resp.raise_for_status()
-        data = resp.json()
+        try:
+            resp = requests.get(url, params=params, timeout=30)
+            resp.raise_for_status()
+            data = resp.json()
+            quota_headers = {
+                "odds_api_requests_remaining": resp.headers.get("x-requests-remaining"),
+                "odds_api_requests_used": resp.headers.get("x-requests-used"),
+            }
+        except requests.RequestException as exc:
+            fail_current_lines(f"odds request failed for {local_sport}: {exc}")
 
         for game in data:
             game_id = game.get("id", "")
             home = game.get("home_team", "")
-            away = next((t for t in game.get("away_team", []) if False), "") if isinstance(game.get("away_team"), list) else game.get("away_team", "")
+            away = game.get("away_team", "")
             matchup = f"{away} at {home}" if away and home else game.get("commence_time", "")
             bookmakers = game.get("bookmakers", [])
             if not bookmakers:
@@ -64,13 +235,15 @@ def main():
                             "timestamp": market.get("last_update") or fetch_time,
                         })
 
-    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with OUT_PATH.open("w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["sport", "market", "game_id", "matchup", "line_source", "side_a", "side_b", "line_a", "line_b", "odds_a", "odds_b", "timestamp"])
-        writer.writeheader()
-        writer.writerows(rows)
+    if not rows:
+        fail_current_lines("sportsbook odds API returned no market rows")
 
-    print({"market_lines_written": len(rows), "output": str(OUT_PATH)})
+    write_current_lines(rows)
+
+    history_rows = append_line_history(rows)
+    status = write_status(True, "sportsbook odds fetch succeeded", rows=len(rows), extra={"cache_hit": False, **quota_headers})
+
+    print({"market_lines_written": len(rows), "line_history_appended": history_rows, "output": str(OUT_PATH), "history": str(HISTORY_PATH), "status": status})
 
 
 if __name__ == "__main__":

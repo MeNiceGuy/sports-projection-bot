@@ -1,3 +1,6 @@
 pandas
 requests
 pypdf
+nba_api
+streamlit
+pytest

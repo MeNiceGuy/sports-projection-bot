@@ -1,16 +1,26 @@
-# Model Gaps
+# Model Layer Status
 
-## NBA gaps
-- injuries / availability
-- stronger defensive context
-- pace / possessions
+## Completed NBA layers
+- weighted recent form
+- weighted offensive strength
+- weighted defensive context
+- pace / possessions context
+- rest context
+- official injury-report context when available
+- market comparison, EV filtering, and governance handoff
 
-## MLB gaps
-- stronger probable starter quality
-- bullpen context
-- home/away splits
+## Completed MLB layers
+- weighted recent form
+- probable starter quality
+- bullpen quality
+- bullpen freshness proxy
+- home/away split context
+- scoring strength
+- run-prevention context
+- market comparison, EV filtering, and governance handoff
 
-## Shared gaps
-- automatic results ingestion
-- confidence calibration
-- optional line comparison later
+## Remaining operational limits
+- live API access can still fail, so the pipeline keeps cached-market fallbacks where possible
+- governance remains blocked until enough graded results exist for calibration
+- historical results still need regular ingestion before confidence buckets should be trusted
+- all outputs remain betting-research signals, not guaranteed winning picks

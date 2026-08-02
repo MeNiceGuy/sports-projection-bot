@@ -1,7 +1,7 @@
 def build_ncaaf_report():
     return {
-        "status": "placeholder",
-        "model": "ncaaf_placeholder",
+        "status": "inactive_not_implemented",
+        "model": "ncaaf_not_implemented",
         "games": [],
-        "note": "NCAAF module scaffolded but not active yet."
+        "note": "NCAAF projections are inactive until a real data source is implemented."
     }

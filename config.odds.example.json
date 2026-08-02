@@ -1,0 +1,12 @@
+{
+  "api_key": "",
+  "regions": "us",
+  "markets": "h2h,spreads,totals",
+  "odds_format": "american",
+  "date_format": "iso",
+  "max_fetch_age_minutes": 10,
+  "sports": {
+    "nba": "basketball_nba",
+    "mlb": "baseball_mlb"
+  }
+}

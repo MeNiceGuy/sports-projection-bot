@@ -1,150 +1,165 @@
-﻿from __future__ import annotations
+from __future__ import annotations
+from sports.adaptive_accuracy import get_dynamic_historical_accuracy
 
 import csv
 import json
-import statistics
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
-from sports.model_utils import confidence_from_gap, edge_band_from_gap, probability_from_score_gap
+from sports.mlb import build_mlb_report
+from sports.nba import build_nba_report
+from sports.model_utils import probability_from_score_gap
+from sports.advanced_analytics import enrich_game
+from bot.data_warehouse import store_projection_report
+from bot.dynamic_learning import apply_dynamic_learning_to_game, load_learning_state
 
 ROOT = Path(__file__).resolve().parent
-MARKET_LINES = ROOT / "logs" / "market_lines.csv"
+CONFIG_PATH = ROOT / "config.json"
 REPORT_OUT = ROOT / "reports" / "daily_projection_report.json"
 PRED_LOG = ROOT / "logs" / "prediction_log.csv"
+GRADED_RESULTS = ROOT / "logs" / "graded_results.csv"
 
-def american_to_prob(odds):
-    odds = float(odds)
-    if odds < 0:
-        return abs(odds) / (abs(odds) + 100)
-    return 100 / (odds + 100)
+BUILDERS = {
+    "nba": build_nba_report,
+    "mlb": build_mlb_report,
+}
 
-def no_vig_pair(prob_a, prob_b):
-    total = prob_a + prob_b
-    if total <= 0:
-        return 0.5, 0.5
-    return prob_a / total, prob_b / total
 
-def load_h2h_market():
-    games = {}
+def load_config():
+    if not CONFIG_PATH.exists():
+        return {"active_sports": ["nba", "mlb"], "output_report": str(REPORT_OUT)}
+    return json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
 
-    with MARKET_LINES.open("r", encoding="utf-8") as f:
+
+def load_historical_accuracy():
+    if not GRADED_RESULTS.exists():
+        return {}
+    totals = {}
+    with GRADED_RESULTS.open("r", newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
-            if row.get("market") != "h2h":
+            sport = row.get("sport", "")
+            if not sport:
                 continue
-
-            gid = row["game_id"]
-            matchup = row["matchup"]
-            away, home = matchup.split(" at ")
-
-            prob_a = american_to_prob(row["odds_a"])
-            prob_b = american_to_prob(row["odds_b"])
-            fair_a, fair_b = no_vig_pair(prob_a, prob_b)
-
-            games.setdefault(gid, {
-                "sport": row["sport"],
-                "game_id": gid,
-                "matchup": matchup,
-                "away_team": away,
-                "home_team": home,
-                "books": [],
-            })
-
-            games[gid]["books"].append({
-                "book": row["line_source"],
-                "side_a": row["side_a"],
-                "side_b": row["side_b"],
-                "fair_a": fair_a,
-                "fair_b": fair_b,
-            })
-
-    return list(games.values())
-
-def build_projection(game):
-    home_probs = []
-    away_probs = []
-
-    for b in game["books"]:
-        if b["side_a"] == game["home_team"]:
-            home_probs.append(b["fair_a"])
-            away_probs.append(b["fair_b"])
-        else:
-            home_probs.append(b["fair_b"])
-            away_probs.append(b["fair_a"])
-
-    market_home = statistics.mean(home_probs) if home_probs else 0.5
-    market_away = statistics.mean(away_probs) if away_probs else 0.5
-
-    # Real v1 model: market baseline + conservative home advantage + underdog resistance.
-    home_adv = 0.025 if game["sport"] == "nba" else 0.015
-    favorite_penalty = 0.015 if market_home > 0.62 else 0.0
-
-    model_home = market_home + home_adv - favorite_penalty
-    model_home = max(0.18, min(0.82, model_home))
-    model_away = 1 - model_home
-
-    gap = (model_home - market_home) * 100
-    lean = game["home_team"] if model_home >= model_away else game["away_team"]
-    model_prob = max(model_home, model_away)
-
+            totals.setdefault(sport, {"total": 0, "correct": 0})
+            totals[sport]["total"] += 1
+            if str(row.get("was_correct", "")).strip().lower() in {"true", "1", "yes", "win"}:
+                totals[sport]["correct"] += 1
     return {
-        **game,
-        "simple_projection_lean": lean,
-        "lean": lean,
-        "model_gap": round(gap, 2),
-        "model_probability": round(model_prob, 4),
-        "model_prob_home": round(model_home, 4),
-        "model_prob_away": round(model_away, 4),
-        "market_prob_home": round(market_home, 4),
-        "market_prob_away": round(market_away, 4),
-        "confidence": confidence_from_gap(gap),
-        "edge_band": edge_band_from_gap(gap),
-        "notes": "Projection v1 uses no-vig market consensus, home advantage, favorite penalty, and sport-specific calibration.",
+        sport: round(data["correct"] / data["total"], 4)
+        for sport, data in totals.items()
+        if data["total"] >= 5
     }
 
-def main():
-    now = datetime.now(timezone.utc).isoformat()
-    games = load_h2h_market()
-    projections = [build_projection(g) for g in games]
 
-    REPORT_OUT.parent.mkdir(parents=True, exist_ok=True)
+def model_probability_for_game(game: dict):
+    if game.get("simple_projection_lean") == (game.get("matchup", "").split(" at ")[0] if " at " in game.get("matchup", "") else ""):
+        return round(float(game.get("win_probability_away", 0) or 0), 4) or _score_gap_probability(game, away=True)
+    if game.get("simple_projection_lean") == (game.get("matchup", "").split(" at ")[-1] if " at " in game.get("matchup", "") else ""):
+        return round(float(game.get("win_probability_home", 0) or 0), 4) or _score_gap_probability(game)
+    if game.get("win_probability_home") is not None and game.get("win_probability_away") is not None:
+        return round(max(float(game.get("win_probability_home") or 0.5), float(game.get("win_probability_away") or 0.5)), 4)
+    return _score_gap_probability(game)
+
+
+def _score_gap_probability(game: dict, away: bool = False):
+    home_score = float(game.get("home_weighted_score", 50) or 50)
+    away_score = float(game.get("away_weighted_score", 50) or 50)
+    home_probability = probability_from_score_gap(home_score - away_score)
+    if away:
+        return round(1.0 - home_probability, 4)
+    return round(max(home_probability, 1.0 - home_probability), 4)
+
+
+def write_prediction_log(report: dict):
     PRED_LOG.parent.mkdir(parents=True, exist_ok=True)
-
-    report = {
-        "generated_at": now,
-        "active_sports": sorted(set(p["sport"] for p in projections)),
-        "reports": {
-            sport: {
-                "status": "ok",
-                "model": "market_consensus_projection_v1",
-                "generated_at": now,
-                "games": [p for p in projections if p["sport"] == sport],
-            }
-            for sport in sorted(set(p["sport"] for p in projections))
-        },
-    }
-
-    REPORT_OUT.write_text(json.dumps(report, indent=2), encoding="utf-8")
-
     with PRED_LOG.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=[
-            "generated_at", "sport", "game_id", "matchup", "lean",
-            "confidence", "edge", "notes"
+            "generated_at",
+            "sport",
+            "game_id",
+            "matchup",
+            "lean",
+            "confidence",
+            "edge",
+            "edge_band",
+            "predicted_probability",
+            "win_probability_home",
+            "win_probability_away",
+            "confidence_band_lower",
+            "confidence_band_upper",
+            "factor_agreement",
+            "historical_accuracy",
+            "calibration_method",
+            "notes",
         ])
         writer.writeheader()
-        for p in projections:
-            writer.writerow({
-                "generated_at": now,
-                "sport": p["sport"],
-                "game_id": p["game_id"],
-                "matchup": p["matchup"],
-                "lean": p["lean"],
-                "confidence": p["confidence"],
-                "edge": p["model_gap"],
-                "notes": p["notes"],
-            })
+        for sport, block in report.get("reports", {}).items():
+            for game in block.get("games", []):
+                writer.writerow({
+                    "generated_at": report.get("generated_at", ""),
+                    "sport": sport,
+                    "game_id": game.get("game_id", ""),
+                    "matchup": game.get("matchup", ""),
+                    "lean": game.get("simple_projection_lean", ""),
+                    "confidence": game.get("confidence", ""),
+                    "edge": game.get("record_edge_pct", ""),
+                    "edge_band": game.get("edge_band", ""),
+                    "predicted_probability": model_probability_for_game(game),
+                    "win_probability_home": game.get("win_probability_home", ""),
+                    "win_probability_away": game.get("win_probability_away", ""),
+                    "confidence_band_lower": (game.get("confidence_band_home") or {}).get("lower", ""),
+                    "confidence_band_upper": (game.get("confidence_band_home") or {}).get("upper", ""),
+                    "factor_agreement": game.get("factor_agreement", ""),
+                    "historical_accuracy": game.get("historical_accuracy", ""),
+                    "calibration_method": (game.get("calibration") or {}).get("method", ""),
+                    "notes": game.get("note", ""),
+                })
 
-    print({"projections_written": len(projections), "model": "market_consensus_projection_v1"})
+
+def enrich_report(report: dict):
+    historical_accuracy = load_historical_accuracy()
+    learning_state = load_learning_state()
+    for sport, block in report.get("reports", {}).items():
+        for game in block.get("games", []):
+            game["historical_accuracy"] = historical_accuracy.get(sport, get_dynamic_historical_accuracy(sport))
+        block["games"] = [
+            apply_dynamic_learning_to_game(enrich_game(sport, game), learning_state)
+            for game in block.get("games", [])
+        ]
+    return report
+
+
+def main():
+    config = load_config()
+    active_sports = [sport for sport in config.get("active_sports", []) if sport in BUILDERS]
+    now = datetime.now(UTC).isoformat()
+    report = {
+        "generated_at": now,
+        "active_sports": active_sports,
+        "reports": {},
+        "model_stack": "weighted_team_models_v2_plus_market_governance",
+        "note": "Daily projection now runs the sport-specific weighted models. Market comparison, EV filtering, staking research, CLV, and governance run in later pipeline steps.",
+    }
+
+    for sport in active_sports:
+        report["reports"][sport] = BUILDERS[sport]()
+
+    enrich_report(report)
+    output_path = ROOT / config.get("output_report", "reports/daily_projection_report.json")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    write_prediction_log(report)
+    store_projection_report(report)
+
+    print({
+        "sports": active_sports,
+        "games": sum(len(block.get("games", [])) for block in report["reports"].values()),
+        "output": str(output_path),
+        "prediction_log": str(PRED_LOG),
+        "warehouse": str(ROOT / "logs" / "bets.db"),
+    })
+
 
 if __name__ == "__main__":
     main()
+

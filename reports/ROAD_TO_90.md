@@ -3,18 +3,20 @@
 ## Already built
 - live NBA feed
 - live MLB feed
-- multi-factor early projection logic
+- weighted NBA projection logic
+- weighted MLB projection logic
+- market comparison and no-vig EV filtering
+- staking, CLV, and governance reporting
 - report generation
 - prediction logging
 - performance summary
 - desktop GitHub-ready packaging
 
 ## Still closing the gap
-- result grading / hit tracking
-- stronger NBA context
-- stronger MLB pitching context
-- confidence reporting improvements
-- more complete validation layer
+- larger graded sample for calibration
+- regular result ingestion discipline
+- live data reliability monitoring
+- weight tuning after enough tracked predictions exist
 
 ## Meaning of 90 percent here
-This project reaching ~90% means most of the major tooling and workflow pieces are present, even if the model still needs ongoing refinement.
+This project reaching ~90% means the major modeling, market, risk, reporting, and governance pieces are present, even though calibration still needs ongoing tracked results.

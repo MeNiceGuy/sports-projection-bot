@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from datetime import datetime
 import requests
+
+from sports.dates import current_slate_date_str
 
 
 def fetch_schedule_for_date(date_str: str):
@@ -33,4 +34,4 @@ def build_probable_pitcher_map(date_str: str):
 
 
 def today_date_str():
-    return datetime.utcnow().strftime('%Y-%m-%d')
+    return current_slate_date_str()

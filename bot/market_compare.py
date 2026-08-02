@@ -5,16 +5,32 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
+from bot.data_warehouse import store_line_movements, store_market_lines
 from sports.model_utils import probability_from_score_gap
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORT_PATH = ROOT / "reports" / "daily_projection_report.json"
 MARKET_LINES = ROOT / "logs" / "market_lines.csv"
+MARKET_LINE_HISTORY = ROOT / "logs" / "market_line_history.csv"
 OUT = ROOT / "reports" / "market_comparison_report.json"
 
 
 EDGE_BAND_RANK = {"weak": 0, "moderate": 1, "strong": 2}
 DEFAULT_MAX_LINE_AGE_HOURS = 12
+FIELD_DEDUPE_KEYS = (
+    "sport",
+    "market",
+    "game_id",
+    "matchup",
+    "line_source",
+    "side_a",
+    "side_b",
+    "line_a",
+    "line_b",
+    "odds_a",
+    "odds_b",
+    "timestamp",
+)
 
 
 def safe_float(value, default=None):
@@ -95,6 +111,24 @@ def read_lines():
         return list(csv.DictReader(f))
 
 
+def read_line_history():
+    rows = []
+    for path in [MARKET_LINE_HISTORY, MARKET_LINES]:
+        if not path.exists():
+            continue
+        with path.open("r", encoding="utf-8", newline="") as f:
+            rows.extend(csv.DictReader(f))
+    seen = set()
+    unique_rows = []
+    for row in rows:
+        key = tuple(row.get(field, "") for field in FIELD_DEDUPE_KEYS)
+        if key in seen:
+            continue
+        seen.add(key)
+        unique_rows.append(row)
+    return unique_rows
+
+
 def line_age_hours(row: dict, now: datetime | None = None):
     timestamp = row.get("timestamp", "")
     if not timestamp:
@@ -114,6 +148,86 @@ def is_line_fresh(row: dict, max_age_hours=DEFAULT_MAX_LINE_AGE_HOURS):
     if age is None:
         return False
     return age <= max_age_hours
+
+
+def line_timestamp(row: dict):
+    timestamp = row.get("timestamp", "")
+    if not timestamp:
+        return datetime.min
+    try:
+        parsed = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+    except ValueError:
+        return datetime.min
+    if parsed.tzinfo is not None:
+        return parsed.astimezone(UTC).replace(tzinfo=None)
+    return parsed
+
+
+def safe_line_delta(open_value, close_value):
+    open_value = safe_float(open_value)
+    close_value = safe_float(close_value)
+    if open_value is None or close_value is None:
+        return None
+    return round(close_value - open_value, 3)
+
+
+def build_line_movement(market_rows: list[dict], model_lean: str):
+    if not market_rows:
+        return {}
+    ordered = sorted(market_rows, key=line_timestamp)
+    open_row = ordered[0]
+    close_row = ordered[-1]
+    odds_delta_a = safe_line_delta(open_row.get("odds_a"), close_row.get("odds_a"))
+    odds_delta_b = safe_line_delta(open_row.get("odds_b"), close_row.get("odds_b"))
+    line_delta_a = safe_line_delta(open_row.get("line_a"), close_row.get("line_a"))
+    line_delta_b = safe_line_delta(open_row.get("line_b"), close_row.get("line_b"))
+    lean_norm = normalize_team_name(model_lean)
+    close_side_a = normalize_team_name(close_row.get("side_a", ""))
+    close_side_b = normalize_team_name(close_row.get("side_b", ""))
+    lean_odds_delta = odds_delta_a if lean_norm == close_side_a else (odds_delta_b if lean_norm == close_side_b else None)
+
+    if lean_odds_delta is None:
+        direction = "unknown"
+    elif lean_odds_delta < 0:
+        direction = "toward_model_side"
+    elif lean_odds_delta > 0:
+        direction = "away_from_model_side"
+    else:
+        direction = "flat"
+
+    return {
+        "open_line": {"line_a": open_row.get("line_a", ""), "line_b": open_row.get("line_b", ""), "odds_a": open_row.get("odds_a", ""), "odds_b": open_row.get("odds_b", ""), "timestamp": open_row.get("timestamp", "")},
+        "closing_line": {"line_a": close_row.get("line_a", ""), "line_b": close_row.get("line_b", ""), "odds_a": close_row.get("odds_a", ""), "odds_b": close_row.get("odds_b", ""), "timestamp": close_row.get("timestamp", "")},
+        "line_delta_a": line_delta_a,
+        "line_delta_b": line_delta_b,
+        "odds_delta_a": odds_delta_a,
+        "odds_delta_b": odds_delta_b,
+        "movement_direction": direction,
+        "books_observed": len({row.get("line_source", "") for row in market_rows if row.get("line_source", "")}),
+    }
+
+
+def market_psychology(line_movement: dict, best_value: dict | None):
+    direction = line_movement.get("movement_direction", "unknown")
+    edge = safe_float(best_value.get("value_edge") if best_value else None, 0.0) or 0.0
+    ev = safe_float(best_value.get("expected_value_per_unit") if best_value else None, 0.0) or 0.0
+    books = int(line_movement.get("books_observed") or 0)
+    flags = []
+    if direction == "toward_model_side" and books >= 2:
+        flags.append("steam_move_candidate")
+    if direction == "away_from_model_side" and edge > 0 and ev > 0:
+        flags.append("reverse_line_value_candidate")
+    if edge >= 7 and direction == "away_from_model_side":
+        flags.append("trap_line_review")
+    return {
+        "public_betting_pct": None,
+        "sharp_money_signal": "possible" if flags else "unknown",
+        "reverse_line_movement": direction == "away_from_model_side" and edge > 0,
+        "steam_move": "steam_move_candidate" in flags,
+        "trap_line": "trap_line_review" in flags,
+        "flags": flags,
+        "note": "Public betting percentages require an external splits feed; this layer infers only from stored line movement.",
+    }
 
 
 def side_value(
@@ -138,6 +252,7 @@ def side_value(
             "side_role": "home",
             "model_probability": model_prob_home,
             "implied_probability": implied_prob,
+            "market_probability": no_vig_probability,
             "no_vig_probability": no_vig_probability,
             "value_edge": round((model_prob_home - no_vig_probability) * 100, 2),
             "raw_value_edge": round((model_prob_home - implied_prob) * 100, 2),
@@ -155,6 +270,7 @@ def side_value(
             "side_role": "away",
             "model_probability": model_prob_away,
             "implied_probability": implied_prob,
+            "market_probability": no_vig_probability,
             "no_vig_probability": no_vig_probability,
             "value_edge": round((model_prob_away - no_vig_probability) * 100, 2),
             "raw_value_edge": round((model_prob_away - implied_prob) * 100, 2),
@@ -225,6 +341,35 @@ def rate_decision(game: dict, best_value: dict | None, teams_matched: bool, line
     return "pass", reasons
 
 
+def select_best_value(value_options: list[dict], model_lean: str):
+    if not value_options:
+        return None
+
+    fresh_options = [v for v in value_options if v.get("line_is_fresh")]
+    usable_options = fresh_options or value_options
+    lean_norm = normalize_team_name(model_lean)
+
+    def option_rank(item: dict):
+        return (
+            item.get("value_edge") if item.get("value_edge") is not None else -999,
+            item.get("expected_value_per_unit") if item.get("expected_value_per_unit") is not None else -999,
+        )
+
+    lean_options = [
+        item
+        for item in usable_options
+        if normalize_team_name(item.get("side", "")) == lean_norm
+        and item.get("value_edge") is not None
+        and item.get("expected_value_per_unit") is not None
+        and item.get("value_edge") > 0
+        and item.get("expected_value_per_unit") > 0
+    ]
+    if lean_options:
+        return max(lean_options, key=option_rank)
+
+    return max(usable_options, key=option_rank)
+
+
 def build_line_lookup(lines: list[dict]):
     lookup = {}
     for row in lines:
@@ -251,24 +396,65 @@ def matching_market_rows(line_lookup: dict, sport: str, game: dict):
     return rows
 
 
+def unmatched_game(sport: str, game: dict, reason: str) -> dict:
+    return {
+        "sport": sport,
+        "game_id": game.get("game_id", ""),
+        "matchup": game.get("matchup", ""),
+        "model_lean": game.get("simple_projection_lean", ""),
+        "reason": reason,
+    }
+
+
+def actionable_edge(decision_tier: str, best_value: dict | None, line_is_fresh: bool, teams_matched: bool):
+    if decision_tier not in {"premium", "watchlist"}:
+        return False
+    if not line_is_fresh or not teams_matched or not best_value:
+        return False
+    value_edge = safe_float(best_value.get("value_edge"))
+    ev = safe_float(best_value.get("expected_value_per_unit"))
+    return value_edge is not None and value_edge > 0 and ev is not None and ev > 0
+
+
+def model_probabilities_for_game(game: dict):
+    home_score = float(game.get("home_weighted_score", 50) or 50)
+    away_score = float(game.get("away_weighted_score", 50) or 50)
+    score_gap = home_score - away_score
+    model_prob_home = safe_float(game.get("learned_probability_home"))
+    if model_prob_home is None:
+        model_prob_home = safe_float(game.get("win_probability_home"))
+    if model_prob_home is None:
+        model_prob_home = probability_from_score_gap(score_gap)
+    model_prob_home = round(model_prob_home, 4)
+
+    model_prob_away = safe_float(game.get("learned_probability_away"))
+    if model_prob_away is None:
+        model_prob_away = safe_float(game.get("win_probability_away"))
+    if model_prob_away is None:
+        model_prob_away = round(1.0 - model_prob_home, 4)
+    model_prob_away = round(model_prob_away, 4)
+    return model_prob_home, model_prob_away
+
+
 def main():
     report = json.loads(REPORT_PATH.read_text(encoding="utf-8")) if REPORT_PATH.exists() else {}
     lines = read_lines()
+    historical_lines = read_line_history()
     comparisons = []
+    unmatched_games = []
     line_lookup = build_line_lookup(lines)
+    historical_line_lookup = build_line_lookup(historical_lines)
 
     for sport, block in report.get("reports", {}).items():
         for game in block.get("games", []):
             matchup = game.get("matchup", "")
             market_rows = matching_market_rows(line_lookup, sport, game)
             if not market_rows:
+                unmatched_games.append(unmatched_game(sport, game, "no_market_line_for_game_id_or_matchup"))
                 continue
+            historical_market_rows = matching_market_rows(historical_line_lookup, sport, game) or market_rows
             model_edge = game.get("record_edge_pct", "")
-            home_score = float(game.get("home_weighted_score", 50) or 50)
-            away_score = float(game.get("away_weighted_score", 50) or 50)
-            score_gap = home_score - away_score
-            model_prob_home = probability_from_score_gap(score_gap)
-            model_prob_away = round(1.0 - model_prob_home, 4)
+            model_prob_home, model_prob_away = model_probabilities_for_game(game)
             home_team = matchup.split(" at ")[-1] if " at " in matchup else ""
             away_team = matchup.split(" at ")[0] if " at " in matchup else ""
             home_team_norm = normalize_team_name(home_team)
@@ -314,6 +500,8 @@ def main():
                     "odds_b": odds_b,
                     "implied_prob_a": implied_a,
                     "implied_prob_b": implied_b,
+                    "market_probability_a": no_vig_a,
+                    "market_probability_b": no_vig_b,
                     "no_vig_prob_a": no_vig_a,
                     "no_vig_prob_b": no_vig_b,
                     "book_hold_pct": hold_pct,
@@ -323,9 +511,8 @@ def main():
                     "expected_value_b": side_b_value["expected_value_per_unit"] if side_b_value else None,
                 })
 
-            fresh_options = [v for v in value_options if v.get("line_is_fresh")]
-            best_value = max(fresh_options or value_options, key=lambda item: (item["value_edge"], item.get("expected_value_per_unit") or -999)) if value_options else None
             lean_norm = normalize_team_name(game.get("simple_projection_lean", ""))
+            best_value = select_best_value(value_options, game.get("simple_projection_lean", ""))
             matched_sides = {normalize_team_name(row.get("side_a", "")) for row in market_rows} | {normalize_team_name(row.get("side_b", "")) for row in market_rows}
             if lean_norm in matched_sides:
                 market_agreement = "leans_toward_model_side"
@@ -335,6 +522,9 @@ def main():
                 market_agreement = "name_mismatch"
             decision_tier, decision_reasons = rate_decision(game, best_value, teams_matched, any_fresh_line)
             first_book = book_comparisons[0] if book_comparisons else {}
+            line_movement = build_line_movement(historical_market_rows, game.get("simple_projection_lean", ""))
+            psychology = market_psychology(line_movement, best_value)
+            is_actionable_edge = actionable_edge(decision_tier, best_value, any_fresh_line, teams_matched)
             comparisons.append({
                 "sport": sport,
                 "game_id": game.get("game_id", ""),
@@ -345,7 +535,9 @@ def main():
                 "model_edge": model_edge,
                 "model_prob_home": model_prob_home,
                 "model_prob_away": model_prob_away,
-                "probability_method": "score_gap_logistic_v1",
+                "probability_method": "dynamic_learning_adjusted" if game.get("learned_probability_home") is not None else (game.get("calibration") or {}).get("method", "score_gap_logistic_v1"),
+                "confidence_band_home": game.get("confidence_band_home", {}),
+                "factor_agreement": game.get("factor_agreement"),
                 "market_side_a": first_book.get("market_side_a", ""),
                 "market_side_b": first_book.get("market_side_b", ""),
                 "market_line_a": first_book.get("market_line_a", ""),
@@ -354,6 +546,8 @@ def main():
                 "odds_b": first_book.get("odds_b", ""),
                 "implied_prob_a": first_book.get("implied_prob_a"),
                 "implied_prob_b": first_book.get("implied_prob_b"),
+                "market_probability_a": first_book.get("market_probability_a"),
+                "market_probability_b": first_book.get("market_probability_b"),
                 "no_vig_prob_a": first_book.get("no_vig_prob_a"),
                 "no_vig_prob_b": first_book.get("no_vig_prob_b"),
                 "book_hold_pct": first_book.get("book_hold_pct"),
@@ -366,6 +560,7 @@ def main():
                 "best_value_raw_edge": best_value.get("raw_value_edge") if best_value else None,
                 "best_value_model_probability": best_value.get("model_probability") if best_value else None,
                 "best_value_implied_probability": best_value.get("implied_probability") if best_value else None,
+                "best_value_market_probability": best_value.get("market_probability") if best_value else None,
                 "best_value_no_vig_probability": best_value.get("no_vig_probability") if best_value else None,
                 "best_value_odds": best_value.get("odds") if best_value else "",
                 "best_value_expected_value": best_value.get("expected_value_per_unit") if best_value else None,
@@ -374,27 +569,41 @@ def main():
                 "quarter_kelly_bankroll_pct": best_value.get("quarter_kelly_bankroll_pct") if best_value else None,
                 "decision_tier": decision_tier,
                 "decision_reasons": decision_reasons,
+                "actionable_edge": is_actionable_edge,
                 "line_source": best_value.get("line_source", "") if best_value else first_book.get("line_source", ""),
                 "line_age_hours": best_value.get("line_age_hours") if best_value else first_book.get("line_age_hours"),
                 "line_is_fresh": best_value.get("line_is_fresh") if best_value else first_book.get("line_is_fresh"),
                 "available_books": len(book_comparisons),
                 "book_comparisons": book_comparisons,
                 "market_agreement": market_agreement,
+                "line_movement": line_movement,
+                "market_psychology": psychology,
                 "note": "Market comparison layer uses no-vig fair probability, expected value, line freshness, and fractional Kelly sizing guidance. Research only."
             })
 
     out = {
         "generated_at": datetime.now(UTC).isoformat(),
         "comparisons": comparisons,
+        "unmatched_games": unmatched_games,
         "summary": {
             "premium": sum(1 for item in comparisons if item.get("decision_tier") == "premium"),
             "watchlist": sum(1 for item in comparisons if item.get("decision_tier") == "watchlist"),
             "pass": sum(1 for item in comparisons if item.get("decision_tier") == "pass"),
+            "unmatched": len(unmatched_games),
         },
         "note": "Decision tiers are research filters, not betting advice. Premium requires aligned model lean, fresh line, high confidence, strong model edge, positive expected value, and no-vig market value."
     }
     OUT.write_text(json.dumps(out, indent=2), encoding="utf-8")
-    print(json.dumps(out, indent=2))
+    stored_lines = store_market_lines()
+    stored_movements = store_line_movements(comparisons)
+    print({
+        "comparisons_written": len(comparisons),
+        "unmatched_games": len(unmatched_games),
+        "summary": out["summary"],
+        "output": str(OUT),
+        "warehouse_market_rows_added": stored_lines,
+        "warehouse_line_movements_added": stored_movements,
+    })
 
 
 if __name__ == "__main__":

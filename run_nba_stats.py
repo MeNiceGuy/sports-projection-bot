@@ -1,19 +1,11 @@
-﻿from nba_api.stats.endpoints import leaguedashplayerstats
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / "logs" / "nba_player_stats.csv"
 
-stats = leaguedashplayerstats.LeagueDashPlayerStats(
-    season='2025-26',
-    season_type_all_star='Regular Season',
-    per_mode_detailed='PerGame'
-)
-
-df = stats.get_data_frames()[0]
-
-keep = [
+SOURCE_COLUMNS = [
     "PLAYER_NAME",
     "TEAM_ABBREVIATION",
     "GP",
@@ -26,12 +18,10 @@ keep = [
     "FG_PCT",
     "FG3_PCT",
     "FT_PCT",
-    "PLUS_MINUS"
+    "PLUS_MINUS",
 ]
 
-df = df[keep]
-
-df.columns = [
+CACHE_COLUMNS = [
     "player",
     "team",
     "games",
@@ -44,12 +34,43 @@ df.columns = [
     "fg_pct",
     "fg3_pct",
     "ft_pct",
-    "plus_minus"
+    "plus_minus",
 ]
 
-OUT.parent.mkdir(exist_ok=True)
 
-df.to_csv(OUT, index=False)
+def write_empty_cache():
+    OUT.parent.mkdir(exist_ok=True)
+    pd.DataFrame(columns=CACHE_COLUMNS).to_csv(OUT, index=False)
 
-print(f"nba player rows written: {len(df)}")
-print(OUT)
+
+def main():
+    try:
+        from nba_api.stats.endpoints import leaguedashplayerstats
+
+        stats = leaguedashplayerstats.LeagueDashPlayerStats(
+            season="2025-26",
+            season_type_all_star="Regular Season",
+            per_mode_detailed="PerGame",
+        )
+        df = stats.get_data_frames()[0]
+        df = df[SOURCE_COLUMNS]
+        df.columns = CACHE_COLUMNS
+        OUT.parent.mkdir(exist_ok=True)
+        df.to_csv(OUT, index=False)
+        print(f"nba player rows written: {len(df)}")
+        print(OUT)
+        return
+    except Exception as exc:
+        if OUT.exists():
+            cached = pd.read_csv(OUT)
+            print(f"nba stats fetch failed; using cached file with {len(cached)} rows: {exc}")
+            print(OUT)
+            return
+
+        write_empty_cache()
+        print(f"nba stats fetch failed and no cache existed; wrote empty cache: {exc}")
+        print(OUT)
+
+
+if __name__ == "__main__":
+    main()

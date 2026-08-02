@@ -1,14 +1,14 @@
 Sports Projection Bot - How To Run
 
 Project folder:
-C:\Users\1bosw\.openclaw\workspace\sports-projection-bot
+C:\Users\1bosw\OneDrive\Desktop\GitHub\sports-projection-bot
 
 1. Open PowerShell in the project folder.
 2. Install dependencies:
    python -m pip install -r requirements.txt
 
-3. Run the bot:
-   python run_bot.py
+3. Run the daily weighted projection model:
+   python run_daily_projection.py
 
 4. The report will print in the terminal and also save to:
    reports\daily_projection_report.json
@@ -34,11 +34,61 @@ C:\Users\1bosw\.openclaw\workspace\sports-projection-bot
 11. To compare projections against supplied market lines:
    python run_market_compare.py
 
-12. To build the current player-props output:
+12. To build the backtesting engine report:
+   python run_backtest_summary.py
+
+13. To build calibration, predictive accuracy, market inefficiency, EV optimization, and governance reporting:
+   python run_model_governance.py
+
+14. To block stale/example data before using any betting output:
+   python pre_bet_health_check.py
+
+15. To export current bet-research candidates:
+   python export_bet_candidates.py
+   python show_bet_candidates.py
+   python betting_readiness_audit.py
+
+   This writes reports\bet_candidates.json and logs\bet_candidates.csv.
+   Candidates require fresh odds, matched market comparisons, a premium/watchlist decision tier, and positive expected value.
+   If governance is blocked, candidates are labeled research_unproven.
+   If the gates fail, the same files are written with mode no_bet and the exact failure reason.
+   The readiness audit scores the bot from 0 to 100. A 100 requires fresh real data, exported candidates, passed governance, positive 100+ bet validation, and no fallback data.
+
+16. To generate optional AI advisor recommendations from the latest projection, market, governance, and backtesting reports:
+   python run_ai_advisor.py
+
+   Set OPENAI_API_KEY to use the OpenAI Responses API. Without a key, this command writes a local rules-based advisor report.
+   Optional: set OPENAI_MODEL to choose the model. The default is gpt-4.1-mini.
+
+17. To build the current player-props output:
    python run_props_engine.py
 
-13. To run the full scheduled pregame email flow:
+18. To run the full scheduled pregame email flow:
    python run_scheduled_cycle.py
+
+Sportsbook odds API:
+- The odds fetcher reads THE_ODDS_API_KEY, SPORTSBOOK_ODDS_API_KEY, or config.odds.json.
+- Check whether the next run will reuse cache or call the API:
+  python api_quota_status.py
+- Run: python run_odds_fetch.py
+- To avoid burning API quota, run_odds_fetch.py reuses a successful odds snapshot while it is fresh. Default: 10 minutes.
+- To intentionally refresh odds before the cache expires, run:
+  python run_odds_fetch.py --force
+- If odds fetch fails, the tool now clears current market lines and exits non-zero.
+- If the API is down, generate a same-team-name manual odds template:
+  python generate_manual_odds_template.py
+- Enter fresh verified sportsbook moneylines into odds_a and odds_b, then run:
+  python import_manual_odds.py
+- Before using any betting output, run:
+  python pre_bet_health_check.py
+- To export bet-research candidates after the health check passes, run:
+  python export_bet_candidates.py
+- To print candidates or the no-bet reason in the terminal, run:
+  python show_bet_candidates.py
+- To get the final 0-100 readiness score, run:
+  python betting_readiness_audit.py
+- After a graded loss, export_bet_candidates.py blocks new picks with a loss cooldown. That cooldown is intentional.
+- Do not use picks when the pre-bet health check reports stale odds, stale projections, failed odds fetch, no current market lines, or no actionable matched edges.
 
 Current active sports:
 - NBA
@@ -48,6 +98,6 @@ If you want to change active sports, edit:
 - config.json
 
 Current model status:
-- NBA: live early model
-- MLB: live early model
+- NBA: weighted model with form, offense, defense, pace, rest, injuries, market comparison, and governance
+- MLB: weighted model with form, starters, bullpen quality, bullpen fatigue, freshness, splits, scoring, run prevention, market comparison, and governance
 - NFL/NHL/NCAAB/NCAAF: scaffold only
