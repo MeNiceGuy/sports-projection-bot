@@ -1,6 +1,6 @@
 # Sports Projection Bot
 
-A multi-sport projection and edge-research bot scaffold using public/open data where available.
+A multi-sport projection and edge-research bot scaffold using public/open data where available. Under active study and upgrade -- see [Track record to date](#track-record-to-date) for the current graded sample and [Important note](#important-note) for how to read it.
 
 ## Current status
 - shared projection architecture
@@ -43,9 +43,19 @@ A multi-sport projection and edge-research bot scaffold using public/open data w
 Collect public sports data, generate projection-style outputs, and track model performance over time.
 
 ## Important note
-This is a sports research tool, not a guaranteed winning system.
+This is a sports research tool, not a guaranteed winning system. It is under active study and development -- the model stack, decision gating, and market layers are still being iterated on as more graded results come in, not a finished/frozen product.
 
 Current NBA and MLB outputs now include clearer edge-band labeling so weak projections are easier to separate from stronger leans.
+
+## Track record to date
+Graded results are tracked in `logs/graded_results.csv` (gitignored, local only) and tagged with a `model_era` so a decision-logic change (e.g. the moneyline suspicious-edge guard added 2026-08-03) doesn't get unfairly credited or blamed for picks made under the old logic. As of 2026-08-05:
+
+| Era | Record |
+| --- | --- |
+| `pre_moneyline_guard` | 1-1 |
+| `post_moneyline_guard` (current logic) | 3-0 |
+
+This sample is far too small to draw any real conclusion from -- it exists for transparency and to build toward the sample size the governance gate (below) actually requires before trusting calibration, not as a performance claim. Every graded row is verified against real box scores (MLB Stats API) before being added, and past results are never deleted or rewritten when the model changes; see `bot/merge_results.py`.
 
 ## Finished model stack
 The active NBA and MLB layers now run as weighted betting-research models:
