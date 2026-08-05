@@ -66,6 +66,14 @@ C:\Users\1bosw\OneDrive\Desktop\GitHub\sports-projection-bot
 18. To run the full scheduled pregame email flow:
    python run_scheduled_cycle.py
 
+Player props (NBA and MLB):
+- NBA props: python run_player_props.py, then python run_nba_stats.py, then python run_matchup_engine.py, then python run_ranked_props.py
+- MLB props: python run_mlb_player_props.py, then python run_mlb_stats.py, then python run_mlb_matchup_engine.py, then python run_mlb_ranked_props.py
+- Both write ranked props to logs/ranked_props.csv (NBA) and logs/mlb_ranked_props.csv (MLB), graded A-D by a scale-aware edge/reliability/odds score.
+- python run_same_game_parlays.py and python run_correlated_parlays.py combine both sports' ranked props before building parlays.
+- python save_best_bets.py combines both sports' top A/B graded props into logs/bets.db, tagged with a sport column.
+- MLB props env vars mirror the NBA ones: MLB_PLAYER_PROPS_MAX_AGE_MINUTES and MLB_PLAYER_PROPS_MAX_EVENTS.
+
 Sportsbook odds API:
 - The odds fetcher reads THE_ODDS_API_KEY, SPORTSBOOK_ODDS_API_KEY, or config.odds.json.
 - Check whether the next run will reuse cache or call the API:
@@ -93,6 +101,8 @@ Sportsbook odds API:
 Current active sports:
 - NBA
 - MLB
+- WNBA
+- NFL
 
 If you want to change active sports, edit:
 - config.json
@@ -100,4 +110,6 @@ If you want to change active sports, edit:
 Current model status:
 - NBA: weighted model with form, offense, defense, pace, rest, injuries, market comparison, and governance
 - MLB: weighted model with form, starters, bullpen quality, bullpen fatigue, freshness, splits, scoring, run prevention, market comparison, and governance
-- NFL/NHL/NCAAB/NCAAF: scaffold only
+- WNBA: weighted model with form, offense, defense, pace, rest, market comparison, and governance. No player-props layer yet (moneyline/team-level only). Injury context has no live data source and is held neutral (no WNBA equivalent of the NBA's official injury-report PDF exists yet).
+- NFL: weighted model with form, offense, defense, turnover differential, rest, a real ESPN injury feed, market comparison, and governance. No player-props layer yet (moneyline/team-level only). Points-allowed/points-for come from season standings and are placeholder league-average values until real games are played this season; the injury weighting will need recalibration once real regular-season injury reports (much shorter than the current preseason camp-report noise) start flowing. The odds mapping targets the regular season (americanfootball_nfl) by default -- preseason games use a separate sport key (americanfootball_nfl_preseason) not wired in by default.
+- NHL/NCAAB/NCAAF: scaffold only

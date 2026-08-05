@@ -4,8 +4,8 @@ A multi-sport projection and edge-research bot scaffold using public/open data w
 
 ## Current status
 - shared projection architecture
-- NBA and MLB active
-- NFL, NHL, NCAAB, and NCAAF scaffolded
+- NBA, MLB, WNBA, and NFL active
+- NHL, NCAAB, and NCAAF scaffolded
 - prediction logging and performance-summary layer added
 - grading and validation structure added
 - result-merge structure added
@@ -51,7 +51,11 @@ The active NBA and MLB layers now run as weighted betting-research models:
 
 - NBA: recent form, home/away advantage, team strength, offense, defense, injury context, rest, pace, and matchup context.
 - MLB: recent form, home/away advantage, team strength, home/away split, scoring strength, run prevention, probable starter quality, bullpen quality, bullpen fatigue, bullpen freshness, rest, and matchup context.
+- WNBA: recent form, home/away advantage, team strength, offense, defense, rest, pace, and matchup context. No player-props layer yet (moneyline/team-level only), and injury context is held neutral since there is no WNBA equivalent of the NBA's official injury-report PDF wired up.
+- NFL: recent form, home/away advantage, team strength, offense, defense, turnover differential, rest, and a real ESPN injury feed. No player-props layer yet (moneyline/team-level only). Points-allowed/points-for come from season standings and stay at a league-average placeholder until real games are played this season (standings carry zero completed games before Week 1). Rest scoring uses NFL's weekly cadence (short week / normal / bye) instead of basketball's near-daily thresholds, and there's no pace factor since NFL has no equivalent concept.
 - Shared: score-gap probability conversion, no-vig market comparison, EV filtering, fractional Kelly sizing research, CLV tracking, staking reports, model governance, seeded Monte Carlo score simulations, weighted ensemble probabilities, feature importance attribution, dynamic regime weights, dynamic learning adjustments, and SQLite historical storage.
+- NBA and WNBA defense/pace factors are driven by real per-team offensive/defensive rating and pace from `nba_api`'s league-wide advanced team stats, not ESPN's per-team statistics endpoint -- that endpoint has no points-allowed or pace fields for either league, so both factors previously fell back to an identical placeholder value for every team and contributed no real signal to the weighted score.
+- NFL's injury layer (`sports/nfl_injuries.py`) uses ESPN's real structured league-wide injury feed rather than the NBA's PDF-scraping approach -- one JSON fetch covers all 32 teams. Injury weighting is status x position (QB weighted heaviest), and is expected to need recalibration once real regular-season injury reports replace the current preseason camp-report noise (many more names get flagged during camp than during a normal week 1+ practice report).
 
 The governance release gate intentionally remains strict. It blocks trust in calibration until there are enough graded historical predictions.
 
@@ -177,3 +181,20 @@ The current analytics stack now covers the requested market-research deliverable
 - NBA `injury_intelligence` with projected minutes impact and usage redistribution signal
 
 `logs/bets.db` now includes warehouse tables for `projection_history`, `odds_history`, `result_history`, and `line_movement_history`.
+
+## Player props: NBA and MLB parity
+The player-props chain (props odds -> player season stats -> matchup engine -> ranked props -> parlays) now runs for both NBA and MLB instead of NBA only, so it stays populated during MLB season / NBA off-season instead of going dead for months.
+
+- NBA: `run_player_props.py` -> `run_nba_stats.py` -> `run_matchup_engine.py` -> `run_ranked_props.py` -> `logs/ranked_props.csv`
+- MLB: `run_mlb_player_props.py` -> `run_mlb_stats.py` (statsapi.mlb.com season hitting/pitching leaderboards) -> `run_mlb_matchup_engine.py` -> `run_mlb_ranked_props.py` -> `logs/mlb_ranked_props.csv`
+- MLB stats are looked up by `(player, role)` so a market like `pitcher_strikeouts` always matches the pitcher's per-start rate, never a same-named batter's per-game rate.
+- Every prop's `projection_edge` is now computed relative to the row's Over/Under side (`sports/model_utils.py:side_aware_edge`) instead of always `projected_stat - line`, so an Under row where the model projects below the line correctly gets the positive edge and higher confidence, not the Over row.
+- MLB confidence and scoring use a relative (percent-of-line) edge instead of NBA's fixed point thresholds, since MLB markets span wildly different scales (hits ~1.5 vs pitcher strikeouts ~5.5); the ratio is clamped so thin lines like earned runs O/U 0.5 can't blow the score up to hundreds of percent.
+- `run_same_game_parlays.py`, `run_correlated_parlays.py`, and `save_best_bets.py` combine both sports' ranked props before building parlays or saving to `logs/bets.db`; saved bets carry a `sport` column.
+
+## MLB props: opponent-handedness matchup context
+MLB batter props no longer use a blind season average regardless of who's pitching. `run_mlb_stats.py` also pulls each batter's vs-LHP and vs-RHP splits (`statSplits`, `sitCodes=vl`/`vr`, bulk league-wide calls); `run_mlb_matchup_engine.py` looks up tonight's actual opposing probable starter (`sports/mlb_schedule.py:build_probable_pitcher_map`) and their throwing hand (`sports/mlb_pitching.py:get_pitcher_handedness`), then uses the batter's rate against that specific hand instead of their overall season rate.
+
+- Platoon splits are built on far fewer at-bats than a season total (tens vs. hundreds), so the split rate is shrunk toward the season rate in proportion to its sample size (`sports/prop_probability.py:shrunk_rate_per_game`, empirical-Bayes-style shrinkage, ~200 AB stabilization point) rather than used raw -- otherwise this would trade one small-sample problem for another.
+- Matching a batter to tonight's opposing pitcher requires crossing two different sources for the same game (the odds API's team/matchup names vs. MLB's own schedule), so the match uses the same normalized-name comparison already used for moneyline market matching, and silently falls back to the season rate (no adjustment) rather than guessing when a game or pitcher can't be matched.
+- Applies to batter markets only (hits, home runs, RBI, runs scored, total bases via the hits proxy, walks, strikeouts); pitcher props are unaffected.

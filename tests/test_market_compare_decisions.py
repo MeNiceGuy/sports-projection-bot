@@ -4,8 +4,10 @@ from datetime import UTC, datetime, timedelta
 from bot.market_compare import (
     actionable_edge,
     american_to_implied_prob,
+    build_line_lookup,
     expected_value_per_unit,
     is_line_fresh,
+    matching_market_rows,
     model_probabilities_for_game,
     no_vig_probabilities,
     rate_decision,
@@ -13,6 +15,64 @@ from bot.market_compare import (
     unmatched_game,
 )
 from sports.model_utils import calibrate_projection, factor_agreement, probability_from_score_gap
+
+
+class SameMatchupDifferentDayTests(unittest.TestCase):
+    def _rows_for_two_games_same_teams(self):
+        # Same two teams playing on back-to-back days (a common MLB series
+        # pattern) get the same "Away at Home" matchup string but are
+        # different real games with different odds-API game_ids.
+        return [
+            {
+                "sport": "mlb", "market": "h2h", "game_id": "today-game",
+                "matchup": "Los Angeles Angels at Baltimore Orioles",
+                "commence_time": "2026-08-04T22:36:00Z",
+                "side_a": "Baltimore Orioles", "side_b": "Los Angeles Angels",
+                "odds_a": "-148", "odds_b": "138",
+            },
+            {
+                "sport": "mlb", "market": "h2h", "game_id": "tomorrow-game",
+                "matchup": "Los Angeles Angels at Baltimore Orioles",
+                "commence_time": "2026-08-05T22:36:00Z",
+                "side_a": "Baltimore Orioles", "side_b": "Los Angeles Angels",
+                "odds_a": "-136", "odds_b": "116",
+            },
+        ]
+
+    def test_matchup_fallback_keeps_only_soonest_game_not_both_blended(self):
+        # The projection's own game_id (from ESPN) never matches the odds
+        # API's game_id, so this always falls back to matchup-name matching.
+        # Before the fix, both real games' rows got blended into one pool
+        # and the "best value" search could pick tomorrow's price for a
+        # game happening today.
+        rows = self._rows_for_two_games_same_teams()
+        lookup = build_line_lookup(rows)
+        game = {"game_id": "espn-different-id-scheme", "matchup": "Los Angeles Angels at Baltimore Orioles"}
+
+        matched = matching_market_rows(lookup, "mlb", game)
+
+        self.assertEqual(len(matched), 1)
+        self.assertEqual(matched[0]["game_id"], "today-game")
+        self.assertEqual(matched[0]["odds_a"], "-148")
+
+    def test_missing_commence_time_on_any_row_returns_nothing_rather_than_guess(self):
+        rows = self._rows_for_two_games_same_teams()
+        rows[1]["commence_time"] = ""  # can no longer tell which game is which
+        lookup = build_line_lookup(rows)
+        game = {"game_id": "espn-different-id-scheme", "matchup": "Los Angeles Angels at Baltimore Orioles"}
+
+        matched = matching_market_rows(lookup, "mlb", game)
+
+        self.assertEqual(matched, [])
+
+    def test_single_game_id_is_unaffected(self):
+        rows = [self._rows_for_two_games_same_teams()[0]]
+        lookup = build_line_lookup(rows)
+        game = {"game_id": "espn-different-id-scheme", "matchup": "Los Angeles Angels at Baltimore Orioles"}
+
+        matched = matching_market_rows(lookup, "mlb", game)
+
+        self.assertEqual(len(matched), 1)
 
 
 class MarketCompareDecisionTests(unittest.TestCase):
@@ -32,6 +92,27 @@ class MarketCompareDecisionTests(unittest.TestCase):
 
         self.assertEqual(tier, "premium")
         self.assertEqual(reasons, ["high_confidence_strong_model_edge_and_market_value"])
+
+    def test_implausibly_large_edge_is_downgraded_to_pass_even_with_high_confidence(self):
+        # Otherwise this would qualify for premium: high confidence, strong
+        # edge band, aligned lean, positive EV. A 29-point moneyline edge is
+        # far more likely to mean the model is missing context several
+        # independent books agree on than a real mispriced line.
+        game = {
+            "simple_projection_lean": "Milwaukee Brewers",
+            "confidence": "High",
+            "edge_band": "strong",
+        }
+        best_value = {
+            "side": "Milwaukee Brewers",
+            "value_edge": 29.28,
+            "expected_value_per_unit": 0.75,
+        }
+
+        tier, reasons = rate_decision(game, best_value, teams_matched=True)
+
+        self.assertEqual(tier, "pass")
+        self.assertIn("edge_implausibly_large_likely_missing_context", reasons)
 
     def test_watchlist_allows_moderate_aligned_market_value(self):
         game = {

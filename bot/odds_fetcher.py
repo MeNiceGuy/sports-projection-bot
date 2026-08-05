@@ -16,7 +16,7 @@ CONFIG_EXAMPLE_PATH = ROOT / "config.odds.example.json"
 OUT_PATH = ROOT / "logs" / "market_lines.csv"
 HISTORY_PATH = ROOT / "logs" / "market_line_history.csv"
 STATUS_PATH = ROOT / "logs" / "odds_fetch_status.json"
-FIELDNAMES = ["sport", "market", "game_id", "matchup", "line_source", "side_a", "side_b", "line_a", "line_b", "odds_a", "odds_b", "timestamp"]
+FIELDNAMES = ["sport", "market", "game_id", "matchup", "commence_time", "line_source", "side_a", "side_b", "line_a", "line_b", "odds_a", "odds_b", "timestamp"]
 API_KEY_RE = re.compile(r"(?i)(apiKey=)[^&\s]+")
 DEFAULT_MAX_FETCH_AGE_MINUTES = 10
 
@@ -127,11 +127,32 @@ def is_placeholder_market_row(row: dict) -> bool:
     )
 
 
+def _migrate_history_schema_if_needed():
+    """Rewrite market_line_history.csv onto the current FIELDNAMES if an
+    older run wrote it with a different column set (e.g. before
+    commence_time existed). This is an append-only file across many runs,
+    so a bare append after a schema change would misalign every row instead
+    of erroring -- silently corrupting historical line-movement data."""
+    if not HISTORY_PATH.exists() or HISTORY_PATH.stat().st_size == 0:
+        return
+    with HISTORY_PATH.open("r", encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f)
+        current_header = reader.fieldnames or []
+        if current_header == FIELDNAMES:
+            return
+        old_rows = list(reader)
+    with HISTORY_PATH.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=FIELDNAMES, restval="")
+        writer.writeheader()
+        writer.writerows(old_rows)
+
+
 def append_line_history(rows: list[dict]):
     real_rows = [row for row in rows if not is_placeholder_market_row(row)]
     if not real_rows:
         return 0
     HISTORY_PATH.parent.mkdir(parents=True, exist_ok=True)
+    _migrate_history_schema_if_needed()
     needs_header = not HISTORY_PATH.exists() or HISTORY_PATH.stat().st_size == 0
     with HISTORY_PATH.open("a", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
@@ -210,6 +231,7 @@ def main(argv: list[str] | None = None):
             home = game.get("home_team", "")
             away = game.get("away_team", "")
             matchup = f"{away} at {home}" if away and home else game.get("commence_time", "")
+            commence_time = game.get("commence_time", "")
             bookmakers = game.get("bookmakers", [])
             if not bookmakers:
                 continue
@@ -225,6 +247,7 @@ def main(argv: list[str] | None = None):
                             "market": market.get("key", ""),
                             "game_id": game_id,
                             "matchup": matchup,
+                            "commence_time": commence_time,
                             "line_source": book.get("title", ""),
                             "side_a": a.get("name", ""),
                             "side_b": b.get("name", ""),

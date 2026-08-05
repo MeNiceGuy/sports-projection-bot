@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from bot.data_warehouse import store_line_movements, store_market_lines
-from sports.model_utils import probability_from_score_gap
+from sports.model_utils import is_suspiciously_large_edge, probability_from_score_gap
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORT_PATH = ROOT / "reports" / "daily_projection_report.json"
@@ -313,6 +313,15 @@ def rate_decision(game: dict, best_value: dict | None, teams_matched: bool, line
     if EDGE_BAND_RANK.get(edge_band, 0) < EDGE_BAND_RANK["moderate"]:
         reasons.append("model_edge_band_below_moderate")
 
+    # A handful of independent books agreeing closely with each other but not
+    # with the model is a much stronger signal the model is missing context
+    # (injury, role/lineup change, weather) than that a mispriced line was
+    # found. Genuine single-game moneyline edges this large are essentially
+    # unheard of in liquid markets, so treat it as untrustworthy, not a win.
+    if is_suspiciously_large_edge(value_edge):
+        reasons.append("edge_implausibly_large_likely_missing_context")
+        return "pass", reasons
+
     if (
         line_is_fresh
         and teams_matched
@@ -385,6 +394,39 @@ def build_line_lookup(lines: list[dict]):
     return lookup
 
 
+def _parse_commence_time(value: str):
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def _disambiguate_same_matchup_rows(rows: list[dict]) -> list[dict]:
+    """Two teams can play on back-to-back days in the same series, so a
+    matchup-name fallback match (the projection's game_id rarely matches the
+    odds API's own game_id, which use different ID systems) can pull rows
+    from two entirely different real games that happen to share the same
+    team names. Left unfiltered, the best-value search below would treat
+    both games' prices as one pool and could recommend a price that belongs
+    to tomorrow's game, not today's. When multiple distinct game_ids are
+    present, keep only the rows for whichever one starts soonest.
+    """
+    distinct_game_ids = {row.get("game_id", "") for row in rows if row.get("game_id", "")}
+    if len(distinct_game_ids) <= 1:
+        return rows
+
+    dated = [(row, _parse_commence_time(row.get("commence_time", ""))) for row in rows]
+    if any(dt is None for _, dt in dated):
+        # Can't reliably tell which game is which without a timestamp on
+        # every row -- safer to return nothing than to silently guess.
+        return []
+
+    soonest_game_id = min(dated, key=lambda pair: pair[1])[0].get("game_id", "")
+    return [row for row in rows if row.get("game_id", "") == soonest_game_id]
+
+
 def matching_market_rows(line_lookup: dict, sport: str, game: dict):
     game_id = game.get("game_id", "")
     matchup = normalize_matchup(game.get("matchup", ""))
@@ -393,7 +435,7 @@ def matching_market_rows(line_lookup: dict, sport: str, game: dict):
         rows.extend(line_lookup.get((sport, "game_id", game_id), []))
     if not rows and matchup:
         rows.extend(line_lookup.get((sport, "matchup", matchup), []))
-    return rows
+    return _disambiguate_same_matchup_rows(rows)
 
 
 def unmatched_game(sport: str, game: dict, reason: str) -> dict:

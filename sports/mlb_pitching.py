@@ -3,6 +3,22 @@ from __future__ import annotations
 import requests
 
 
+def get_pitcher_handedness(player_id: int | None) -> str | None:
+    """Return 'L' or 'R' for a pitcher's throwing hand, or None if unknown."""
+    if not player_id:
+        return None
+    try:
+        resp = requests.get(f"https://statsapi.mlb.com/api/v1/people/{player_id}", timeout=20)
+        resp.raise_for_status()
+        people = resp.json().get("people", [])
+        if not people:
+            return None
+        code = (people[0].get("pitchHand") or {}).get("code")
+        return code if code in {"L", "R"} else None
+    except Exception:
+        return None
+
+
 def _fetch_player_pitching_stats(player_id: int, season: int | None = None, career: bool = False):
     if career:
         url = f"https://statsapi.mlb.com/api/v1/people/{player_id}?hydrate=stats(group=[pitching],type=[career])"

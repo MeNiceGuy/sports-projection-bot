@@ -8,6 +8,20 @@ def clamp(value, low=0.0, high=100.0):
     return max(low, min(high, value))
 
 
+# Real, liquid single-game markets (moneylines and player props alike) are
+# efficient enough that a genuine model-vs-market probability disagreement
+# this large essentially never happens. When the math produces one, it is a
+# much stronger signal that the model is missing context the book has (an
+# injury, a role/workload change, a lineup change, weather) than that a
+# mispriced line was found. Multiple independent books agreeing closely with
+# each other but not with the model is exactly this pattern, not an edge.
+SUSPICIOUS_EDGE_THRESHOLD = 25.0
+
+
+def is_suspiciously_large_edge(value_edge) -> bool:
+    return value_edge is not None and abs(value_edge) > SUSPICIOUS_EDGE_THRESHOLD
+
+
 def scale_ratio(value, max_value=1.0):
     if max_value == 0:
         return 0.0

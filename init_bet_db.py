@@ -36,7 +36,7 @@ for column in ["predicted_probability", "model_probability", "market_probability
         conn.execute(f"ALTER TABLE bets ADD COLUMN {column} REAL")
 if "actionable_edge" not in existing_columns:
     conn.execute("ALTER TABLE bets ADD COLUMN actionable_edge INTEGER")
-for column in ["confidence", "edge_persistence_status"]:
+for column in ["confidence", "edge_persistence_status", "sport"]:
     if column not in existing_columns:
         conn.execute(f"ALTER TABLE bets ADD COLUMN {column} TEXT")
 
