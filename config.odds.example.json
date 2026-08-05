@@ -7,6 +7,8 @@
   "max_fetch_age_minutes": 10,
   "sports": {
     "nba": "basketball_nba",
-    "mlb": "baseball_mlb"
+    "mlb": "baseball_mlb",
+    "wnba": "basketball_wnba",
+    "nfl": "americanfootball_nfl"
   }
 }

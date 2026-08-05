@@ -56,8 +56,8 @@ class ManualOddsImportTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             input_path = Path(tmp) / "manual.csv"
             input_path.write_text(
-                "sport,market,game_id,matchup,line_source,side_a,side_b,line_a,line_b,odds_a,odds_b,timestamp\n"
-                "mlb,spreads,game-1,Away at Home,Book,Away,Home,-1.5,1.5,-110,-110,not-a-date\n",
+                "sport,market,game_id,matchup,commence_time,line_source,side_a,side_b,line_a,line_b,odds_a,odds_b,timestamp\n"
+                "mlb,spreads,game-1,Away at Home,2026-08-04T22:36:00Z,Book,Away,Home,-1.5,1.5,-110,-110,not-a-date\n",
                 encoding="utf-8",
             )
 
@@ -68,8 +68,8 @@ class ManualOddsImportTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             input_path = Path(tmp) / "manual.csv"
             input_path.write_text(
-                "sport,market,game_id,matchup,line_source,side_a,side_b,line_a,line_b,odds_a,odds_b,timestamp\n"
-                f"mlb,h2h,example-1,Away Team at Home Team,Book,Away Team,Home Team,,,+110,-130,{datetime.now(UTC).isoformat()}\n",
+                "sport,market,game_id,matchup,commence_time,line_source,side_a,side_b,line_a,line_b,odds_a,odds_b,timestamp\n"
+                f"mlb,h2h,example-1,Away Team at Home Team,2026-08-04T22:36:00Z,Book,Away Team,Home Team,,,+110,-130,{datetime.now(UTC).isoformat()}\n",
                 encoding="utf-8",
             )
 

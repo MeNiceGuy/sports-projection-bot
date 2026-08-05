@@ -4,11 +4,15 @@ from datetime import UTC, datetime
 import requests
 
 from sports.dates import current_slate_date_compact, current_slate_date_str
-from sports.model_utils import calibrate_projection, factor_agreement, scale_ratio, scale_diff, weighted_score
-from sports.nfl_injuries import fetch_league_injuries, team_injury_context
+from sports.model_utils import calibrate_projection, clamp, factor_agreement, scale_ratio, scale_diff, weighted_score
+from sports.team_advanced_stats import get_league_advanced_team_stats, league_average_pace
 
-STANDINGS_URL = "https://site.api.espn.com/apis/v2/sports/football/nfl/standings"
-DEFAULT_POINTS_PER_GAME = 22.0  # league-average-ish NFL scoring baseline
+# There is no WNBA equivalent of the NBA's official injury-report PDF that
+# sports/nba_injuries.py parses, so injury context has no live data source
+# yet. Both sides get this same neutral score, which is a no-op in the
+# weighted edge (home_score - away_score cancels an equal term on both
+# sides) rather than a fabricated signal.
+NEUTRAL_INJURY_CONTEXT = {"injury_count": 0, "injury_score": 50.0, "status": "no_data_source", "note": "No WNBA injury report source is wired up yet."}
 
 
 def _safe_float(value, default=0.0):
@@ -30,24 +34,19 @@ def _parse_espn_datetime(value: str):
 
 
 def _rest_score(days_since_last_game):
-    """NFL teams play about once a week, unlike near-daily NBA/MLB slates --
-    a short week (Thursday game) is meaningfully worse rest than the norm,
-    and a bye-week return is meaningfully better."""
     if days_since_last_game is None:
         return 50.0
-    if days_since_last_game <= 4:
-        return 40.0
-    if days_since_last_game <= 6:
-        return 46.0
-    if days_since_last_game == 7:
+    if days_since_last_game <= 0:
+        return 42.0
+    if days_since_last_game == 1:
         return 50.0
-    if days_since_last_game <= 9:
-        return 54.0
-    return 58.0
+    if days_since_last_game == 2:
+        return 56.0
+    return 60.0
 
 
 def get_recent_form(team_abbr: str):
-    url = f"https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/{team_abbr.lower()}/schedule"
+    url = f"https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/teams/{team_abbr.lower()}/schedule"
     try:
         resp = requests.get(url, timeout=20)
         resp.raise_for_status()
@@ -67,8 +66,8 @@ def get_recent_form(team_abbr: str):
         for c in competitors:
             team = c.get("team", {})
             if team.get("abbreviation", "").lower() == team_abbr.lower() and "winner" in c:
+                results.append(1 if c.get("winner") else 0)
                 if event_date and event_date <= datetime.now(UTC):
-                    results.append(1 if c.get("winner") else 0)
                     completed_dates.append(event_date)
                 break
     last5 = results[-5:]
@@ -88,7 +87,7 @@ def get_recent_form(team_abbr: str):
 
 
 def get_team_stats(team_abbr: str):
-    url = f"https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/{team_abbr.lower()}/statistics"
+    url = f"https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/teams/{team_abbr.lower()}/statistics"
     try:
         resp = requests.get(url, timeout=20)
         resp.raise_for_status()
@@ -96,12 +95,14 @@ def get_team_stats(team_abbr: str):
         categories = payload.get("results", {}).get("stats", {}).get("categories", [])
     except Exception:
         return {
-            "ppg": DEFAULT_POINTS_PER_GAME,
-            "yards_per_game": 330.0,
-            "turnover_differential": 0.0,
-            "third_down_pct": 38.0,
-            "redzone_scoring_pct": 55.0,
-            "points_allowed": DEFAULT_POINTS_PER_GAME,
+            "ppg": 0.0,
+            "fg_pct": 0.0,
+            "scoring_efficiency": 0.0,
+            "rebounds": 0.0,
+            "turnovers": 0.0,
+            "points_allowed": 82.0,
+            "defensive_efficiency": 0.0,
+            "pace": 82.0,
             "stats_status": "fallback",
         }
 
@@ -110,75 +111,57 @@ def get_team_stats(team_abbr: str):
         for stat in cat.get("stats", []):
             stats_map[stat.get("name")] = stat.get("value", 0)
     return {
-        "ppg": _safe_float(stats_map.get("totalPointsPerGame"), DEFAULT_POINTS_PER_GAME),
-        "yards_per_game": _safe_float(stats_map.get("yardsPerGame"), 330.0),
-        "turnover_differential": _safe_float(stats_map.get("turnOverDifferential"), 0.0),
-        "third_down_pct": _safe_float(stats_map.get("thirdDownConvPct"), 38.0),
-        "redzone_scoring_pct": _safe_float(stats_map.get("redzoneScoringPct"), 55.0),
-        "points_allowed": DEFAULT_POINTS_PER_GAME,
+        "ppg": _safe_float(stats_map.get("avgPoints", 0)),
+        "fg_pct": _safe_float(stats_map.get("fieldGoalPct", 0)),
+        "scoring_efficiency": _safe_float(stats_map.get("scoringEfficiency", 0)),
+        "rebounds": _safe_float(stats_map.get("avgRebounds", 0)),
+        "turnovers": _safe_float(stats_map.get("avgTurnovers", 0)),
+        "points_allowed": _safe_float(
+            stats_map.get("avgPointsAllowed")
+            or stats_map.get("opponentPointsPerGame")
+            or stats_map.get("pointsAllowedPerGame"),
+            82.0,
+        ),
+        "defensive_efficiency": _safe_float(
+            stats_map.get("defensiveEfficiency")
+            or stats_map.get("defensiveRating")
+            or stats_map.get("oppScoringEfficiency"),
+            0.0,
+        ),
+        "pace": _safe_float(
+            stats_map.get("pace")
+            or stats_map.get("possessionsPerGame")
+            or stats_map.get("avgPossessions"),
+            82.0,
+        ),
         "stats_status": "live",
     }
 
 
-def get_league_scoring_stats() -> dict:
-    """Return {team_name: {points_for_per_game, points_against_per_game, games_played}}.
+def apply_advanced_stats(stats: dict, team_name: str, advanced_by_team: dict, avg_pace: float) -> dict:
+    """Override ESPN's fallback points_allowed/pace with real per-team ratings.
 
-    ESPN's per-team statistics endpoint (get_team_stats above) has no
-    opponent-scoring field at all, so points_allowed there is always the
-    fallback constant. Standings entries carry real season pointsFor/
-    pointsAgainst, so that's the source of truth for points allowed --
-    fetched once for the whole league rather than per team.
+    ESPN's WNBA (and NBA) team-statistics endpoint has no opponent-scoring or
+    pace fields at all, so points_allowed/pace previously fell back to the
+    same constant for every team, contributing nothing to the weighted score.
+    DEF_RATING (points allowed per 100 possessions) is a better points-allowed
+    proxy than a per-game raw total anyway, since it already adjusts for pace.
     """
-    try:
-        resp = requests.get(STANDINGS_URL, timeout=20)
-        resp.raise_for_status()
-        payload = resp.json()
-    except Exception:
-        return {}
-
-    result = {}
-    for conference in payload.get("children", []):
-        for entry in conference.get("standings", {}).get("entries", []):
-            team_name = entry.get("team", {}).get("displayName", "")
-            if not team_name:
-                continue
-            stats = {s.get("name"): s.get("value") for s in entry.get("stats", []) if "value" in s}
-            wins = _safe_float(stats.get("wins"), 0.0)
-            losses = _safe_float(stats.get("losses"), 0.0)
-            ties = _safe_float(stats.get("ties"), 0.0)
-            games_played = wins + losses + ties
-            points_for = _safe_float(stats.get("pointsFor"), 0.0)
-            points_against = _safe_float(stats.get("pointsAgainst"), 0.0)
-            result[team_name] = {
-                "points_for_per_game": round(points_for / games_played, 2) if games_played > 0 else None,
-                "points_against_per_game": round(points_against / games_played, 2) if games_played > 0 else None,
-                "games_played": games_played,
-            }
-    return result
-
-
-def apply_scoring_stats(stats: dict, team_name: str, league_scoring: dict) -> dict:
-    """Override the fallback points_allowed with real season points-against.
-
-    Before Week 1 of a season, standings carry no completed games yet, so
-    this intentionally leaves the fallback in place rather than dividing by
-    zero or reporting a fabricated points-allowed figure.
-    """
-    scoring = league_scoring.get(team_name)
-    if not scoring or scoring.get("games_played", 0) <= 0:
+    advanced = advanced_by_team.get(team_name)
+    if not advanced:
         return stats
     stats = dict(stats)
-    if scoring.get("points_against_per_game") is not None:
-        stats["points_allowed"] = scoring["points_against_per_game"]
-    if scoring.get("points_for_per_game") is not None:
-        stats["ppg"] = scoring["points_for_per_game"]
-    stats["scoring_stats_source"] = "espn_standings"
+    stats["points_allowed"] = advanced["def_rating"]
+    stats["defensive_efficiency"] = 0.0
+    stats["pace"] = advanced["pace"]
+    stats["pace_baseline"] = avg_pace
+    stats["advanced_stats_source"] = "nba_api_league_advanced"
     return stats
 
 
-def build_nfl_report():
+def build_wnba_report():
     slate_date = current_slate_date_str()
-    url = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
+    url = "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard"
     try:
         resp = requests.get(url, params={"dates": current_slate_date_compact()}, timeout=20)
         resp.raise_for_status()
@@ -187,15 +170,15 @@ def build_nfl_report():
     except Exception as e:
         return {
             "status": "error",
-            "model": "nfl_scaffold_v1",
+            "model": "wnba_scaffold_v1",
             "generated_at": datetime.utcnow().isoformat(),
             "slate_date": slate_date,
             "games": [],
-            "note": f"NFL live feed error: {e}"
+            "note": f"WNBA live feed error: {e}"
         }
 
-    league_scoring = get_league_scoring_stats()
-    league_injuries = fetch_league_injuries()
+    advanced_by_team = get_league_advanced_team_stats(league_id="10")
+    avg_pace = league_average_pace(advanced_by_team, default=82.0)
 
     games = []
     for game in games_raw:
@@ -226,45 +209,57 @@ def build_nfl_report():
         away_pct = away_wins / max(away_wins + away_losses, 1)
         home_form = get_recent_form(home_abbr)
         away_form = get_recent_form(away_abbr)
-        home_stats = apply_scoring_stats(get_team_stats(home_abbr), home_name, league_scoring)
-        away_stats = apply_scoring_stats(get_team_stats(away_abbr), away_name, league_scoring)
-        home_injury = team_injury_context(home_name, league_injuries)
-        away_injury = team_injury_context(away_name, league_injuries)
-        home_injury_score = float(home_injury.get('injury_score', 50.0) or 50.0)
-        away_injury_score = float(away_injury.get('injury_score', 50.0) or 50.0)
+        home_stats = apply_advanced_stats(get_team_stats(home_abbr), home_name, advanced_by_team, avg_pace)
+        away_stats = apply_advanced_stats(get_team_stats(away_abbr), away_name, advanced_by_team, avg_pace)
 
         home_recent_score = scale_ratio(home_form['last5_wins'], 5)
         away_recent_score = scale_ratio(away_form['last5_wins'], 5)
         home_strength_score = scale_ratio(home_pct, 1.0)
         away_strength_score = scale_ratio(away_pct, 1.0)
-        home_offense_score = scale_diff((home_stats['ppg'] - away_stats['ppg']) * 1.4 + ((home_stats['yards_per_game'] - away_stats['yards_per_game']) * 0.06), 16)
-        away_offense_score = scale_diff((away_stats['ppg'] - home_stats['ppg']) * 1.4 + ((away_stats['yards_per_game'] - home_stats['yards_per_game']) * 0.06), 16)
-        home_defense_score = scale_diff((away_stats['points_allowed'] - home_stats['points_allowed']) * 1.4, 14)
-        away_defense_score = scale_diff((home_stats['points_allowed'] - away_stats['points_allowed']) * 1.4, 14)
-        home_matchup_score = scale_diff((home_stats['turnover_differential'] - away_stats['turnover_differential']) * 4.0, 12)
-        away_matchup_score = scale_diff((away_stats['turnover_differential'] - home_stats['turnover_differential']) * 4.0, 12)
-        home_advantage_score = 56.0
-        away_advantage_score = 44.0
+        home_offense_score = scale_diff((home_stats['ppg'] - away_stats['ppg']) + ((home_stats['scoring_efficiency'] - away_stats['scoring_efficiency']) * 10), 20)
+        away_offense_score = scale_diff((away_stats['ppg'] - home_stats['ppg']) + ((away_stats['scoring_efficiency'] - home_stats['scoring_efficiency']) * 10), 20)
+        home_defense_score = scale_diff(
+            (away_stats['points_allowed'] - home_stats['points_allowed'])
+            + ((home_stats['defensive_efficiency'] - away_stats['defensive_efficiency']) * 8),
+            18,
+        )
+        away_defense_score = scale_diff(
+            (home_stats['points_allowed'] - away_stats['points_allowed'])
+            + ((away_stats['defensive_efficiency'] - home_stats['defensive_efficiency']) * 8),
+            18,
+        )
+        home_pace_score = clamp(50.0 + ((home_stats['pace'] - avg_pace) * 1.2))
+        away_pace_score = clamp(50.0 + ((away_stats['pace'] - avg_pace) * 1.2))
+        home_matchup_score = scale_diff(((home_stats['rebounds'] - away_stats['rebounds']) * 1.5) + ((away_stats['turnovers'] - home_stats['turnovers']) * 2.0), 16)
+        away_matchup_score = scale_diff(((away_stats['rebounds'] - home_stats['rebounds']) * 1.5) + ((home_stats['turnovers'] - away_stats['turnovers']) * 2.0), 16)
+        home_advantage_score = 60.0
+        away_advantage_score = 40.0
+        home_injury = NEUTRAL_INJURY_CONTEXT
+        away_injury = NEUTRAL_INJURY_CONTEXT
+        home_injury_score = float(home_injury.get('injury_score', 50.0) or 50.0)
+        away_injury_score = float(away_injury.get('injury_score', 50.0) or 50.0)
 
         home_score = weighted_score([
-            (home_recent_score, 0.14),
-            (home_advantage_score, 0.08),
-            (home_strength_score, 0.16),
-            (home_offense_score, 0.16),
-            (home_defense_score, 0.16),
-            (home_injury_score, 0.18),
+            (home_recent_score, 0.16),
+            (home_advantage_score, 0.10),
+            (home_strength_score, 0.14),
+            (home_offense_score, 0.14),
+            (home_defense_score, 0.14),
+            (home_injury_score, 0.16),
             (home_form.get('rest_score', 50.0), 0.08),
-            (home_matchup_score, 0.04),
+            (home_pace_score, 0.03),
+            (home_matchup_score, 0.05),
         ])
         away_score = weighted_score([
-            (away_recent_score, 0.14),
-            (away_advantage_score, 0.08),
-            (away_strength_score, 0.16),
-            (away_offense_score, 0.16),
-            (away_defense_score, 0.16),
-            (away_injury_score, 0.18),
+            (away_recent_score, 0.16),
+            (away_advantage_score, 0.10),
+            (away_strength_score, 0.14),
+            (away_offense_score, 0.14),
+            (away_defense_score, 0.14),
+            (away_injury_score, 0.16),
             (away_form.get('rest_score', 50.0), 0.08),
-            (away_matchup_score, 0.04),
+            (away_pace_score, 0.03),
+            (away_matchup_score, 0.05),
         ])
         edge = round(home_score - away_score, 2)
         if edge > 10:
@@ -280,6 +275,7 @@ def build_nfl_report():
             "defense": home_defense_score,
             "injury": home_injury_score,
             "rest": home_form.get('rest_score', 50.0),
+            "pace": home_pace_score,
             "matchup": home_matchup_score,
         }
         away_components = {
@@ -289,6 +285,7 @@ def build_nfl_report():
             "defense": away_defense_score,
             "injury": away_injury_score,
             "rest": away_form.get('rest_score', 50.0),
+            "pace": away_pace_score,
             "matchup": away_matchup_score,
         }
         agreement = factor_agreement(home_components, away_components)
@@ -314,10 +311,8 @@ def build_nfl_report():
             "away_ppg": round(away_stats['ppg'], 2),
             "home_points_allowed": round(home_stats['points_allowed'], 2),
             "away_points_allowed": round(away_stats['points_allowed'], 2),
-            "home_yards_per_game": round(home_stats['yards_per_game'], 2),
-            "away_yards_per_game": round(away_stats['yards_per_game'], 2),
-            "home_turnover_differential": home_stats['turnover_differential'],
-            "away_turnover_differential": away_stats['turnover_differential'],
+            "home_pace": round(home_stats['pace'], 2),
+            "away_pace": round(away_stats['pace'], 2),
             "home_days_since_last_game": home_form.get("days_since_last_game"),
             "away_days_since_last_game": away_form.get("days_since_last_game"),
             "home_rest_score": round(home_form.get('rest_score', 50.0), 2),
@@ -326,6 +321,10 @@ def build_nfl_report():
             "away_offense_score": away_offense_score,
             "home_defense_score": home_defense_score,
             "away_defense_score": away_defense_score,
+            "home_rebounds": round(home_stats['rebounds'], 2),
+            "away_rebounds": round(away_stats['rebounds'], 2),
+            "home_turnovers": round(home_stats['turnovers'], 2),
+            "away_turnovers": round(away_stats['turnovers'], 2),
             "home_weighted_score": home_score,
             "away_weighted_score": away_score,
             "home_injury_count": home_injury.get('injury_count', 0),
@@ -336,15 +335,15 @@ def build_nfl_report():
             "away_injury_status": away_injury.get('status', 'unknown'),
             "home_matchup_score": home_matchup_score,
             "away_matchup_score": away_matchup_score,
-            "factors": ["recent form", "home/away advantage", "team strength", "offense", "defense", "injuries", "rest", "turnover differential"],
-            "note": f"Projection uses the NFL weighted model with offense, defense, turnover differential, rest, and a real ESPN injury feed. Points-allowed comes from season standings and is only real once games have been played this season (games_played>0); before that it falls back to a league-average placeholder. Injury status: home={home_injury.get('status', 'unknown')}, away={away_injury.get('status', 'unknown')}."
+            "factors": ["recent form", "home/away advantage", "team strength", "offense", "defense", "rest", "pace", "matchup edge"],
+            "note": "Projection uses the WNBA weighted model with offense, defense, pace, rest, and matchup layers. Injury context has no live WNBA data source yet and is held neutral (does not affect the edge)."
         })
 
     return {
         "status": "ok",
-        "model": "nfl_weighted_betting_model_v1",
+        "model": "wnba_weighted_betting_model_v1",
         "generated_at": datetime.now(UTC).isoformat(),
         "slate_date": slate_date,
         "games": games,
-        "note": "NFL weighted model covers team form, offense, defense, turnover differential, rest, and a real ESPN injury feed. Points-allowed/points-for are season standings-based and are placeholder league-average values until real games are played this season. Research only."
+        "note": "WNBA weighted model covers team form, offense, defense, pace, rest, and matchup layers. Injury context is not yet wired to a live source. Research only."
     }

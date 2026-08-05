@@ -6,6 +6,7 @@ import requests
 from sports.dates import current_slate_date_compact, current_slate_date_str
 from sports.model_utils import calibrate_projection, clamp, factor_agreement, scale_ratio, scale_diff, weighted_score
 from sports.nba_injuries import get_team_injury_context
+from sports.team_advanced_stats import get_league_advanced_team_stats, league_average_pace
 
 
 def _safe_float(value, default=0.0):
@@ -131,6 +132,28 @@ def get_team_stats(team_abbr: str):
     }
 
 
+def apply_advanced_stats(stats: dict, team_name: str, advanced_by_team: dict, avg_pace: float) -> dict:
+    """Override ESPN's fallback points_allowed/pace with real per-team ratings.
+
+    ESPN's NBA team-statistics endpoint has no opponent-scoring or pace
+    fields at all, so points_allowed/pace previously fell back to the same
+    constant for every team, contributing nothing to the weighted score.
+    DEF_RATING (points allowed per 100 possessions) is a better points-
+    allowed proxy than a per-game raw total anyway, since it already
+    adjusts for pace.
+    """
+    advanced = advanced_by_team.get(team_name)
+    if not advanced:
+        return stats
+    stats = dict(stats)
+    stats["points_allowed"] = advanced["def_rating"]
+    stats["defensive_efficiency"] = 0.0
+    stats["pace"] = advanced["pace"]
+    stats["pace_baseline"] = avg_pace
+    stats["advanced_stats_source"] = "nba_api_league_advanced"
+    return stats
+
+
 def build_nba_report():
     slate_date = current_slate_date_str()
     url = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard"
@@ -148,6 +171,9 @@ def build_nba_report():
             "games": [],
             "note": f"NBA live feed error: {e}"
         }
+
+    advanced_by_team = get_league_advanced_team_stats(league_id="00")
+    avg_pace = league_average_pace(advanced_by_team, default=99.0)
 
     games = []
     for game in games_raw:
@@ -178,8 +204,8 @@ def build_nba_report():
         away_pct = away_wins / max(away_wins + away_losses, 1)
         home_form = get_recent_form(home_abbr)
         away_form = get_recent_form(away_abbr)
-        home_stats = get_team_stats(home_abbr)
-        away_stats = get_team_stats(away_abbr)
+        home_stats = apply_advanced_stats(get_team_stats(home_abbr), home_name, advanced_by_team, avg_pace)
+        away_stats = apply_advanced_stats(get_team_stats(away_abbr), away_name, advanced_by_team, avg_pace)
 
         home_recent_score = scale_ratio(home_form['last5_wins'], 5)
         away_recent_score = scale_ratio(away_form['last5_wins'], 5)
@@ -197,8 +223,8 @@ def build_nba_report():
             + ((away_stats['defensive_efficiency'] - home_stats['defensive_efficiency']) * 8),
             22,
         )
-        home_pace_score = clamp(50.0 + ((home_stats['pace'] - 99.0) * 1.2))
-        away_pace_score = clamp(50.0 + ((away_stats['pace'] - 99.0) * 1.2))
+        home_pace_score = clamp(50.0 + ((home_stats['pace'] - avg_pace) * 1.2))
+        away_pace_score = clamp(50.0 + ((away_stats['pace'] - avg_pace) * 1.2))
         home_matchup_score = scale_diff(((home_stats['rebounds'] - away_stats['rebounds']) * 1.5) + ((away_stats['turnovers'] - home_stats['turnovers']) * 2.0), 20)
         away_matchup_score = scale_diff(((away_stats['rebounds'] - home_stats['rebounds']) * 1.5) + ((home_stats['turnovers'] - away_stats['turnovers']) * 2.0), 20)
         home_advantage_score = 60.0

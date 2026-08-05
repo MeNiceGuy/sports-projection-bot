@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from sports.nba import build_nba_report
+from sports.nba import apply_advanced_stats, build_nba_report
 
 
 class NbaPipelineTests(unittest.TestCase):
@@ -61,6 +61,7 @@ class NbaPipelineTests(unittest.TestCase):
                 "injury_score": 45.0,
                 "status": "live",
             }),
+            patch("sports.nba.get_league_advanced_team_stats", return_value={}),
         ):
             report = build_nba_report()
 
@@ -73,6 +74,27 @@ class NbaPipelineTests(unittest.TestCase):
         self.assertIn("rest", game["factors"])
         self.assertIn("home_defense_score", game)
         self.assertIn("away_rest_score", game)
+
+
+class NbaAdvancedStatsOverrideTests(unittest.TestCase):
+    def test_known_team_overrides_points_allowed_and_pace(self):
+        # ESPN's team-statistics endpoint has no points-allowed/pace fields
+        # for NBA, so both previously fell back to identical constants for
+        # every team -- contributing nothing to the weighted score. A team
+        # found in the advanced-stats table must get real values instead.
+        stats = {"points_allowed": 115.0, "defensive_efficiency": 0.0, "pace": 99.0}
+        advanced_by_team = {"Boston Celtics": {"off_rating": 120.0, "def_rating": 111.7, "net_rating": 8.3, "pace": 95.58}}
+
+        result = apply_advanced_stats(stats, "Boston Celtics", advanced_by_team, avg_pace=99.0)
+
+        self.assertEqual(result["points_allowed"], 111.7)
+        self.assertEqual(result["pace"], 95.58)
+        self.assertEqual(result["advanced_stats_source"], "nba_api_league_advanced")
+
+    def test_unknown_team_falls_back_unchanged(self):
+        stats = {"points_allowed": 115.0, "defensive_efficiency": 0.0, "pace": 99.0}
+        result = apply_advanced_stats(stats, "Some Team Not In Table", {}, avg_pace=99.0)
+        self.assertEqual(result, stats)
 
 
 if __name__ == "__main__":

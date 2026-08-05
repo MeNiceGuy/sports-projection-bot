@@ -69,6 +69,7 @@ st.caption("Research tool only. Not financial or betting advice.")
 
 FILES = {
     "Ranked Props": "logs/ranked_props.csv",
+    "MLB Ranked Props": "logs/mlb_ranked_props.csv",
     "Market Lines": "logs/market_lines.csv",
     "Arbitrage": "logs/arbitrage_report.csv",
     "Parlays": "logs/risk_controlled_parlays.csv",
@@ -82,10 +83,16 @@ tabs = st.tabs(["Command Center"] + list(FILES.keys()) + ["Governance", "Health"
 with tabs[0]:
     st.subheader("Command Center")
 
-    if Path(FILES["Ranked Props"]).exists():
-        df = pd.read_csv(FILES["Ranked Props"])
-        st.metric("Ranked Props", len(df))
-        st.dataframe(df.sort_values("prop_score", ascending=False).head(25), width="stretch", hide_index=True)
+    ranked_frames = [
+        pd.read_csv(FILES[name])
+        for name in ("Ranked Props", "MLB Ranked Props")
+        if Path(FILES[name]).exists() and Path(FILES[name]).stat().st_size > 0
+    ]
+    ranked_frames = [f for f in ranked_frames if not f.empty]
+    if ranked_frames:
+        combined = pd.concat(ranked_frames, ignore_index=True, sort=False)
+        st.metric("Ranked Props (NBA + MLB)", len(combined))
+        st.dataframe(combined.sort_values("prop_score", ascending=False).head(25), width="stretch", hide_index=True)
 
 for i, (name, file) in enumerate(FILES.items(), start=1):
     with tabs[i]:
