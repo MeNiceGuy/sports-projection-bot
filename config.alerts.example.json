@@ -1,0 +1,18 @@
+{
+  "email_to": "you@example.com",
+  "min_confidence": [
+    "High"
+  ],
+  "min_edge_band": [
+    "strong"
+  ],
+  "enabled_sports": [
+    "nba",
+    "mlb"
+  ],
+  "subject_prefix": "Sports Bot Alert",
+  "min_value_edge": 5.0,
+  "min_expected_value": 0.02,
+  "mlb_max_favorite_price": -150,
+  "mlb_min_value_edge_favorite": 7.0
+}

@@ -22,6 +22,7 @@ backups/
 .env.*
 !.env.example
 config.odds.json
+config.alerts.json
 
 # Notebooks/build/editor
 .ipynb_checkpoints/
