@@ -29,3 +29,6 @@ dist/
 build/
 .DS_Store
 Thumbs.db
+
+# Local Claude Code config (machine-specific paths/permissions)
+.claude/

@@ -3,6 +3,8 @@ from sports.adaptive_accuracy import get_dynamic_historical_accuracy
 
 import math
 
+from bot.betting_metrics import american_to_decimal_odds, american_to_implied_probability
+
 
 def clamp(value, low=0.0, high=100.0):
     return max(low, min(high, value))
@@ -20,6 +22,47 @@ SUSPICIOUS_EDGE_THRESHOLD = 25.0
 
 def is_suspiciously_large_edge(value_edge) -> bool:
     return value_edge is not None and abs(value_edge) > SUSPICIOUS_EDGE_THRESHOLD
+
+
+def no_vig_probability_for_side(side_odds, opposite_odds):
+    """No-vig fair probability for one side of a two-way market (moneyline,
+    spread, total, or player-prop Over/Under -- the math is identical)."""
+    implied_side = american_to_implied_probability(side_odds)
+    implied_opposite = american_to_implied_probability(opposite_odds)
+    if implied_side is None or implied_opposite is None:
+        return None
+    overround = implied_side + implied_opposite
+    if overround <= 0:
+        return None
+    return round(implied_side / overround, 6)
+
+
+def evaluate_against_market(model_probability, odds, opposite_odds):
+    """Given a model's probability for one side of a two-way market, return
+    the no-vig market probability, value edge, and expected value for it.
+
+    Shared by moneylines, player props, and spreads/totals -- whatever
+    produced model_probability (Poisson rate, game simulation, etc.) is the
+    only thing that differs between markets; the edge/EV math on top of it
+    is the same everywhere.
+    """
+    market_probability = no_vig_probability_for_side(odds, opposite_odds)
+    decimal_odds = american_to_decimal_odds(odds)
+
+    value_edge = None
+    expected_value = None
+    if model_probability is not None and market_probability is not None:
+        value_edge = round((model_probability - market_probability) * 100, 2)
+        if decimal_odds is not None:
+            expected_value = round((model_probability * decimal_odds) - 1, 4)
+
+    return {
+        "model_probability": model_probability,
+        "market_probability": market_probability,
+        "decimal_odds": decimal_odds,
+        "value_edge": value_edge,
+        "expected_value_per_unit": expected_value,
+    }
 
 
 def scale_ratio(value, max_value=1.0):

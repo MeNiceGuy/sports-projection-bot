@@ -19,6 +19,7 @@ A multi-sport projection and edge-research bot scaffold using public/open data w
 - advanced analytics layer added: probability intervals, Monte Carlo simulations, feature attribution, dynamic weighting, regime detection, ensemble probabilities, injury intelligence, risk controls, and historical warehouse tables
 - sportsbook odds API config, backtesting engine report, MLB bullpen fatigue engine, and dynamic learning projection adjustments added
 - optional AI advisor connector added for development recommendations from current projection, market, governance, and backtesting reports
+- spreads and totals analysis added: real point-spread and Over/Under probabilities from the same seeded Monte Carlo game simulation used for moneylines, cross-checked against no-vig market prices with the same decision-tier gating
 
 | Area | Status |
 | --- | --- |
@@ -67,6 +68,14 @@ The governance release gate intentionally remains strict. It blocks trust in cal
 - `pass`: the price, confidence, model edge, or team matching is not strong enough.
 
 Alerts use this market-aware layer when `reports/market_comparison_report.json` is available, so the bot avoids alerting on model strength alone when the market price does not support the side.
+
+## Spreads and totals
+Each game's `spread_comparison` and `totals_comparison` (`bot/spread_total_compare.py`, `sports/spread_total_probability.py`) apply the same no-vig/EV rigor to point spreads and Over/Under totals that the moneyline layer applies to game winners:
+
+- Spread-cover and Over/Under probabilities come from the same seeded Monte Carlo score simulation (`sports/advanced_analytics.py::simulate_game_scores`) that already powers moneyline win probability and confidence -- not a separate, disconnected model.
+- Both sides of the market are evaluated and shopped across every fetched bookmaker, same as moneyline's `select_best_value`.
+- `decision_tier` uses the same `premium`/`watchlist`/`pass` gating and the same suspicious-edge guard, but does not use moneyline's team-lean alignment check -- a moneyline "lean" is a win-probability call and doesn't map onto covering a spread or clearing a total, so `confidence`/`edge_band` from the game's own calibration are reused as the independent corroboration instead.
+- Requires spreads/totals rows in `logs/market_lines.csv` (fetched automatically by `run_odds_fetch.py` alongside moneylines); if a game has no spread or totals rows, `spread_comparison`/`totals_comparison` are `null` for that game rather than guessing.
 
 ## Upgraded bet-selection filters
 The market layer now uses stricter betting mechanics:

@@ -2,8 +2,12 @@ from __future__ import annotations
 
 import math
 
-from bot.betting_metrics import american_to_decimal_odds, american_to_implied_probability
-from sports.model_utils import SUSPICIOUS_EDGE_THRESHOLD, is_suspiciously_large_edge
+from sports.model_utils import (
+    SUSPICIOUS_EDGE_THRESHOLD,
+    evaluate_against_market,
+    is_suspiciously_large_edge,
+    no_vig_probability_for_side as _no_vig_probability_for_side,
+)
 
 __all__ = [
     "poisson_over_probability",
@@ -100,16 +104,14 @@ def prop_side_probability(rate, line, side):
     return None
 
 
-def no_vig_probability_for_side(side_odds, opposite_odds, side: str):
-    """No-vig fair probability for one side of an Over/Under pair."""
-    implied_side = american_to_implied_probability(side_odds)
-    implied_opposite = american_to_implied_probability(opposite_odds)
-    if implied_side is None or implied_opposite is None:
-        return None
-    overround = implied_side + implied_opposite
-    if overround <= 0:
-        return None
-    return round(implied_side / overround, 6)
+def no_vig_probability_for_side(side_odds, opposite_odds, side: str = ""):
+    """No-vig fair probability for one side of an Over/Under pair.
+
+    Thin wrapper over sports/model_utils.py's sport-agnostic version --
+    kept here (with the vestigial `side` param) so existing callers/imports
+    of this module don't need to change.
+    """
+    return _no_vig_probability_for_side(side_odds, opposite_odds)
 
 
 def evaluate_prop_side(rate, line, side, odds, opposite_odds):
@@ -117,29 +119,12 @@ def evaluate_prop_side(rate, line, side, odds, opposite_odds):
 
     Mirrors the no-vig / expected-value approach already used for moneylines
     in bot/market_compare.py, applied to a single player-prop side instead of
-    a two-team game line.
+    a two-team game line. Expected value is only meaningful as a claim about
+    beating the market, so it requires an actual two-sided quote to no-vig
+    against -- some props (e.g. "anytime home run") are frequently offered
+    one-sided with no priced opposite outcome, and evaluate_against_market
+    already leaves value_edge/expected_value_per_unit as None in that case
+    rather than reporting the model's own guess dressed up as a measured edge.
     """
     model_probability = prop_side_probability(rate, line, side)
-    market_probability = no_vig_probability_for_side(odds, opposite_odds, side)
-    decimal_odds = american_to_decimal_odds(odds)
-
-    # Expected value is only meaningful as a claim about beating the market,
-    # so it requires an actual two-sided quote to no-vig against. Some props
-    # (e.g. "anytime home run") are frequently offered one-sided with no
-    # priced opposite outcome; without market_probability there is nothing
-    # to validate model_probability against, so reporting an EV here would
-    # just be the model's own guess dressed up as a measured edge.
-    value_edge = None
-    expected_value = None
-    if model_probability is not None and market_probability is not None:
-        value_edge = round((model_probability - market_probability) * 100, 2)
-        if decimal_odds is not None:
-            expected_value = round((model_probability * decimal_odds) - 1, 4)
-
-    return {
-        "model_probability": model_probability,
-        "market_probability": market_probability,
-        "decimal_odds": decimal_odds,
-        "value_edge": value_edge,
-        "expected_value_per_unit": expected_value,
-    }
+    return evaluate_against_market(model_probability, odds, opposite_odds)

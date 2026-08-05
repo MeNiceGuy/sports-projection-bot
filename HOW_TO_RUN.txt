@@ -34,6 +34,13 @@ C:\Users\1bosw\OneDrive\Desktop\GitHub\sports-projection-bot
 11. To compare projections against supplied market lines:
    python run_market_compare.py
 
+   Each game's comparison now also includes spread_comparison and totals_comparison,
+   using real point-spread/Over-Under probabilities from the same Monte Carlo game
+   simulation, no-vig market pricing, and the same premium/watchlist/pass decision
+   gating as moneyline. Requires spreads/totals rows in logs\market_lines.csv
+   (fetched automatically alongside moneylines by run_odds_fetch.py); a game with
+   no spread or totals rows gets null for those fields instead of a guess.
+
 12. To build the backtesting engine report:
    python run_backtest_summary.py
 

@@ -379,10 +379,10 @@ def select_best_value(value_options: list[dict], model_lean: str):
     return max(usable_options, key=option_rank)
 
 
-def build_line_lookup(lines: list[dict]):
+def build_line_lookup(lines: list[dict], market: str = "h2h"):
     lookup = {}
     for row in lines:
-        if row.get("market", "") != "h2h":
+        if row.get("market", "") != market:
             continue
         keys = [
             (row.get("sport", ""), "game_id", row.get("game_id", "")),
@@ -479,6 +479,11 @@ def model_probabilities_for_game(game: dict):
 
 
 def main():
+    # Imported inside main(), not at module level, to avoid a circular
+    # import: bot/spread_total_compare.py imports several helpers back out
+    # of this module.
+    from bot.spread_total_compare import analyze_spread_market, analyze_totals_market
+
     report = json.loads(REPORT_PATH.read_text(encoding="utf-8")) if REPORT_PATH.exists() else {}
     lines = read_lines()
     historical_lines = read_line_history()
@@ -486,6 +491,8 @@ def main():
     unmatched_games = []
     line_lookup = build_line_lookup(lines)
     historical_line_lookup = build_line_lookup(historical_lines)
+    spread_line_lookup = build_line_lookup(lines, market="spreads")
+    totals_line_lookup = build_line_lookup(lines, market="totals")
 
     for sport, block in report.get("reports", {}).items():
         for game in block.get("games", []):
@@ -567,6 +574,12 @@ def main():
             line_movement = build_line_movement(historical_market_rows, game.get("simple_projection_lean", ""))
             psychology = market_psychology(line_movement, best_value)
             is_actionable_edge = actionable_edge(decision_tier, best_value, any_fresh_line, teams_matched)
+
+            spread_rows = matching_market_rows(spread_line_lookup, sport, game)
+            totals_rows = matching_market_rows(totals_line_lookup, sport, game)
+            spread_comparison = analyze_spread_market(sport, game, spread_rows) if spread_rows else None
+            totals_comparison = analyze_totals_market(sport, game, totals_rows) if totals_rows else None
+
             comparisons.append({
                 "sport": sport,
                 "game_id": game.get("game_id", ""),
@@ -620,6 +633,8 @@ def main():
                 "market_agreement": market_agreement,
                 "line_movement": line_movement,
                 "market_psychology": psychology,
+                "spread_comparison": spread_comparison,
+                "totals_comparison": totals_comparison,
                 "note": "Market comparison layer uses no-vig fair probability, expected value, line freshness, and fractional Kelly sizing guidance. Research only."
             })
 

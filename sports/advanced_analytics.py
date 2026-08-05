@@ -10,8 +10,14 @@ from sports.model_utils import calibrate_projection, probability_from_score_gap
 
 
 SPORT_BASELINES = {
-    "nba": {"home_score": 114.0, "away_score": 111.0, "score_sd": 12.0, "margin_sd": 13.5},
-    "mlb": {"home_score": 4.6, "away_score": 4.3, "score_sd": 2.8, "margin_sd": 3.2},
+    "nba": {"home_score": 114.0, "away_score": 111.0, "score_sd": 12.0, "margin_sd": 13.5, "gap_scale": 0.18},
+    "mlb": {"home_score": 4.6, "away_score": 4.3, "score_sd": 2.8, "margin_sd": 3.2, "gap_scale": 0.035},
+    # WNBA plays at a meaningfully lower scoring scale than NBA (40-minute
+    # games, fewer possessions) -- these previously fell back to the NBA
+    # baseline entirely, simulating WNBA games as if they scored like NBA
+    # games.
+    "wnba": {"home_score": 84.0, "away_score": 81.0, "score_sd": 10.5, "margin_sd": 12.0, "gap_scale": 0.13},
+    "nfl": {"home_score": 23.0, "away_score": 21.0, "score_sd": 10.0, "margin_sd": 11.5, "gap_scale": 0.09},
 }
 
 SPORT_FEATURES = {
@@ -38,6 +44,30 @@ SPORT_FEATURES = {
         ("bullpen_fatigue", "home_bullpen_dynamic_freshness_score", "away_bullpen_dynamic_freshness_score", 0.03),
         ("bullpen_freshness", "home_bullpen_freshness_score", "away_bullpen_freshness_score", 0.03),
         ("matchup", "home_matchup_score", "away_matchup_score", 0.05),
+    ],
+    # Mirrors the weight structure in sports/wnba.py's build_wnba_report().
+    "wnba": [
+        ("recent_form", "home_recent_form", "away_recent_form", 0.16),
+        ("home_away", "home_weighted_score", "away_weighted_score", 0.10),
+        ("team_strength", "home_record", "away_record", 0.14),
+        ("offense", "home_offense_score", "away_offense_score", 0.14),
+        ("defense", "home_defense_score", "away_defense_score", 0.14),
+        ("injury_context", "home_injury_score", "away_injury_score", 0.16),
+        ("rest", "home_rest_score", "away_rest_score", 0.08),
+        ("pace", "home_pace", "away_pace", 0.03),
+        ("matchup", "home_matchup_score", "away_matchup_score", 0.05),
+    ],
+    # Mirrors the weight structure in sports/nfl.py's build_nfl_report().
+    # No pace factor -- NFL has no equivalent concept.
+    "nfl": [
+        ("recent_form", "home_recent_form", "away_recent_form", 0.14),
+        ("home_away", "home_weighted_score", "away_weighted_score", 0.08),
+        ("team_strength", "home_record", "away_record", 0.16),
+        ("offense", "home_offense_score", "away_offense_score", 0.16),
+        ("defense", "home_defense_score", "away_defense_score", 0.16),
+        ("injury_context", "home_injury_score", "away_injury_score", 0.18),
+        ("rest", "home_rest_score", "away_rest_score", 0.08),
+        ("matchup", "home_matchup_score", "away_matchup_score", 0.04),
     ],
 }
 
@@ -164,23 +194,26 @@ def _seed_for_game(sport: str, game: dict):
     return int(hashlib.sha256(raw.encode("utf-8")).hexdigest()[:12], 16)
 
 
-def monte_carlo_game(sport: str, game: dict, simulations: int = 2000):
+def simulate_game_scores(sport: str, game: dict, simulations: int = 2000):
+    """Return (home_scores, away_scores) -- the raw per-simulation score
+    samples, seeded deterministically per game so repeated calls agree.
+
+    This is the shared core behind monte_carlo_game's summary stats and
+    sports/spread_total_probability.py's real spread/total probabilities;
+    both need the same underlying distribution, not just its percentiles.
+    """
     sport = (sport or "").lower()
     baseline = SPORT_BASELINES.get(sport, SPORT_BASELINES["nba"])
     home_score_model = safe_float(game.get("home_weighted_score"), 50.0)
     away_score_model = safe_float(game.get("away_weighted_score"), 50.0)
     model_gap = home_score_model - away_score_model
-    home_probability = probability_from_score_gap(model_gap)
     rng = random.Random(_seed_for_game(sport, game))
 
-    home_mean = baseline["home_score"] + (model_gap * (0.18 if sport == "nba" else 0.035))
-    away_mean = baseline["away_score"] - (model_gap * (0.18 if sport == "nba" else 0.035))
+    gap_scale = baseline.get("gap_scale", 0.035)
+    home_mean = baseline["home_score"] + (model_gap * gap_scale)
+    away_mean = baseline["away_score"] - (model_gap * gap_scale)
     home_scores = []
     away_scores = []
-    home_wins = 0
-    spread_hits = 0
-    upset_wins = 0
-    lean_is_home = game.get("simple_projection_lean") == (game.get("matchup", "").split(" at ")[-1] if " at " in game.get("matchup", "") else "")
     for _ in range(simulations):
         home = max(0.0, rng.gauss(home_mean, baseline["score_sd"]))
         away = max(0.0, rng.gauss(away_mean, baseline["score_sd"]))
@@ -189,10 +222,23 @@ def monte_carlo_game(sport: str, game: dict, simulations: int = 2000):
             away = round(away)
         home_scores.append(home)
         away_scores.append(away)
+    return home_scores, away_scores
+
+
+def monte_carlo_game(sport: str, game: dict, simulations: int = 2000):
+    sport = (sport or "").lower()
+    home_score_model = safe_float(game.get("home_weighted_score"), 50.0)
+    away_score_model = safe_float(game.get("away_weighted_score"), 50.0)
+    model_gap = home_score_model - away_score_model
+    home_probability = probability_from_score_gap(model_gap)
+
+    home_scores, away_scores = simulate_game_scores(sport, game, simulations)
+    home_wins = 0
+    upset_wins = 0
+    lean_is_home = game.get("simple_projection_lean") == (game.get("matchup", "").split(" at ")[-1] if " at " in game.get("matchup", "") else "")
+    for home, away in zip(home_scores, away_scores):
         home_win = home > away
         home_wins += 1 if home_win else 0
-        if (home - away) * (1 if model_gap >= 0 else -1) > 0:
-            spread_hits += 1
         if lean_is_home is not None and home_win != lean_is_home:
             upset_wins += 1
 
@@ -217,7 +263,11 @@ def monte_carlo_game(sport: str, game: dict, simulations: int = 2000):
             "away": [round(percentile(away_scores, 0.10), 2), round(percentile(away_scores, 0.90), 2)],
         },
         "upset_frequency": round(upset_wins / simulations, 4),
-        "spread_hit_probability": round(spread_hits / simulations, 4),
+        # spread_hit_probability was removed here -- it checked "did the
+        # favorite win by any margin", which is just home/away_win_probability
+        # again, not a real market spread threshold. Real spread probability
+        # against an actual line now lives in sports/spread_total_probability.py,
+        # which uses simulate_game_scores() above against the real number.
         "method": "seeded_gaussian_score_simulation",
     }
 
