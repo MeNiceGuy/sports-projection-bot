@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from bot.data_warehouse import store_line_movements, store_market_lines
+from bot.pick_ledger import record_pick_odds
 from sports.model_utils import is_suspiciously_large_edge, probability_from_score_gap
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -653,6 +654,7 @@ def main():
     OUT.write_text(json.dumps(out, indent=2), encoding="utf-8")
     stored_lines = store_market_lines()
     stored_movements = store_line_movements(comparisons)
+    recorded_picks = record_pick_odds(comparisons, out["generated_at"])
     print({
         "comparisons_written": len(comparisons),
         "unmatched_games": len(unmatched_games),
@@ -660,6 +662,7 @@ def main():
         "output": str(OUT),
         "warehouse_market_rows_added": stored_lines,
         "warehouse_line_movements_added": stored_movements,
+        "pick_odds_recorded": recorded_picks,
     })
 
 

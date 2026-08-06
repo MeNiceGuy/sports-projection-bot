@@ -87,6 +87,68 @@ class MergeResultsPreservesHistoryTests(unittest.TestCase):
             self.assertEqual(rows["999999"]["model_era"], merge_results_module.CURRENT_MODEL_ERA)
             self.assertEqual(rows["999999"]["was_correct"], "True")
 
+    def test_known_odds_computes_flat_unit_profit_for_a_win(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            graded = tmp_path / "graded_results.csv"
+            write_csv(graded, merge_results_module.FIELDNAMES, [])
+            preds = tmp_path / "prediction_log.csv"
+            write_csv(preds, ["generated_at", "sport", "game_id", "matchup", "lean", "confidence"], [{
+                "generated_at": "2026-08-05T12:00:00+00:00", "sport": "mlb", "game_id": "999999",
+                "matchup": "Team A at Team B", "lean": "Team B", "confidence": "High",
+            }])
+            results = tmp_path / "results_ingest_template.csv"
+            write_csv(results, ["sport", "game_id", "matchup", "actual_winner", "game_completed", "notes"], [{
+                "sport": "mlb", "game_id": "999999", "matchup": "Team A at Team B",
+                "actual_winner": "Team B", "game_completed": "true", "notes": "won",
+            }])
+
+            with (
+                patch.object(merge_results_module, "GRADED_RESULTS", graded),
+                patch.object(merge_results_module, "PREDICTION_LOG", preds),
+                patch.object(merge_results_module, "RESULTS_TEMPLATE", results),
+                patch.object(merge_results_module, "lookup_pick", return_value={"odds": "-150"}),
+            ):
+                merge_results_module.merge_results()
+
+            rows = {r["game_id"]: r for r in merge_results_module.read_csv(graded)}
+            self.assertEqual(rows["999999"]["odds"], "-150")
+            self.assertAlmostEqual(float(rows["999999"]["profit_units"]), 0.666667, places=5)
+
+    def test_missing_odds_leaves_a_win_profit_blank_but_a_loss_is_still_minus_one(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            graded = tmp_path / "graded_results.csv"
+            write_csv(graded, merge_results_module.FIELDNAMES, [])
+            preds = tmp_path / "prediction_log.csv"
+            write_csv(preds, ["generated_at", "sport", "game_id", "matchup", "lean", "confidence"], [
+                {"generated_at": "2026-08-05T12:00:00+00:00", "sport": "mlb", "game_id": "999999",
+                 "matchup": "Team A at Team B", "lean": "Team B", "confidence": "High"},
+                {"generated_at": "2026-08-05T12:00:00+00:00", "sport": "mlb", "game_id": "888888",
+                 "matchup": "Team C at Team D", "lean": "Team D", "confidence": "High"},
+            ])
+            results = tmp_path / "results_ingest_template.csv"
+            write_csv(results, ["sport", "game_id", "matchup", "actual_winner", "game_completed", "notes"], [
+                {"sport": "mlb", "game_id": "999999", "matchup": "Team A at Team B",
+                 "actual_winner": "Team B", "game_completed": "true", "notes": "won, odds never recorded"},
+                {"sport": "mlb", "game_id": "888888", "matchup": "Team C at Team D",
+                 "actual_winner": "Team C", "game_completed": "true", "notes": "lost, odds never recorded"},
+            ])
+
+            with (
+                patch.object(merge_results_module, "GRADED_RESULTS", graded),
+                patch.object(merge_results_module, "PREDICTION_LOG", preds),
+                patch.object(merge_results_module, "RESULTS_TEMPLATE", results),
+                patch.object(merge_results_module, "lookup_pick", return_value=None),
+            ):
+                merge_results_module.merge_results()
+
+            rows = {r["game_id"]: r for r in merge_results_module.read_csv(graded)}
+            self.assertEqual(rows["999999"]["odds"], "")
+            self.assertEqual(rows["999999"]["profit_units"], "")
+            self.assertEqual(rows["888888"]["odds"], "")
+            self.assertEqual(rows["888888"]["profit_units"], "-1.0")
+
     def test_no_new_completed_results_leaves_file_untouched(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)

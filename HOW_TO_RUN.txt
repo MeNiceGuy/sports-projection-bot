@@ -22,6 +22,12 @@ C:\Users\1bosw\OneDrive\Desktop\GitHub\sports-projection-bot
 7. To merge completed game results from the template into graded results:
    python run_merge_results.py
 
+   Each newly graded row now also gets odds and profit_units (flat 1-unit
+   staking), looked up from logs\pick_odds_log.csv -- the odds actually
+   available when run_market_compare.py flagged the pick as premium/
+   watchlist (bot\pick_ledger.py). A pick graded before that price was
+   ever recorded gets a blank profit_units rather than a guessed one.
+
 8. To build confidence-bucket reporting from graded results:
    python run_confidence_report.py
 
