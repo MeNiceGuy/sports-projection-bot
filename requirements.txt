@@ -1,6 +1,9 @@
 pandas
+numpy
 requests
 pypdf
 nba_api
 streamlit
+python-dotenv
+scikit-learn
 pytest

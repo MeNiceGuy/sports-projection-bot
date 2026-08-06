@@ -1,10 +1,52 @@
 Sports Projection Bot - How To Run
 
-Project folder:
+Project folder (adjust to wherever you cloned it):
 C:\Users\1bosw\OneDrive\Desktop\GitHub\sports-projection-bot
 
-1. Open PowerShell in the project folder.
-2. Install dependencies:
+=== Setup (one-time) ===
+
+1. Clone the repo and open a terminal in the project folder.
+
+2. Create and activate a virtual environment (recommended so dependencies
+   don't collide with anything else on your machine):
+   python -m venv .venv
+   .venv\Scripts\activate
+
+3. Install dependencies:
+   python -m pip install -r requirements.txt
+
+4. Copy the example config/env files and fill in real values:
+   copy config.odds.example.json config.odds.json
+   copy config.alerts.example.json config.alerts.json
+   copy .env.example .env
+   - config.odds.json / .env: needs an odds API key. The current pipeline
+     uses The Odds API (https://the-odds-api.com) -- set THE_ODDS_API_KEY
+     in .env, or put the key directly in config.odds.json.
+   - config.alerts.json: set email_to to your own address if you want
+     run_alerts.py to actually email you.
+   - config.json (tracked, not gitignored) controls which sports are
+     active (active_sports) -- edit directly, no copying needed.
+   All three of the copied files are gitignored, so your real keys/email
+   never get committed.
+
+5. Verify the install:
+   python -m pytest tests/ -q
+   This should show every test passing (test files with pandas/numpy/
+   sklearn imports can occasionally fail with an OpenBLAS memory error if
+   your machine is low on free RAM at that moment -- that's a system
+   resource issue, not a code problem; re-running the file alone usually
+   passes).
+
+=== Daily use ===
+
+Shortcut: python run_pipeline.py runs the entire pipeline below (projection
+through health check, props, backtesting, governance, staking, CLV) as one
+command and prints a pass/fail summary per step. The numbered steps that
+follow are the same pipeline broken out individually, useful when you only
+want to re-run one stage or need to see a single step's raw output.
+
+1. Open PowerShell in the project folder (activate the venv if you made one).
+2. Confirm dependencies are current:
    python -m pip install -r requirements.txt
 
 3. Run the daily weighted projection model:

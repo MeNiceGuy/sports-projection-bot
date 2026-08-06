@@ -2,6 +2,8 @@
 
 A multi-sport projection and edge-research bot scaffold using public/open data where available. Under active study and upgrade -- see [Track record to date](#track-record-to-date) for the current graded sample and [Important note](#important-note) for how to read it.
 
+**New here?** [HOW_TO_RUN.txt](HOW_TO_RUN.txt) has full setup (clone, venv, dependencies, config/API keys) and the complete step-by-step command list. `legacy/` holds an older, unmaintained iteration of the bet-tracking layer that isn't part of the current pipeline -- see [legacy/README.md](legacy/README.md).
+
 ## Current status
 - shared projection architecture
 - NBA, MLB, WNBA, and NFL active
