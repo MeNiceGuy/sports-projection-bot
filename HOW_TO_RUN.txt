@@ -137,8 +137,14 @@ Sportsbook odds API:
 - To avoid burning API quota, run_odds_fetch.py reuses a successful odds snapshot while it is fresh. Default: 10 minutes.
 - To intentionally refresh odds before the cache expires, run:
   python run_odds_fetch.py --force
-- If odds fetch fails, the tool now clears current market lines and exits non-zero.
-- If the API is down, generate a same-team-name manual odds template:
+- If SHARPAPI_API_KEY is set (see .env.example), a sport that fails against
+  The Odds API (quota exhausted, outage, bad key) automatically falls back
+  to SharpAPI for that sport alone instead of failing the whole run. Check
+  logs/odds_fetch_status.json's sport_sources field to see which provider
+  each sport actually came from on the last run.
+- If odds fetch fails for every sport (no SharpAPI key, or SharpAPI also
+  failed), the tool clears current market lines and exits non-zero.
+- If both APIs are down, generate a same-team-name manual odds template:
   python generate_manual_odds_template.py
 - Enter fresh verified sportsbook moneylines into odds_a and odds_b, then run:
   python import_manual_odds.py

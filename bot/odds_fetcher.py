@@ -10,6 +10,8 @@ from pathlib import Path
 
 import requests
 
+from bot.sharpapi_fetcher import fetch_sharpapi_odds, load_sharpapi_key
+
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT / "config.odds.json"
 CONFIG_EXAMPLE_PATH = ROOT / "config.odds.example.json"
@@ -205,6 +207,9 @@ def main(argv: list[str] | None = None):
 
     rows = []
     quota_headers = {}
+    sharpapi_key = load_sharpapi_key()
+    sport_sources = {}
+    failed_sports = []
 
     for local_sport, odds_sport in config.get("sports", {}).items():
         url = f"https://api.the-odds-api.com/v4/sports/{odds_sport}/odds"
@@ -215,6 +220,7 @@ def main(argv: list[str] | None = None):
             "oddsFormat": config.get("odds_format", "american"),
             "dateFormat": config.get("date_format", "iso"),
         }
+        data = None
         try:
             resp = requests.get(url, params=params, timeout=30)
             resp.raise_for_status()
@@ -224,8 +230,20 @@ def main(argv: list[str] | None = None):
                 "odds_api_requests_used": resp.headers.get("x-requests-used"),
             }
         except requests.RequestException as exc:
-            fail_current_lines(f"odds request failed for {local_sport}: {exc}")
+            # The Odds API failed for this sport (quota exhausted, outage,
+            # bad key, ...) -- try SharpAPI for this sport alone rather than
+            # killing the whole run over one sport, then fall through to
+            # skipping the sport only if SharpAPI has no key or also fails.
+            if sharpapi_key:
+                fallback_rows = fetch_sharpapi_odds(local_sport, sharpapi_key)
+                if fallback_rows:
+                    rows.extend(fallback_rows)
+                    sport_sources[local_sport] = "sharpapi_fallback"
+                    continue
+            failed_sports.append(f"{local_sport}: {exc}")
+            continue
 
+        sport_sources[local_sport] = "the_odds_api"
         for game in data:
             game_id = game.get("id", "")
             home = game.get("home_team", "")
@@ -259,12 +277,21 @@ def main(argv: list[str] | None = None):
                         })
 
     if not rows:
-        fail_current_lines("sportsbook odds API returned no market rows")
+        reason = "sportsbook odds API returned no market rows"
+        if failed_sports:
+            reason = f"sportsbook odds API returned no market rows; failures: {'; '.join(failed_sports)}"
+        fail_current_lines(reason)
 
     write_current_lines(rows)
 
     history_rows = append_line_history(rows)
-    status = write_status(True, "sportsbook odds fetch succeeded", rows=len(rows), extra={"cache_hit": False, **quota_headers})
+    status_note = "sportsbook odds fetch succeeded"
+    if failed_sports:
+        status_note += f" (some sports failed and had no fallback: {'; '.join(failed_sports)})"
+    status = write_status(
+        True, status_note, rows=len(rows),
+        extra={"cache_hit": False, "sport_sources": sport_sources, **quota_headers},
+    )
 
     print({"market_lines_written": len(rows), "line_history_appended": history_rows, "output": str(OUT_PATH), "history": str(HISTORY_PATH), "status": status})
 

@@ -102,6 +102,8 @@ The market layer now uses stricter betting mechanics:
 
 For current decisions, run `run_odds_fetch.py` first, then run `run_market_compare.py` and `run_alerts.py`. The sportsbook odds key can come from `THE_ODDS_API_KEY`, `SPORTSBOOK_ODDS_API_KEY`, or `config.odds.json`.
 
+If `SHARPAPI_API_KEY` is set, a sport that fails against The Odds API (quota exhausted, outage, bad key) automatically falls back to [SharpAPI](https://sharpapi.io) for that sport alone (`bot/sharpapi_fetcher.py`) instead of failing the whole fetch -- check `sport_sources` in `logs/odds_fetch_status.json` to see which provider each sport actually came from. SharpAPI's response shape (flat per-selection rows vs. The Odds API's nested bookmakers/markets/outcomes) is reshaped back into the same `market_lines.csv` schema so nothing downstream needs to know which provider a row came from. The WNBA league slug used against SharpAPI is an unverified guess (their docs only confirmed nba/nfl/mlb by name) -- worth checking after the first real fallback fetch.
+
 `run_odds_fetch.py` protects API quota by reusing the current odds snapshot when it is still fresh. The default freshness window is 10 minutes and can be changed with `max_fetch_age_minutes` in `config.odds.json` or per run:
 
 ```bash
