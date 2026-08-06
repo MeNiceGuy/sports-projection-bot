@@ -9,8 +9,17 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import requests
+from dotenv import load_dotenv
 
 from bot.sharpapi_fetcher import fetch_sharpapi_odds, load_sharpapi_key
+
+# Without this, THE_ODDS_API_KEY/SPORTSBOOK_ODDS_API_KEY/SHARPAPI_API_KEY
+# are only visible here if set as real OS environment variables -- a key
+# that only exists in .env (the documented, expected place to put it per
+# .env.example) would silently never be read. Caught live: SHARPAPI_API_KEY
+# was correctly saved to .env but invisible to this module until this line
+# was added, so the fallback never actually fired despite being wired in.
+load_dotenv()
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT / "config.odds.json"

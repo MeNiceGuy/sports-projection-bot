@@ -5,6 +5,13 @@ from pathlib import Path
 
 import pandas as pd
 import requests
+from dotenv import load_dotenv
+
+# Without this, THE_ODDS_API_KEY/PLAYER_PROPS_MAX_AGE_MINUTES/
+# PLAYER_PROPS_MAX_EVENTS are only visible here if set as real OS
+# environment variables -- a value that only exists in .env would
+# silently never be read.
+load_dotenv()
 
 ROOT = Path(__file__).resolve().parent
 MARKET = ROOT / "logs" / "market_lines.csv"

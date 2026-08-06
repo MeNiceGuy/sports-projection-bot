@@ -47,6 +47,40 @@ class FetchSharpapiOddsTests(unittest.TestCase):
         self.assertEqual({row["side_a"], row["side_b"]}, {"Boston Red Sox", "New York Yankees"})
         self.assertEqual({row["odds_a"], row["odds_b"]}, {-130, 110})
 
+    def test_uses_full_team_names_not_sharpapis_abbreviated_selection_text(self):
+        # Caught against a live response: SharpAPI's `selection` field for
+        # moneyline/spread rows comes back abbreviated ("BAL Orioles", "LA
+        # Angels"), not the full names ("Baltimore Orioles", "Los Angeles
+        # Angels") used everywhere else in the pipeline. normalize_team_name()
+        # in bot/market_compare.py would never match an abbreviated form
+        # against the full names built from ESPN/MLB Stats API data, so a
+        # row like this would silently fail to pair with any projected game.
+        payload = {"data": [
+            {
+                "id": "a", "sportsbook": "draftkings", "event_id": "evt-1",
+                "home_team": "Baltimore Orioles", "away_team": "Los Angeles Angels",
+                "market_type": "moneyline", "selection": "BAL Orioles", "selection_type": "home",
+                "odds_american": -174, "is_main_line": True,
+                "event_start_time": "2026-08-06T16:35:00Z", "timestamp": "2026-08-06T14:37:00Z",
+            },
+            {
+                "id": "b", "sportsbook": "draftkings", "event_id": "evt-1",
+                "home_team": "Baltimore Orioles", "away_team": "Los Angeles Angels",
+                "market_type": "moneyline", "selection": "LA Angels", "selection_type": "away",
+                "odds_american": 162, "is_main_line": True,
+                "event_start_time": "2026-08-06T16:35:00Z", "timestamp": "2026-08-06T14:37:00Z",
+            },
+        ]}
+        with patch.object(sharpapi_fetcher, "requests") as mock_requests:
+            mock_requests.get.return_value = _mock_response(payload)
+            mock_requests.RequestException = Exception
+            rows = sharpapi_fetcher.fetch_sharpapi_odds("mlb", "fake-key")
+
+        self.assertEqual(len(rows), 1)
+        self.assertEqual({rows[0]["side_a"], rows[0]["side_b"]}, {"Baltimore Orioles", "Los Angeles Angels"})
+        self.assertNotIn("BAL Orioles", {rows[0]["side_a"], rows[0]["side_b"]})
+        self.assertNotIn("LA Angels", {rows[0]["side_a"], rows[0]["side_b"]})
+
     def test_pairs_totals_over_and_under(self):
         payload = {"data": [
             {
@@ -71,7 +105,11 @@ class FetchSharpapiOddsTests(unittest.TestCase):
 
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["market"], "totals")
-        self.assertEqual({rows[0]["side_a"], rows[0]["side_b"]}, {"Over 8.5", "Under 8.5"})
+        # side names are normalized to "Over"/"Under" via selection_type,
+        # not SharpAPI's raw `selection` text -- the line number lives in
+        # line_a/line_b instead, matching The Odds API's convention.
+        self.assertEqual({rows[0]["side_a"], rows[0]["side_b"]}, {"Over", "Under"})
+        self.assertEqual({rows[0]["line_a"], rows[0]["line_b"]}, {8.5})
 
     def test_prefers_main_line_over_alternates(self):
         payload = {"data": [

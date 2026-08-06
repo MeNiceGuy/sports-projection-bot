@@ -6,6 +6,12 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import requests
+from dotenv import load_dotenv
+
+# Without this, OPENAI_API_KEY/OPENAI_MODEL are only visible here if set as
+# real OS environment variables -- a key that only exists in .env (the
+# documented, expected place per .env.example) would silently never be read.
+load_dotenv()
 
 ROOT = Path(__file__).resolve().parents[1]
 DAILY_REPORT = ROOT / "reports" / "daily_projection_report.json"

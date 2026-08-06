@@ -11,26 +11,35 @@ schema bot/odds_fetcher.py already writes, so nothing downstream (market
 comparison, spread/total analysis, alerts) needs to know which provider a
 row came from.
 
-Built from SharpAPI's published API docs (https://docs.sharpapi.io/), not
-verified against a live response yet -- the account this was written
-against didn't have a populated key at the time. In particular the league
-slug used for WNBA (assumed "wnba", mirroring the documented "nba"/"nfl"/
-"mlb" slugs) has not been confirmed. Treat the first real run as a
-verification step, not an assumption.
+Built from SharpAPI's published API docs (https://docs.sharpapi.io/) and
+confirmed with a real key against live mlb/wnba/nfl/nba responses (nba
+returned zero rows only because there were no games in-season that day).
+That live check caught one real bug the docs didn't reveal: SharpAPI's
+`selection` field for moneyline/spread rows comes back abbreviated ("BAL
+Orioles", "LA Angels") rather than the full team names ("Baltimore
+Orioles", "Los Angeles Angels") used everywhere else in this pipeline --
+_side_name() below reconstructs the full name from home_team/away_team
+instead of trusting `selection` directly, since an abbreviated form would
+silently fail to match in normalize_team_name() and the row would never
+pair with a projected game.
 """
 
 import os
 from datetime import UTC, datetime
 
 import requests
+from dotenv import load_dotenv
+
+# Loaded here too (not just by bot/odds_fetcher.py) so this module still
+# picks up SHARPAPI_API_KEY from .env when imported/run on its own.
+load_dotenv()
 
 BASE_URL = "https://api.sharpapi.io/api/v1/odds"
 
-# SharpAPI's league slugs, one per sport this tool tracks. WNBA is an
-# unverified guess (SharpAPI's docs only confirmed nba/nfl/mlb by name) --
-# check logs/odds_fetch_status.json's sharpapi_leagues_unverified field
-# after a real fetch and fix this mapping if wnba rows come back empty
-# while other sports succeed.
+# SharpAPI's league slugs, one per sport this tool tracks. Confirmed
+# against a live response for mlb/wnba/nfl; nba wasn't verifiable at
+# confirmation time (no games in-season that day) but uses the same slug
+# pattern already confirmed for the other three.
 LEAGUE_SLUGS = {
     "nba": "nba",
     "mlb": "mlb",
@@ -56,6 +65,28 @@ def load_sharpapi_key():
 
 def _group_key(row: dict):
     return (row.get("event_id", ""), row.get("sportsbook", ""), MARKET_TYPE_MAP.get(row.get("market_type", ""), ""))
+
+
+def _side_name(row: dict, home_team: str, away_team: str):
+    """The team-name side of a market row's own side name, not SharpAPI's
+    abbreviated `selection` field (observed live as e.g. "BAL Orioles",
+    "LA Angels") -- normalize_team_name() elsewhere in the pipeline
+    compares side names against the full home_team/away_team names
+    already used to build `matchup`, so an abbreviated form would never
+    match and the row would silently fail to pair with a projected game.
+    Totals rows aren't teams at all, so "Over"/"Under" pass straight
+    through via selection_type instead.
+    """
+    side_type = (row.get("selection_type") or "").strip().lower()
+    if side_type == "home":
+        return home_team or row.get("selection", "")
+    if side_type == "away":
+        return away_team or row.get("selection", "")
+    if side_type == "over":
+        return "Over"
+    if side_type == "under":
+        return "Under"
+    return row.get("selection", "")
 
 
 def _pair_rows(same_group_rows: list[dict]):
@@ -122,6 +153,8 @@ def fetch_sharpapi_odds(local_sport: str, api_key: str, markets: str = "main", r
         home_team = a.get("home_team") or b.get("home_team") or ""
         away_team = a.get("away_team") or b.get("away_team") or ""
         matchup = f"{away_team} at {home_team}" if away_team and home_team else ""
+        side_a_name = _side_name(a, home_team, away_team)
+        side_b_name = _side_name(b, home_team, away_team)
         rows.append({
             "sport": local_sport,
             "market": market,
@@ -129,8 +162,8 @@ def fetch_sharpapi_odds(local_sport: str, api_key: str, markets: str = "main", r
             "matchup": matchup,
             "commence_time": a.get("event_start_time", "") or b.get("event_start_time", ""),
             "line_source": sportsbook,
-            "side_a": a.get("selection", ""),
-            "side_b": b.get("selection", ""),
+            "side_a": side_a_name,
+            "side_b": side_b_name,
             "line_a": a.get("line", ""),
             "line_b": b.get("line", ""),
             "odds_a": a.get("odds_american", ""),
