@@ -50,6 +50,7 @@ def save_top_bets(top: pd.DataFrame, conn: sqlite3.Connection) -> tuple[int, int
           AND odds = ?
           AND sportsbook = ?
           AND prop_grade = ?
+          AND matchup = ?
           AND result = 'PENDING'
         LIMIT 1
         """, (
@@ -59,6 +60,7 @@ def save_top_bets(top: pd.DataFrame, conn: sqlite3.Connection) -> tuple[int, int
             r.get("odds"),
             r.get("book"),
             r.get("prop_grade"),
+            r.get("matchup"),
         )).fetchone()
 
         if existing:
@@ -84,10 +86,13 @@ def save_top_bets(top: pd.DataFrame, conn: sqlite3.Connection) -> tuple[int, int
             actionable_edge,
             confidence,
             sport,
+            matchup,
+            side,
+            game_date_hint,
             result,
             profit
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             datetime.now(UTC).isoformat(),
             r.get("player"),
@@ -106,6 +111,13 @@ def save_top_bets(top: pd.DataFrame, conn: sqlite3.Connection) -> tuple[int, int
             actionable_edge,
             r.get("confidence"),
             r.get("sport"),
+            # matchup/side/last_update were already present in ranked_props.csv
+            # but silently dropped here -- without them there is no way to
+            # later find the real game or determine over/under, so every
+            # prop saved before this fix was permanently unsettleable.
+            r.get("matchup"),
+            r.get("side"),
+            r.get("last_update"),
             "PENDING",
             0,
         ))

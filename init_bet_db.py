@@ -39,6 +39,13 @@ if "actionable_edge" not in existing_columns:
 for column in ["confidence", "edge_persistence_status", "sport"]:
     if column not in existing_columns:
         conn.execute(f"ALTER TABLE bets ADD COLUMN {column} TEXT")
+# matchup/side/game_date_hint: needed to actually settle a prop against a
+# real box score later (bot/prop_settlement.py). Rows saved before these
+# columns existed have no way to know which game or side they were for, so
+# they stay permanently unsettleable -- there's no way to guess that back.
+for column in ["matchup", "side", "game_date_hint", "settlement_note"]:
+    if column not in existing_columns:
+        conn.execute(f"ALTER TABLE bets ADD COLUMN {column} TEXT")
 
 conn.commit()
 initialize_warehouse(conn)

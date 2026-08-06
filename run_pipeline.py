@@ -27,6 +27,7 @@ STEPS = [
     ("MLB matchup engine", "run_mlb_matchup_engine.py", "logs/mlb_enhanced_props.csv"),
     ("MLB rank props", "run_mlb_ranked_props.py", "logs/mlb_ranked_props.csv"),
     ("Save best bets", "save_best_bets.py", "logs/bets.db"),
+    ("Settle props", "run_settle_props.py", None),
     ("Bankroll tracker", "run_bankroll_tracker.py", "logs/bankroll_history.csv"),
     ("Staking engine", "run_staking_engine.py", "logs/recommended_stakes.csv"),
     ("CLV report", "run_clv_report.py", "logs/clv_report.csv"),

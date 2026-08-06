@@ -127,6 +127,13 @@ Player props (NBA and MLB):
 - Both write ranked props to logs/ranked_props.csv (NBA) and logs/mlb_ranked_props.csv (MLB), graded A-D by a scale-aware edge/reliability/odds score.
 - python run_same_game_parlays.py and python run_correlated_parlays.py combine both sports' ranked props before building parlays.
 - python save_best_bets.py combines both sports' top A/B graded props into logs/bets.db, tagged with a sport column.
+- python run_settle_props.py settles PENDING props in logs/bets.db against real box scores
+  (bot/prop_settlement.py -- MLB via statsapi.mlb.com, NBA via nba_api). A prop only settles
+  once its game is confirmed Final; a player who didn't play (DNP, scratch) is voided (profit 0)
+  rather than guessed at. Props saved before this existed have no matchup/side recorded and stay
+  permanently PENDING -- there's no way to know what game or side they were for after the fact.
+  This replaces legacy/settle_bets.py, which picked WIN/LOSS with random.choice() and never
+  checked a real result.
 - MLB props env vars mirror the NBA ones: MLB_PLAYER_PROPS_MAX_AGE_MINUTES and MLB_PLAYER_PROPS_MAX_EVENTS.
 
 Sportsbook odds API:

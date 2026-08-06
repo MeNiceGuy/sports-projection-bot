@@ -17,3 +17,10 @@ suite.
 
 The current, actively developed pipeline is documented in the top-level
 [README.md](../README.md) and [HOW_TO_RUN.txt](../HOW_TO_RUN.txt).
+
+One of these is worth calling out specifically rather than lumping in as
+"old": `settle_bets.py` is not just superseded, it was never actually
+grading anything -- it picked a prop's WIN/LOSS with `random.choice()`,
+never checked a real result. `run_settle_props.py` (`bot/prop_settlement.py`)
+replaces it with real box-score lookups (MLB via `statsapi.mlb.com`, NBA via
+`nba_api`) and is part of the active pipeline.

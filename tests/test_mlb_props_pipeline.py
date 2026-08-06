@@ -309,7 +309,8 @@ class CombinedParlayAndBestBetsTests(unittest.TestCase):
                 opening_odds REAL, closing_odds REAL, sportsbook TEXT, prop_grade TEXT,
                 prop_score REAL, predicted_probability REAL, model_probability REAL,
                 market_probability REAL, expected_value REAL, actionable_edge INTEGER,
-                confidence TEXT, sport TEXT, result TEXT, profit REAL
+                confidence TEXT, sport TEXT, matchup TEXT, side TEXT, game_date_hint TEXT,
+                result TEXT, profit REAL
             )
         """)
 
