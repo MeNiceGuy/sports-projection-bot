@@ -9,6 +9,7 @@
     "nba": "basketball_nba",
     "mlb": "baseball_mlb",
     "wnba": "basketball_wnba",
-    "nfl": "americanfootball_nfl"
+    "nfl": "americanfootball_nfl",
+    "ufc": "mma_mixed_martial_arts"
   }
 }

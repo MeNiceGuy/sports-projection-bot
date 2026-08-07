@@ -18,6 +18,15 @@ SPORT_BASELINES = {
     # games.
     "wnba": {"home_score": 84.0, "away_score": 81.0, "score_sd": 10.5, "margin_sd": 12.0, "gap_scale": 0.13},
     "nfl": {"home_score": 23.0, "away_score": 21.0, "score_sd": 10.0, "margin_sd": 11.5, "gap_scale": 0.09},
+    # MMA fights are binary (win/loss), not scored -- there's no real
+    # "home_score"/"away_score" to simulate. This exists only so
+    # simulate_game_scores()/monte_carlo_game() (shared by every sport, and
+    # unconditionally called by enrich_game() for all of them) has a sane
+    # scale to turn the fighter_weighted_score gap into a coherent win-
+    # probability signal, instead of silently falling back to NBA's
+    # 114-point scale -- the same bug already fixed once for WNBA/NFL.
+    # These are abstract units, not fight statistics.
+    "ufc": {"home_score": 50.0, "away_score": 50.0, "score_sd": 15.0, "margin_sd": 18.0, "gap_scale": 0.20},
 }
 
 SPORT_FEATURES = {
@@ -68,6 +77,19 @@ SPORT_FEATURES = {
         ("injury_context", "home_injury_score", "away_injury_score", 0.18),
         ("rest", "home_rest_score", "away_rest_score", 0.08),
         ("matchup", "home_matchup_score", "away_matchup_score", 0.04),
+    ],
+    # Mirrors the weight structure in sports/ufc.py's build_ufc_report().
+    # No recent-form/rest/injury factors -- MMA has no schedule cadence or
+    # injury feed equivalent to the team sports here; "matchup" reuses the
+    # physical (reach/height) differential as the closest analog to the
+    # other sports' opponent-specific matchup context.
+    "ufc": [
+        ("record", "home_record_score", "away_record_score", 0.24),
+        ("finish_rate", "home_finish_rate_score", "away_finish_rate_score", 0.14),
+        ("home_away", "home_weighted_score", "away_weighted_score", 0.16),
+        ("age", "home_age_score", "away_age_score", 0.16),
+        ("experience", "home_experience_score", "away_experience_score", 0.16),
+        ("matchup", "home_matchup_score", "away_matchup_score", 0.14),
     ],
 }
 

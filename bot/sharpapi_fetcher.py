@@ -45,6 +45,7 @@ LEAGUE_SLUGS = {
     "mlb": "mlb",
     "nfl": "nfl",
     "wnba": "wnba",
+    "ufc": "ufc",
 }
 
 # SharpAPI's market_type values collapsed onto this tool's three markets.

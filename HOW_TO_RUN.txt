@@ -171,6 +171,7 @@ Current active sports:
 - MLB
 - WNBA
 - NFL
+- UFC
 
 If you want to change active sports, edit:
 - config.json
@@ -180,4 +181,5 @@ Current model status:
 - MLB: weighted model with form, starters, bullpen quality, bullpen fatigue, freshness, splits, scoring, run prevention, market comparison, and governance
 - WNBA: weighted model with form, offense, defense, pace, rest, market comparison, and governance. No player-props layer yet (moneyline/team-level only). Injury context has no live data source and is held neutral (no WNBA equivalent of the NBA's official injury-report PDF exists yet).
 - NFL: weighted model with form, offense, defense, turnover differential, rest, a real ESPN injury feed, market comparison, and governance. No player-props layer yet (moneyline/team-level only). Points-allowed/points-for come from season standings and are placeholder league-average values until real games are played this season; the injury weighting will need recalibration once real regular-season injury reports (much shorter than the current preseason camp-report noise) start flowing. The odds mapping targets the regular season (americanfootball_nfl) by default -- preseason games use a separate sport key (americanfootball_nfl_preseason) not wired in by default.
+- UFC: weighted fighter-vs-fighter model (sports/ufc.py) -- structurally different from every other sport here (no teams, no home/away, no scoring to simulate). Uses win-loss record, finish rate (TKO+submission share of wins), reach/height differential, age, and career fight count, pulled from ESPN's MMA scoreboard and per-fighter bio endpoints. Moneyline only -- MMA has no real spreads/totals market. Recent-form/days-since-last-fight is deliberately not included; ESPN's public fight-history endpoint didn't return usable per-fight dates during development, so it stays out rather than being faked. Odds come from The Odds API (mma_mixed_martial_arts) with the same SharpAPI (league=ufc) fallback every other sport uses.
 - NHL/NCAAB/NCAAF: scaffold only

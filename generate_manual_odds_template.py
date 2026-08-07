@@ -40,7 +40,7 @@ def build_rows(report: dict, line_source: str = "ManualBook", now: datetime | No
     rows = []
 
     for sport, block in report.get("reports", {}).items():
-        if sport not in {"nba", "mlb", "wnba", "nfl"}:
+        if sport not in {"nba", "mlb", "wnba", "nfl", "ufc"}:
             continue
         for game in block.get("games", []):
             if _is_placeholder(game):

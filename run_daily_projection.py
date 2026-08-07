@@ -10,6 +10,7 @@ from sports.mlb import build_mlb_report
 from sports.nba import build_nba_report
 from sports.wnba import build_wnba_report
 from sports.nfl import build_nfl_report
+from sports.ufc import build_ufc_report
 from sports.model_utils import probability_from_score_gap
 from sports.advanced_analytics import enrich_game
 from bot.data_warehouse import store_projection_report
@@ -26,12 +27,13 @@ BUILDERS = {
     "mlb": build_mlb_report,
     "wnba": build_wnba_report,
     "nfl": build_nfl_report,
+    "ufc": build_ufc_report,
 }
 
 
 def load_config():
     if not CONFIG_PATH.exists():
-        return {"active_sports": ["nba", "mlb", "wnba", "nfl"], "output_report": str(REPORT_OUT)}
+        return {"active_sports": ["nba", "mlb", "wnba", "nfl", "ufc"], "output_report": str(REPORT_OUT)}
     return json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
 
 
