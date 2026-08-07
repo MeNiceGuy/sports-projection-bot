@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import json
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -97,8 +98,42 @@ def fractional_kelly_pct(full_kelly_fraction, fraction=0.25):
     return round(full_kelly_fraction * fraction * 100, 2)
 
 
+# Team-name variants where two data sources genuinely disagree on a club's
+# name, found by matching real games against real odds and seeing them
+# silently fail to pair. Liga MX/MLS entries found while verifying Leagues
+# Cup live -- SharpAPI and ESPN use different short forms for the same
+# clubs (e.g. SharpAPI's "Atlas Gdj" vs ESPN's "Atlas"). Expect more of
+# these to surface over time as more Leagues Cup fixtures get real lines;
+# add them here the same way. Applied as substring replacement, not an
+# exact-string lookup, because normalize_matchup() below reuses this same
+# function on a whole "Away at Home" matchup string, not just a lone team
+# name -- an exact-match dict would silently stop substituting a name
+# embedded inside a longer matchup string (caught live: this exact bug,
+# fixed before it shipped).
+TEAM_NAME_ALIASES = {
+    "los angeles clippers": "la clippers",
+    "los angeles lakers": "la lakers",
+    "atlas gdj": "atlas",
+    "juarez": "fc juarez",
+}
+
+
 def normalize_team_name(text: str):
-    return " ".join((text or "").lower().replace("los angeles clippers", "la clippers").replace("los angeles lakers", "la lakers").split())
+    normalized = (text or "").lower()
+    for original, alias in TEAM_NAME_ALIASES.items():
+        pattern = rf"\b{re.escape(original)}\b"
+        if alias.endswith(original) and alias != original:
+            # Some aliases (e.g. "juarez" -> "fc juarez") have the source
+            # name as a trailing substring of the target -- a plain
+            # replace would turn already-correct input ("fc juarez") into
+            # "fc fc juarez" the moment both spellings need to normalize
+            # to the same alias. A negative lookbehind for the alias's own
+            # prefix ("fc ") skips exactly that already-correct case.
+            # Caught live before this shipped.
+            prefix = alias[: -len(original)]
+            pattern = rf"(?<!{re.escape(prefix)})\b{re.escape(original)}\b"
+        normalized = re.sub(pattern, alias, normalized)
+    return " ".join(normalized.split())
 
 
 def normalize_matchup(text: str):

@@ -27,6 +27,13 @@ SPORT_BASELINES = {
     # 114-point scale -- the same bug already fixed once for WNBA/NFL.
     # These are abstract units, not fight statistics.
     "ufc": {"home_score": 50.0, "away_score": 50.0, "score_sd": 15.0, "margin_sd": 18.0, "gap_scale": 0.20},
+    # Soccer scores on a real, low, integer goal scale -- unlike UFC this
+    # isn't abstract, it mirrors sports/leagues_cup.py's own Poisson model
+    # baseline (~1.3-1.6 goals/game across MLS/Liga MX). score_sd is small
+    # because soccer scorelines have low variance in absolute terms (a
+    # single goal is a huge swing), not because the underlying match is
+    # low-variance.
+    "leagues_cup": {"home_score": 1.5, "away_score": 1.3, "score_sd": 1.2, "margin_sd": 1.4, "gap_scale": 0.15},
 }
 
 SPORT_FEATURES = {
@@ -89,6 +96,16 @@ SPORT_FEATURES = {
         ("home_away", "home_weighted_score", "away_weighted_score", 0.16),
         ("age", "home_age_score", "away_age_score", 0.16),
         ("experience", "home_experience_score", "away_experience_score", 0.16),
+        ("matchup", "home_matchup_score", "away_matchup_score", 0.14),
+    ],
+    # Mirrors the weight structure in sports/leagues_cup.py's
+    # build_leagues_cup_report(). No injury factor -- no live injury feed
+    # for MLS/Liga MX equivalent to the NBA/NFL ones.
+    "leagues_cup": [
+        ("recent_form", "home_recent_form", "away_recent_form", 0.20),
+        ("home_away", "home_weighted_score", "away_weighted_score", 0.10),
+        ("offense", "home_attack_score", "away_attack_score", 0.28),
+        ("defense", "home_defense_score", "away_defense_score", 0.28),
         ("matchup", "home_matchup_score", "away_matchup_score", 0.14),
     ],
 }

@@ -10,11 +10,41 @@ from bot.market_compare import (
     matching_market_rows,
     model_probabilities_for_game,
     no_vig_probabilities,
+    normalize_team_name,
     rate_decision,
     select_best_value,
     unmatched_game,
 )
 from sports.model_utils import calibrate_projection, factor_agreement, probability_from_score_gap
+
+
+class NormalizeTeamNameAliasTests(unittest.TestCase):
+    def test_already_correct_spelling_is_left_alone(self):
+        # Regression: caught live -- "juarez" -> "fc juarez" is an alias
+        # whose target contains the source as a substring, so a naive
+        # replace corrupted already-correct input ("FC Juarez") into
+        # "fc fc juarez" the moment both spellings needed normalizing.
+        self.assertEqual(normalize_team_name("FC Juarez at Vancouver Whitecaps"), "fc juarez at vancouver whitecaps")
+
+    def test_shortened_spelling_gets_aliased_to_the_full_form(self):
+        self.assertEqual(normalize_team_name("Juarez at Vancouver Whitecaps"), "fc juarez at vancouver whitecaps")
+        self.assertEqual(normalize_team_name("Juarez"), "fc juarez")
+
+    def test_alias_applies_inside_a_full_matchup_string_not_just_a_lone_team_name(self):
+        # normalize_matchup() reuses this function on a whole "Away at
+        # Home" string, not just a single team -- the alias must still
+        # apply when embedded, matching the pre-existing LA Clippers/
+        # Lakers behavior this alias mechanism replaced.
+        self.assertEqual(normalize_team_name("Atlas Gdj at Charlotte FC"), "atlas at charlotte fc")
+        self.assertEqual(normalize_team_name("Atlas at Charlotte FC"), "atlas at charlotte fc")
+
+    def test_la_clippers_and_lakers_still_aliased(self):
+        self.assertEqual(normalize_team_name("Los Angeles Clippers"), "la clippers")
+        self.assertEqual(normalize_team_name("Los Angeles Lakers"), "la lakers")
+        self.assertEqual(normalize_team_name("LA Clippers"), "la clippers")
+
+    def test_unrelated_team_names_are_unaffected(self):
+        self.assertEqual(normalize_team_name("Boston Celtics"), "boston celtics")
 
 
 class SameMatchupDifferentDayTests(unittest.TestCase):

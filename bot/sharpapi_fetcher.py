@@ -46,6 +46,11 @@ LEAGUE_SLUGS = {
     "nfl": "nfl",
     "wnba": "wnba",
     "ufc": "ufc",
+    # NOT "league_cup" (singular) -- confirmed live that's a different, real
+    # competition (the English League Cup/Carabao Cup; SharpAPI's own
+    # invalid_filter "did_you_mean" suggested it and was wrong). The real
+    # CONCACAF Leagues Cup (MLS/Liga MX) is "leagues_cup" (plural).
+    "leagues_cup": "leagues_cup",
 }
 
 # SharpAPI's market_type values collapsed onto this tool's three markets.
