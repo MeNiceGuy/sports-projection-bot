@@ -1,18 +1,13 @@
 {
-  "api_key": "",
-  "regions": "us",
-  "markets": "h2h,spreads,totals",
-  "odds_format": "american",
-  "date_format": "iso",
   "max_fetch_age_minutes": 10,
-  "sports": {
-    "nba": "basketball_nba",
-    "mlb": "baseball_mlb",
-    "wnba": "basketball_wnba",
-    "nfl": "americanfootball_nfl",
-    "ufc": "mma_mixed_martial_arts",
-    "leagues_cup": "soccer_concacaf_leagues_cup",
-    "tennis_atp": "",
-    "tennis_wta": ""
-  }
+  "sports": [
+    "nba",
+    "mlb",
+    "wnba",
+    "nfl",
+    "ufc",
+    "leagues_cup",
+    "tennis_atp",
+    "tennis_wta"
+  ]
 }

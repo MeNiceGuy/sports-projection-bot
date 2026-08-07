@@ -20,8 +20,7 @@ C:\Users\1bosw\OneDrive\Desktop\GitHub\sports-projection-bot
    copy config.alerts.example.json config.alerts.json
    copy .env.example .env
    - config.odds.json / .env: needs an odds API key. The current pipeline
-     uses The Odds API (https://the-odds-api.com) -- set THE_ODDS_API_KEY
-     in .env, or put the key directly in config.odds.json.
+     uses SharpAPI (https://sharpapi.io) -- set SHARPAPI_API_KEY in .env.
    - config.alerts.json: set email_to to your own address if you want
      run_alerts.py to actually email you.
    - config.json (tracked, not gitignored) controls which sports are
@@ -137,21 +136,24 @@ Player props (NBA and MLB):
 - MLB props env vars mirror the NBA ones: MLB_PLAYER_PROPS_MAX_AGE_MINUTES and MLB_PLAYER_PROPS_MAX_EVENTS.
 
 Sportsbook odds API:
-- The odds fetcher reads THE_ODDS_API_KEY, SPORTSBOOK_ODDS_API_KEY, or config.odds.json.
+- The odds fetcher reads SHARPAPI_API_KEY (env or .env). SharpAPI is the
+  sole odds provider -- The Odds API was removed (2026-08-07) after its
+  free-tier quota (500 requests/month) ran out under normal use; every
+  sport was already silently falling back to SharpAPI by that point anyway.
 - Check whether the next run will reuse cache or call the API:
   python api_quota_status.py
 - Run: python run_odds_fetch.py
-- To avoid burning API quota, run_odds_fetch.py reuses a successful odds snapshot while it is fresh. Default: 10 minutes.
+- To avoid over-fetching, run_odds_fetch.py reuses a successful odds snapshot while it is fresh. Default: 10 minutes.
 - To intentionally refresh odds before the cache expires, run:
   python run_odds_fetch.py --force
-- If SHARPAPI_API_KEY is set (see .env.example), a sport that fails against
-  The Odds API (quota exhausted, outage, bad key) automatically falls back
-  to SharpAPI for that sport alone instead of failing the whole run. Check
-  logs/odds_fetch_status.json's sport_sources field to see which provider
-  each sport actually came from on the last run.
-- If odds fetch fails for every sport (no SharpAPI key, or SharpAPI also
-  failed), the tool clears current market lines and exits non-zero.
-- If both APIs are down, generate a same-team-name manual odds template:
+- config.odds.json's "sports" field is a plain list of local sport names
+  (["nba", "mlb", ...]) -- every sport in that list gets fetched from
+  SharpAPI. Check logs/odds_fetch_status.json's sport_sources field to
+  confirm which sports actually returned rows on the last run.
+- If odds fetch fails for every sport (no SHARPAPI_API_KEY set, or SharpAPI
+  returned nothing for every configured sport), the tool clears current
+  market lines and exits non-zero.
+- If SharpAPI is down, generate a same-team-name manual odds template:
   python generate_manual_odds_template.py
 - Enter fresh verified sportsbook moneylines into odds_a and odds_b, then run:
   python import_manual_odds.py
@@ -184,7 +186,7 @@ Current model status:
 - MLB: weighted model with form, starters, bullpen quality, bullpen fatigue, freshness, splits, scoring, run prevention, market comparison, and governance
 - WNBA: weighted model with form, offense, defense, pace, rest, market comparison, and governance. No player-props layer yet (moneyline/team-level only). Injury context has no live data source and is held neutral (no WNBA equivalent of the NBA's official injury-report PDF exists yet).
 - NFL: weighted model with form, offense, defense, turnover differential, rest, a real ESPN injury feed, market comparison, and governance. No player-props layer yet (moneyline/team-level only). Points-allowed/points-for come from season standings and are placeholder league-average values until real games are played this season; the injury weighting will need recalibration once real regular-season injury reports (much shorter than the current preseason camp-report noise) start flowing. The odds mapping targets the regular season (americanfootball_nfl) by default -- preseason games use a separate sport key (americanfootball_nfl_preseason) not wired in by default.
-- UFC: weighted fighter-vs-fighter model (sports/ufc.py) -- structurally different from every other sport here (no teams, no home/away, no scoring to simulate). Uses win-loss record, finish rate (TKO+submission share of wins), reach/height differential, age, and career fight count, pulled from ESPN's MMA scoreboard and per-fighter bio endpoints. Moneyline only -- MMA has no real spreads/totals market. Recent-form/days-since-last-fight is deliberately not included; ESPN's public fight-history endpoint didn't return usable per-fight dates during development, so it stays out rather than being faked. Odds come from The Odds API (mma_mixed_martial_arts) with the same SharpAPI (league=ufc) fallback every other sport uses.
+- UFC: weighted fighter-vs-fighter model (sports/ufc.py) -- structurally different from every other sport here (no teams, no home/away, no scoring to simulate). Uses win-loss record, finish rate (TKO+submission share of wins), reach/height differential, age, and career fight count, pulled from ESPN's MMA scoreboard and per-fighter bio endpoints. Moneyline only -- MMA has no real spreads/totals market. Recent-form/days-since-last-fight is deliberately not included; ESPN's public fight-history endpoint didn't return usable per-fight dates during development, so it stays out rather than being faked. Odds come from SharpAPI (league=ufc).
 - Leagues Cup (sports/leagues_cup.py): the MLS/Liga MX summer cup tournament, drawing teams from two different leagues. Combines a weighted team-strength score (recent form, attack, defense, home advantage from real MLS/Liga MX season standings) with a real double-Poisson goal-scoring model for actual win/draw/loss probabilities -- not the shared sigmoid every other sport uses, since soccer has three real outcomes, not two. Team goal rates are shrunk toward their league average by sample size (same style as MLB's platoon-split shrinkage) rather than trusted outright -- caught live: an unshrunk 3-game sample drove a 95% win probability off noise before this was added. Moneyline only for now: the Draw price is reported (poisson_draw_probability on every game) but not yet compared against the market, since market_lines.csv is a 2-way schema and Draw is a genuine third outcome -- see README for the tradeoff.
-- ATP/WTA tennis (sports/tennis.py, tennis_atp/tennis_wta): a real maximum-likelihood Bradley-Terry player rating fit against every singles result each tour has played so far this season (fit_player_ratings()), blended with current real ATP/WTA ranking points as a secondary/fallback signal. This is the tennis analog of Leagues Cup's Poisson regression -- same reasoning, verified the same way (see README's "Why regression, here specifically"). No teams, no home/away, moneyline only, and surface (clay/hard/grass) is not modeled -- ESPN's public endpoints don't expose it. Odds come from SharpAPI's fixed atp/wta league keys as the primary source (not a fallback) since The Odds API's tennis coverage rotates a new sport key per tournament every week.
+- ATP/WTA tennis (sports/tennis.py, tennis_atp/tennis_wta): a real maximum-likelihood Bradley-Terry player rating fit against every singles result each tour has played so far this season (fit_player_ratings()), blended with current real ATP/WTA ranking points as a secondary/fallback signal. This is the tennis analog of Leagues Cup's Poisson regression -- same reasoning, verified the same way (see README's "Why regression, here specifically"). No teams, no home/away, moneyline only, and surface (clay/hard/grass) is not modeled -- ESPN's public endpoints don't expose it. Odds come from SharpAPI's fixed atp/wta league keys.
 - NHL/NCAAB/NCAAF: scaffold only

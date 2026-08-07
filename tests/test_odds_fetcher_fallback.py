@@ -3,41 +3,11 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import MagicMock, patch
-
-import requests
+from unittest.mock import patch
 
 from bot import odds_fetcher
 
-
-def _the_odds_api_response(rows_payload):
-    mock = MagicMock()
-    mock.status_code = 200
-    mock.headers = {}
-    mock.json.return_value = rows_payload
-    mock.raise_for_status.return_value = None
-    return mock
-
-
-THE_ODDS_API_MLB_PAYLOAD = [{
-    "id": "game-1",
-    "home_team": "Boston Red Sox",
-    "away_team": "New York Yankees",
-    "commence_time": "2026-08-06T23:00:00Z",
-    "bookmakers": [{
-        "title": "DraftKings",
-        "markets": [{
-            "key": "h2h",
-            "last_update": "2026-08-06T20:00:00Z",
-            "outcomes": [
-                {"name": "Boston Red Sox", "price": -130},
-                {"name": "New York Yankees", "price": 110},
-            ],
-        }],
-    }],
-}]
-
-SHARPAPI_FALLBACK_ROWS = [{
+SHARPAPI_ROWS = [{
     "sport": "nba", "market": "h2h", "game_id": "evt-1",
     "matchup": "Away Team at Home Team", "commence_time": "2026-08-06T23:00:00Z",
     "line_source": "fanduel", "side_a": "Home Team", "side_b": "Away Team",
@@ -45,9 +15,17 @@ SHARPAPI_FALLBACK_ROWS = [{
     "timestamp": "2026-08-06T20:00:00Z",
 }]
 
+SHARPAPI_MLB_ROWS = [{
+    "sport": "mlb", "market": "h2h", "game_id": "evt-2",
+    "matchup": "New York Yankees at Boston Red Sox", "commence_time": "2026-08-06T23:00:00Z",
+    "line_source": "draftkings", "side_a": "Boston Red Sox", "side_b": "New York Yankees",
+    "line_a": "", "line_b": "", "odds_a": -130, "odds_b": 110,
+    "timestamp": "2026-08-06T20:00:00Z",
+}]
 
-class OddsFetcherFallbackTests(unittest.TestCase):
-    def _run_main_with(self, config, requests_side_effect, sharpapi_key="", sharpapi_return=None):
+
+class OddsFetcherSharpApiOnlyTests(unittest.TestCase):
+    def _run_main_with(self, config, sharpapi_key="sharp-key", sharpapi_side_effect=None):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
             out_path = tmp_path / "market_lines.csv"
@@ -59,10 +37,8 @@ class OddsFetcherFallbackTests(unittest.TestCase):
                 patch.object(odds_fetcher, "HISTORY_PATH", history_path),
                 patch.object(odds_fetcher, "STATUS_PATH", status_path),
                 patch.object(odds_fetcher, "load_config", return_value=config),
-                patch.object(odds_fetcher, "load_api_key", return_value="the-odds-api-key"),
                 patch.object(odds_fetcher, "load_sharpapi_key", return_value=sharpapi_key),
-                patch.object(odds_fetcher, "fetch_sharpapi_odds", return_value=sharpapi_return or []),
-                patch.object(odds_fetcher.requests, "get", side_effect=requests_side_effect),
+                patch.object(odds_fetcher, "fetch_sharpapi_odds", side_effect=sharpapi_side_effect),
             ):
                 try:
                     odds_fetcher.main([])
@@ -77,85 +53,65 @@ class OddsFetcherFallbackTests(unittest.TestCase):
                     rows = list(csv.DictReader(f))
             return exited, status, rows
 
-    def test_falls_back_to_sharpapi_when_the_odds_api_fails_for_a_sport(self):
-        config = {"sports": {"nba": "basketball_nba"}, "max_fetch_age_minutes": 10}
+    def test_fetches_every_configured_sport_from_sharpapi(self):
+        config = {"sports": ["mlb", "nba"], "max_fetch_age_minutes": 10}
 
-        exited, status, _ = self._run_main_with(
-            config,
-            requests_side_effect=requests.RequestException("401 unauthorized"),
-            sharpapi_key="sharp-key",
-            sharpapi_return=SHARPAPI_FALLBACK_ROWS,
-        )
+        def side_effect(local_sport, api_key):
+            return SHARPAPI_MLB_ROWS if local_sport == "mlb" else SHARPAPI_ROWS
+
+        exited, status, rows = self._run_main_with(config, sharpapi_side_effect=side_effect)
 
         self.assertIsNone(exited)
         self.assertTrue(status["ok"])
-        self.assertEqual(status["rows"], 1)
-        self.assertEqual(status["sport_sources"]["nba"], "sharpapi_fallback")
+        self.assertEqual(status["sport_sources"], {"mlb": "sharpapi", "nba": "sharpapi"})
+        self.assertEqual({row["sport"] for row in rows}, {"mlb", "nba"})
 
-    def test_one_sport_falls_back_while_another_succeeds_via_the_odds_api(self):
-        config = {"sports": {"mlb": "baseball_mlb", "nba": "basketball_nba"}, "max_fetch_age_minutes": 10}
+    def test_one_sport_returning_nothing_does_not_fail_the_whole_run(self):
+        config = {"sports": ["mlb", "nba"], "max_fetch_age_minutes": 10}
 
-        def side_effect(url, params=None, timeout=None):
-            if "baseball_mlb" in url:
-                return _the_odds_api_response(THE_ODDS_API_MLB_PAYLOAD)
-            raise requests.RequestException("401 unauthorized")
+        def side_effect(local_sport, api_key):
+            return SHARPAPI_MLB_ROWS if local_sport == "mlb" else []
 
-        exited, status, rows = self._run_main_with(
-            config,
-            requests_side_effect=side_effect,
-            sharpapi_key="sharp-key",
-            sharpapi_return=SHARPAPI_FALLBACK_ROWS,
-        )
+        exited, status, rows = self._run_main_with(config, sharpapi_side_effect=side_effect)
 
         self.assertIsNone(exited)
         self.assertTrue(status["ok"])
-        self.assertEqual(status["sport_sources"]["mlb"], "the_odds_api")
-        self.assertEqual(status["sport_sources"]["nba"], "sharpapi_fallback")
-        sports_present = {row["sport"] for row in rows}
-        self.assertEqual(sports_present, {"mlb", "nba"})
+        self.assertEqual(status["sport_sources"], {"mlb": "sharpapi"})
+        self.assertIn("nba", status["reason"])
+        self.assertEqual({row["sport"] for row in rows}, {"mlb"})
 
-    def test_fails_run_when_the_odds_api_fails_and_no_sharpapi_key_configured(self):
-        config = {"sports": {"nba": "basketball_nba"}, "max_fetch_age_minutes": 10}
+    def test_fails_run_when_no_sharpapi_key_configured(self):
+        config = {"sports": ["nba"], "max_fetch_age_minutes": 10}
 
-        exited, status, rows = self._run_main_with(
-            config,
-            requests_side_effect=requests.RequestException("401 unauthorized"),
-            sharpapi_key="",
-            sharpapi_return=[],
-        )
+        exited, status, rows = self._run_main_with(config, sharpapi_key="", sharpapi_side_effect=lambda *a, **k: [])
 
         self.assertEqual(exited, 1)
         self.assertFalse(status["ok"])
         self.assertEqual(rows, [])
+        self.assertIn("SHARPAPI_API_KEY", status["reason"])
 
-    def test_fails_run_when_both_providers_fail_for_the_only_sport(self):
-        config = {"sports": {"nba": "basketball_nba"}, "max_fetch_age_minutes": 10}
+    def test_fails_run_when_sharpapi_returns_nothing_for_every_sport(self):
+        config = {"sports": ["nba"], "max_fetch_age_minutes": 10}
 
-        exited, status, rows = self._run_main_with(
-            config,
-            requests_side_effect=requests.RequestException("401 unauthorized"),
-            sharpapi_key="sharp-key",
-            sharpapi_return=[],
-        )
+        exited, status, rows = self._run_main_with(config, sharpapi_side_effect=lambda *a, **k: [])
 
         self.assertEqual(exited, 1)
         self.assertFalse(status["ok"])
         self.assertIn("nba", status["reason"])
+        self.assertEqual(rows, [])
 
-    def test_normal_the_odds_api_success_path_is_unaffected(self):
+    def test_accepts_legacy_dict_shaped_sports_config_as_a_key_list(self):
+        # config.odds.json used to map local_sport -> Odds API sport key
+        # (e.g. {"mlb": "baseball_mlb"}). An old config file left over from
+        # before the SharpAPI-only switch should still work -- the dict's
+        # keys are exactly the sport list SharpAPI needs.
         config = {"sports": {"mlb": "baseball_mlb"}, "max_fetch_age_minutes": 10}
 
-        exited, status, rows = self._run_main_with(
-            config,
-            requests_side_effect=lambda url, params=None, timeout=None: _the_odds_api_response(THE_ODDS_API_MLB_PAYLOAD),
-            sharpapi_key="",
-            sharpapi_return=[],
-        )
+        exited, status, rows = self._run_main_with(config, sharpapi_side_effect=lambda *a, **k: SHARPAPI_MLB_ROWS)
 
         self.assertIsNone(exited)
         self.assertTrue(status["ok"])
-        self.assertEqual(status["sport_sources"]["mlb"], "the_odds_api")
-        self.assertEqual(len(rows), 1)
+        self.assertEqual(status["sport_sources"], {"mlb": "sharpapi"})
 
 
 if __name__ == "__main__":

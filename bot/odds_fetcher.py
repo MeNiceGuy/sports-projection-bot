@@ -3,22 +3,19 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-import os
 import re
 from datetime import UTC, datetime
 from pathlib import Path
 
-import requests
 from dotenv import load_dotenv
 
 from bot.sharpapi_fetcher import fetch_sharpapi_odds, load_sharpapi_key
 
-# Without this, THE_ODDS_API_KEY/SPORTSBOOK_ODDS_API_KEY/SHARPAPI_API_KEY
-# are only visible here if set as real OS environment variables -- a key
-# that only exists in .env (the documented, expected place to put it per
-# .env.example) would silently never be read. Caught live: SHARPAPI_API_KEY
-# was correctly saved to .env but invisible to this module until this line
-# was added, so the fallback never actually fired despite being wired in.
+# Without this, SHARPAPI_API_KEY is only visible here if set as a real OS
+# environment variable -- a key that only exists in .env (the documented,
+# expected place to put it per .env.example) would silently never be read.
+# Caught live: SHARPAPI_API_KEY was correctly saved to .env but invisible to
+# this module until this line was added, so a fetch would silently fail.
 load_dotenv()
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -43,11 +40,16 @@ def load_config():
 
 
 def load_api_key(config: dict):
-    return (
-        os.environ.get("THE_ODDS_API_KEY", "").strip()
-        or os.environ.get("SPORTSBOOK_ODDS_API_KEY", "").strip()
-        or str(config.get("api_key") or config.get("sportsbook_odds_api_key") or "").strip()
-    )
+    """The single "is an odds provider key configured" check used by
+    pre_bet_health_check.py. Delegates to SharpAPI's key now that The Odds
+    API has been removed as a provider (its free-tier quota (500 requests)
+    proved too easy to exhaust running this pipeline regularly, and it
+    turned every failure into a silent per-sport SharpAPI fallback that
+    only showed up in `sport_sources` if you went looking -- SharpAPI alone
+    is simpler and was already the de facto workhorse most days). Keeps the
+    `config` param so every existing call site stays unchanged."""
+    del config
+    return load_sharpapi_key()
 
 
 def sanitize_reason(reason: str):
@@ -174,8 +176,8 @@ def append_line_history(rows: list[dict]):
 
 
 def main(argv: list[str] | None = None):
-    parser = argparse.ArgumentParser(description="Fetch sportsbook odds without burning API quota.")
-    parser.add_argument("--force", action="store_true", help="Call the odds API even if the current odds snapshot is fresh.")
+    parser = argparse.ArgumentParser(description="Fetch sportsbook odds from SharpAPI without over-fetching.")
+    parser.add_argument("--force", action="store_true", help="Call SharpAPI even if the current odds snapshot is fresh.")
     parser.add_argument(
         "--max-age-minutes",
         type=int,
@@ -208,115 +210,45 @@ def main(argv: list[str] | None = None):
             })
             return
 
-    api_key = load_api_key(config)
-    if not api_key:
-        fail_current_lines("sportsbook odds API key is not set")
-    if not config.get("sports"):
-        fail_current_lines("sportsbook odds sports mapping is not configured")
+    sharpapi_key = load_api_key(config)
+    if not sharpapi_key:
+        fail_current_lines("SHARPAPI_API_KEY is not set")
+    sport_list = list(config.get("sports", []))
+    if not sport_list:
+        fail_current_lines("sportsbook odds sports list is not configured")
 
     rows = []
-    quota_headers = {}
-    sharpapi_key = load_sharpapi_key()
     sport_sources = {}
     failed_sports = []
 
-    for local_sport, odds_sport in config.get("sports", {}).items():
-        if not odds_sport:
-            # No fixed Odds API sport key configured for this sport (e.g.
-            # tennis, whose key rotates per-tournament -- "tennis_atp_
-            # canadian_open" this week, something else next week -- rather
-            # than staying fixed like every other sport here). There is
-            # nothing to call The Odds API with, so go straight to
-            # SharpAPI's fixed league key instead of attempting a request
-            # that has no valid sport_key to use.
-            if sharpapi_key:
-                fallback_rows = fetch_sharpapi_odds(local_sport, sharpapi_key)
-                if fallback_rows:
-                    rows.extend(fallback_rows)
-                    sport_sources[local_sport] = "sharpapi_only"
-                    continue
-            failed_sports.append(f"{local_sport}: no fixed Odds API sport key (rotates per tournament) and SharpAPI unavailable or returned nothing")
-            continue
-
-        url = f"https://api.the-odds-api.com/v4/sports/{odds_sport}/odds"
-        params = {
-            "apiKey": api_key,
-            "regions": config.get("regions", "us"),
-            "markets": config.get("markets", "h2h,spreads,totals"),
-            "oddsFormat": config.get("odds_format", "american"),
-            "dateFormat": config.get("date_format", "iso"),
-        }
-        data = None
-        try:
-            resp = requests.get(url, params=params, timeout=30)
-            resp.raise_for_status()
-            data = resp.json()
-            quota_headers = {
-                "odds_api_requests_remaining": resp.headers.get("x-requests-remaining"),
-                "odds_api_requests_used": resp.headers.get("x-requests-used"),
-            }
-        except requests.RequestException as exc:
-            # The Odds API failed for this sport (quota exhausted, outage,
-            # bad key, ...) -- try SharpAPI for this sport alone rather than
-            # killing the whole run over one sport, then fall through to
-            # skipping the sport only if SharpAPI has no key or also fails.
-            if sharpapi_key:
-                fallback_rows = fetch_sharpapi_odds(local_sport, sharpapi_key)
-                if fallback_rows:
-                    rows.extend(fallback_rows)
-                    sport_sources[local_sport] = "sharpapi_fallback"
-                    continue
-            failed_sports.append(f"{local_sport}: {exc}")
-            continue
-
-        sport_sources[local_sport] = "the_odds_api"
-        for game in data:
-            game_id = game.get("id", "")
-            home = game.get("home_team", "")
-            away = game.get("away_team", "")
-            matchup = f"{away} at {home}" if away and home else game.get("commence_time", "")
-            commence_time = game.get("commence_time", "")
-            bookmakers = game.get("bookmakers", [])
-            if not bookmakers:
-                continue
-            fetch_time = datetime.now(UTC).isoformat()
-            for book in bookmakers:
-                for market in book.get("markets", []):
-                    outcomes = market.get("outcomes", [])
-                    if len(outcomes) >= 2:
-                        a = outcomes[0]
-                        b = outcomes[1]
-                        rows.append({
-                            "sport": local_sport,
-                            "market": market.get("key", ""),
-                            "game_id": game_id,
-                            "matchup": matchup,
-                            "commence_time": commence_time,
-                            "line_source": book.get("title", ""),
-                            "side_a": a.get("name", ""),
-                            "side_b": b.get("name", ""),
-                            "line_a": a.get("point", ""),
-                            "line_b": b.get("point", ""),
-                            "odds_a": a.get("price", ""),
-                            "odds_b": b.get("price", ""),
-                            "timestamp": market.get("last_update") or fetch_time,
-                        })
+    # SharpAPI is the sole odds provider -- The Odds API was removed after
+    # its free-tier quota (500 requests/month) ran out under this pipeline's
+    # normal call volume, at which point every sport was silently falling
+    # back to SharpAPI anyway (visible only in `sport_sources` if you went
+    # looking for it). One provider, one code path, no quota to babysit.
+    for local_sport in sport_list:
+        fetched_rows = fetch_sharpapi_odds(local_sport, sharpapi_key)
+        if fetched_rows:
+            rows.extend(fetched_rows)
+            sport_sources[local_sport] = "sharpapi"
+        else:
+            failed_sports.append(f"{local_sport}: SharpAPI returned no rows")
 
     if not rows:
-        reason = "sportsbook odds API returned no market rows"
+        reason = "SharpAPI returned no market rows"
         if failed_sports:
-            reason = f"sportsbook odds API returned no market rows; failures: {'; '.join(failed_sports)}"
+            reason = f"SharpAPI returned no market rows; failures: {'; '.join(failed_sports)}"
         fail_current_lines(reason)
 
     write_current_lines(rows)
 
     history_rows = append_line_history(rows)
-    status_note = "sportsbook odds fetch succeeded"
+    status_note = "sportsbook odds fetch succeeded (SharpAPI)"
     if failed_sports:
-        status_note += f" (some sports failed and had no fallback: {'; '.join(failed_sports)})"
+        status_note += f" (some sports returned nothing: {'; '.join(failed_sports)})"
     status = write_status(
         True, status_note, rows=len(rows),
-        extra={"cache_hit": False, "sport_sources": sport_sources, **quota_headers},
+        extra={"cache_hit": False, "sport_sources": sport_sources},
     )
 
     print({"market_lines_written": len(rows), "line_history_appended": history_rows, "output": str(OUT_PATH), "history": str(HISTORY_PATH), "status": status})

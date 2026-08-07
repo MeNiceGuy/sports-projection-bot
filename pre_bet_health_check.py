@@ -102,7 +102,7 @@ def run_check(max_line_age_hours=DEFAULT_MAX_LINE_AGE_HOURS):
     status = _load_json(STATUS_PATH)
     status_source = status.get("source", "api") if status else "api"
     if status_source != "manual_import" and not load_api_key(config):
-        failures.append("No odds API key configured in env or config.odds.json.")
+        failures.append("No SHARPAPI_API_KEY configured.")
 
     if not status:
         failures.append("No odds status file found. Run python run_odds_fetch.py or python import_manual_odds.py.")
