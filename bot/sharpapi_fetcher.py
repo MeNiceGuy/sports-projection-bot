@@ -51,6 +51,15 @@ LEAGUE_SLUGS = {
     # invalid_filter "did_you_mean" suggested it and was wrong). The real
     # CONCACAF Leagues Cup (MLS/Liga MX) is "leagues_cup" (plural).
     "leagues_cup": "leagues_cup",
+    # Fixed, tour-wide keys -- unlike The Odds API's tennis coverage (which
+    # rotates a new per-tournament sport key every week, e.g.
+    # "tennis_atp_canadian_open") SharpAPI's tennis league keys stay "atp"/
+    # "wta" regardless of which tournament is currently being played.
+    # config.odds.json has no Odds API key for these sports at all (see
+    # bot/odds_fetcher.py's handling of a blank "sports" mapping value) --
+    # SharpAPI is the primary, not a fallback, for tennis specifically.
+    "tennis_atp": "atp",
+    "tennis_wta": "wta",
 }
 
 # SharpAPI's market_type values collapsed onto this tool's three markets.

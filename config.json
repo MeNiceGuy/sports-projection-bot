@@ -1,5 +1,5 @@
 {
-  "active_sports": ["nba", "mlb", "wnba", "nfl", "ufc", "leagues_cup"],
-  "enabled_sports": ["nba", "mlb", "wnba", "nfl", "ufc", "leagues_cup", "nhl", "ncaab", "ncaaf"],
+  "active_sports": ["nba", "mlb", "wnba", "nfl", "ufc", "leagues_cup", "tennis_atp", "tennis_wta"],
+  "enabled_sports": ["nba", "mlb", "wnba", "nfl", "ufc", "leagues_cup", "tennis_atp", "tennis_wta", "nhl", "ncaab", "ncaaf"],
   "output_report": "reports/daily_projection_report.json"
 }

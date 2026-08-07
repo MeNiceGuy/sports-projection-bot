@@ -29,8 +29,8 @@ def validate_rows(rows: list[dict]):
                 errors.append(f"line {index}: missing {field}")
         if row.get("market") != "h2h":
             errors.append(f"line {index}: only h2h moneyline rows are supported for manual betting readiness")
-        if row.get("sport") not in {"nba", "mlb", "wnba", "nfl", "ufc", "leagues_cup"}:
-            errors.append(f"line {index}: sport must be nba, mlb, wnba, nfl, ufc, or leagues_cup")
+        if row.get("sport") not in {"nba", "mlb", "wnba", "nfl", "ufc", "leagues_cup", "tennis_atp", "tennis_wta"}:
+            errors.append(f"line {index}: sport must be nba, mlb, wnba, nfl, ufc, leagues_cup, tennis_atp, or tennis_wta")
         if is_placeholder_market_row(row):
             errors.append(f"line {index}: placeholder/example market rows are not allowed")
         if _parse_timestamp(row.get("timestamp", "")) is None:

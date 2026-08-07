@@ -34,6 +34,14 @@ SPORT_BASELINES = {
     # single goal is a huge swing), not because the underlying match is
     # low-variance.
     "leagues_cup": {"home_score": 1.5, "away_score": 1.3, "score_sd": 1.2, "margin_sd": 1.4, "gap_scale": 0.15},
+    # Tennis is binary (match win/loss), not scored, the same situation as
+    # UFC -- these are abstract units purely so simulate_game_scores()/
+    # monte_carlo_game() have a sane scale for the weighted_score gap,
+    # instead of silently falling back to NBA's 114-point scale. Both tours
+    # share one baseline since sports/tennis.py's weighted_score and
+    # calibrate_projection pipeline is identical between them.
+    "tennis_atp": {"home_score": 50.0, "away_score": 50.0, "score_sd": 15.0, "margin_sd": 18.0, "gap_scale": 0.20},
+    "tennis_wta": {"home_score": 50.0, "away_score": 50.0, "score_sd": 15.0, "margin_sd": 18.0, "gap_scale": 0.20},
 }
 
 SPORT_FEATURES = {
@@ -107,6 +115,22 @@ SPORT_FEATURES = {
         ("offense", "home_attack_score", "away_attack_score", 0.28),
         ("defense", "home_defense_score", "away_defense_score", 0.28),
         ("matchup", "home_matchup_score", "away_matchup_score", 0.14),
+    ],
+    # Mirrors the weight structure in sports/tennis.py's build_tour_report()
+    # -- "rating" is the Bradley-Terry MLE fit (the primary signal, same
+    # role fit_team_ratings() plays for leagues_cup), "ranking" is real
+    # current ATP/WTA ranking points (secondary signal and fallback for
+    # players without enough season history to fit reliably). No recent-
+    # form/injury/rest factors -- a player's own season match results
+    # already feed the rating fit directly, and there's no live injury feed
+    # for tennis equivalent to the team sports here.
+    "tennis_atp": [
+        ("rating", "home_rating_score", "away_rating_score", 0.55),
+        ("ranking", "home_ranking_score", "away_ranking_score", 0.45),
+    ],
+    "tennis_wta": [
+        ("rating", "home_rating_score", "away_rating_score", 0.55),
+        ("ranking", "home_ranking_score", "away_ranking_score", 0.45),
     ],
 }
 

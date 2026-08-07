@@ -221,6 +221,23 @@ def main(argv: list[str] | None = None):
     failed_sports = []
 
     for local_sport, odds_sport in config.get("sports", {}).items():
+        if not odds_sport:
+            # No fixed Odds API sport key configured for this sport (e.g.
+            # tennis, whose key rotates per-tournament -- "tennis_atp_
+            # canadian_open" this week, something else next week -- rather
+            # than staying fixed like every other sport here). There is
+            # nothing to call The Odds API with, so go straight to
+            # SharpAPI's fixed league key instead of attempting a request
+            # that has no valid sport_key to use.
+            if sharpapi_key:
+                fallback_rows = fetch_sharpapi_odds(local_sport, sharpapi_key)
+                if fallback_rows:
+                    rows.extend(fallback_rows)
+                    sport_sources[local_sport] = "sharpapi_only"
+                    continue
+            failed_sports.append(f"{local_sport}: no fixed Odds API sport key (rotates per tournament) and SharpAPI unavailable or returned nothing")
+            continue
+
         url = f"https://api.the-odds-api.com/v4/sports/{odds_sport}/odds"
         params = {
             "apiKey": api_key,
