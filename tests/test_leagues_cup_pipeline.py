@@ -85,6 +85,31 @@ class TeamStrengthShrinkageTests(unittest.TestCase):
 
 
 class ExpectedGoalsTests(unittest.TestCase):
+    def test_mle_fit_path_does_not_double_count_the_league_baseline(self):
+        # Regression: caught live -- when both sides have a real MLE-fit
+        # rating, expected_goals() was still multiplying by the league's
+        # average goals on top of already-real fitted rates (the fit's own
+        # baseline already reflects real goals, since it was fit against
+        # real scorelines). That inflated a genuine matchup's expected home
+        # goals from a plausible ~3.5 to an unrealistic 5.2. With both
+        # ratings present, the result must match the model's own direct
+        # log-space formula, not that formula times an extra league-average
+        # multiplier.
+        home_stats = {"rating": {"attack": 0.5, "defense": 0.3}, "league_avg_goals": 1.6}
+        away_stats = {"rating": {"attack": 0.1, "defense": -0.4}, "league_avg_goals": 1.4}
+        home_advantage = 1.3
+
+        lambda_home, lambda_away = expected_goals(home_stats, away_stats, home_advantage)
+
+        import math
+        expected_lambda_home = round(math.exp(0.5 - (-0.4)) * home_advantage, 3)
+        expected_lambda_away = round(math.exp(0.1 - 0.3), 3)
+        self.assertAlmostEqual(lambda_home, expected_lambda_home, places=2)
+        self.assertAlmostEqual(lambda_away, expected_lambda_away, places=2)
+        # Sanity bound: the double-counting bug pushed this well past 5;
+        # the corrected value should stay in a realistic soccer range.
+        self.assertLess(lambda_home, 4.5)
+
     def test_home_advantage_is_applied(self):
         # Two identical teams should still favor the home side via the
         # home-advantage multiplier alone.
