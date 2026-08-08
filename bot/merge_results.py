@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import sqlite3
 from pathlib import Path
 
 from bot.betting_metrics import expected_profit_per_unit
@@ -10,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PREDICTION_LOG = ROOT / "logs" / "prediction_log.csv"
 RESULTS_TEMPLATE = ROOT / "logs" / "results_ingest_template.csv"
 GRADED_RESULTS = ROOT / "logs" / "graded_results.csv"
+WAREHOUSE_DB = ROOT / "logs" / "bets.db"
 
 FIELDNAMES = ["generated_at", "sport", "game_id", "matchup", "lean", "confidence", "actual_winner", "was_correct", "odds", "profit_units", "grading_note", "model_era"]
 
@@ -25,6 +27,46 @@ def read_csv(path: Path):
         return []
     with path.open("r", encoding="utf-8", newline="") as f:
         return list(csv.DictReader(f))
+
+
+def _load_warehouse_predictions(keys_needed: set[tuple[str, str]]):
+    """Fallback prediction source for (sport, game_id) pairs that a real
+    result was recorded for but that no longer appear in PREDICTION_LOG.
+
+    PREDICTION_LOG is overwritten every run of run_daily_projection.py, so
+    a pick's own prediction row is gone from it the moment the game
+    finishes and a new day's pipeline run replaces the file -- there is
+    normally only a same-day window to grade a pick before its source row
+    disappears. bot/data_warehouse.py's projection_history table is
+    append-only (every run adds rows, nothing is ever overwritten), so it
+    still has the original matchup/lean/confidence for a pick from days or
+    weeks ago. Caught live: two real tennis wins (Jakub Mensik, Belinda
+    Bencic) from the prior day could not be graded through PREDICTION_LOG
+    alone because the next day's pipeline runs had already replaced it --
+    this closes that gap rather than requiring manual SQL lookups each time.
+    """
+    if not keys_needed or not WAREHOUSE_DB.exists():
+        return []
+    conn = sqlite3.connect(WAREHOUSE_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        rows = conn.execute(
+            "SELECT generated_at, sport, game_id, matchup, lean, confidence FROM projection_history ORDER BY id"
+        ).fetchall()
+    except sqlite3.OperationalError:
+        return []
+    finally:
+        conn.close()
+
+    seen = set()
+    out = []
+    for row in rows:
+        key = (row["sport"] or "", row["game_id"] or "")
+        if key not in keys_needed or key in seen:
+            continue
+        seen.add(key)
+        out.append(dict(row))
+    return out
 
 
 def merge_results():
@@ -44,6 +86,10 @@ def merge_results():
     preds = read_csv(PREDICTION_LOG)
     results = read_csv(RESULTS_TEMPLATE)
     result_map = {(r.get("sport", ""), r.get("game_id", "")): r for r in results if str(r.get("game_completed", "")).lower() in {"true", "1", "yes"}}
+
+    pred_keys = {(p.get("sport", ""), p.get("game_id", "")) for p in preds}
+    missing_keys = set(result_map) - pred_keys - set(existing_by_key)
+    preds += _load_warehouse_predictions(missing_keys)
 
     added = 0
     for p in preds:

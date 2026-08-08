@@ -1,4 +1,5 @@
 import csv
+import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
@@ -163,6 +164,126 @@ class MergeResultsPreservesHistoryTests(unittest.TestCase):
                 patch.object(merge_results_module, "GRADED_RESULTS", graded),
                 patch.object(merge_results_module, "PREDICTION_LOG", preds),
                 patch.object(merge_results_module, "RESULTS_TEMPLATE", results),
+            ):
+                added = merge_results_module.merge_results()
+
+            self.assertEqual(added, 0)
+
+
+class MergeResultsWarehouseFallbackTests(unittest.TestCase):
+    def _make_warehouse(self, db_path: Path, rows: list[dict]):
+        conn = sqlite3.connect(db_path)
+        conn.execute("""
+            CREATE TABLE projection_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                generated_at TEXT, sport TEXT, game_id TEXT, matchup TEXT,
+                lean TEXT, confidence TEXT
+            )
+        """)
+        for r in rows:
+            conn.execute(
+                "INSERT INTO projection_history (generated_at, sport, game_id, matchup, lean, confidence) VALUES (?, ?, ?, ?, ?, ?)",
+                (r["generated_at"], r["sport"], r["game_id"], r["matchup"], r["lean"], r["confidence"]),
+            )
+        conn.commit()
+        conn.close()
+
+    def test_grades_a_pick_whose_game_already_aged_out_of_prediction_log(self):
+        # Regression: caught live -- two real tennis wins (Jakub Mensik,
+        # Belinda Bencic) from the prior day's run could not be graded
+        # because run_daily_projection.py had already overwritten
+        # prediction_log.csv by the time their results were being entered.
+        # The warehouse's append-only projection_history table is the
+        # fallback source for exactly this case.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            graded = tmp_path / "graded_results.csv"
+            write_csv(graded, merge_results_module.FIELDNAMES, [])
+            preds = tmp_path / "prediction_log.csv"
+            # Today's prediction_log.csv no longer has this game -- it
+            # already finished and isn't "upcoming" anymore.
+            write_csv(preds, ["generated_at", "sport", "game_id", "matchup", "lean", "confidence"], [])
+            results = tmp_path / "results_ingest_template.csv"
+            write_csv(results, ["sport", "game_id", "matchup", "actual_winner", "game_completed", "notes"], [{
+                "sport": "tennis_atp", "game_id": "181777", "matchup": "Terence Atmane at Jakub Mensik",
+                "actual_winner": "Jakub Mensik", "game_completed": "true",
+                "notes": "Mensik ML premium pick won 7-5, 6-4 (verified via ESPN)",
+            }])
+            db_path = tmp_path / "bets.db"
+            self._make_warehouse(db_path, [{
+                "generated_at": "2026-08-07T17:11:23+00:00", "sport": "tennis_atp", "game_id": "181777",
+                "matchup": "Terence Atmane at Jakub Mensik", "lean": "Jakub Mensik", "confidence": "High",
+            }])
+
+            with (
+                patch.object(merge_results_module, "GRADED_RESULTS", graded),
+                patch.object(merge_results_module, "PREDICTION_LOG", preds),
+                patch.object(merge_results_module, "RESULTS_TEMPLATE", results),
+                patch.object(merge_results_module, "WAREHOUSE_DB", db_path),
+                patch.object(merge_results_module, "lookup_pick", return_value={"odds": "-220"}),
+            ):
+                added = merge_results_module.merge_results()
+
+            self.assertEqual(added, 1)
+            rows = {r["game_id"]: r for r in merge_results_module.read_csv(graded)}
+            self.assertEqual(rows["181777"]["lean"], "Jakub Mensik")
+            self.assertEqual(rows["181777"]["was_correct"], "True")
+            self.assertEqual(rows["181777"]["odds"], "-220")
+
+    def test_already_graded_key_is_not_re_pulled_from_warehouse(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            graded = tmp_path / "graded_results.csv"
+            write_csv(graded, merge_results_module.FIELDNAMES, [{
+                "generated_at": "2026-08-07T00:00:00+00:00", "sport": "tennis_atp", "game_id": "181777",
+                "matchup": "Terence Atmane at Jakub Mensik", "lean": "Jakub Mensik", "confidence": "High",
+                "actual_winner": "Jakub Mensik", "was_correct": "True", "odds": "-220",
+                "profit_units": "0.4545", "grading_note": "already graded", "model_era": "post_moneyline_guard",
+            }])
+            preds = tmp_path / "prediction_log.csv"
+            write_csv(preds, ["generated_at", "sport", "game_id", "matchup", "lean", "confidence"], [])
+            results = tmp_path / "results_ingest_template.csv"
+            write_csv(results, ["sport", "game_id", "matchup", "actual_winner", "game_completed", "notes"], [{
+                "sport": "tennis_atp", "game_id": "181777", "matchup": "Terence Atmane at Jakub Mensik",
+                "actual_winner": "Jakub Mensik", "game_completed": "true", "notes": "won",
+            }])
+            db_path = tmp_path / "bets.db"
+            self._make_warehouse(db_path, [{
+                "generated_at": "2026-08-07T17:11:23+00:00", "sport": "tennis_atp", "game_id": "181777",
+                "matchup": "Terence Atmane at Jakub Mensik", "lean": "Jakub Mensik", "confidence": "High",
+            }])
+
+            with (
+                patch.object(merge_results_module, "GRADED_RESULTS", graded),
+                patch.object(merge_results_module, "PREDICTION_LOG", preds),
+                patch.object(merge_results_module, "RESULTS_TEMPLATE", results),
+                patch.object(merge_results_module, "WAREHOUSE_DB", db_path),
+            ):
+                added = merge_results_module.merge_results()
+
+            self.assertEqual(added, 0)
+            rows = merge_results_module.read_csv(graded)
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0]["grading_note"], "already graded")
+
+    def test_missing_warehouse_db_does_not_crash(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            graded = tmp_path / "graded_results.csv"
+            write_csv(graded, merge_results_module.FIELDNAMES, [])
+            preds = tmp_path / "prediction_log.csv"
+            write_csv(preds, ["generated_at", "sport", "game_id", "matchup", "lean", "confidence"], [])
+            results = tmp_path / "results_ingest_template.csv"
+            write_csv(results, ["sport", "game_id", "matchup", "actual_winner", "game_completed", "notes"], [{
+                "sport": "tennis_atp", "game_id": "181777", "matchup": "Terence Atmane at Jakub Mensik",
+                "actual_winner": "Jakub Mensik", "game_completed": "true", "notes": "won",
+            }])
+
+            with (
+                patch.object(merge_results_module, "GRADED_RESULTS", graded),
+                patch.object(merge_results_module, "PREDICTION_LOG", preds),
+                patch.object(merge_results_module, "RESULTS_TEMPLATE", results),
+                patch.object(merge_results_module, "WAREHOUSE_DB", tmp_path / "does_not_exist.db"),
             ):
                 added = merge_results_module.merge_results()
 
