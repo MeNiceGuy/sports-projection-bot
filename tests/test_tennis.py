@@ -5,11 +5,14 @@ from sports.tennis import (
     _player_weighted_score,
     _ranking_score,
     _rating_score,
+    _select_rating_pair,
     build_tour_report,
     fetch_match_history,
     fetch_rankings,
     fetch_upcoming_matches,
     fit_player_ratings,
+    fit_surface_ratings,
+    guess_surface,
     rating_win_probability,
 )
 
@@ -268,6 +271,101 @@ class BuildTourReportTests(unittest.TestCase):
             report = build_tour_report("atp")
         self.assertEqual(report["status"], "error")
         self.assertEqual(report["games"], [])
+
+
+class GuessSurfaceTests(unittest.TestCase):
+    def test_recognizes_known_tournaments_case_insensitively(self):
+        self.assertEqual(guess_surface("Wimbledon"), "grass")
+        self.assertEqual(guess_surface("ROLAND GARROS"), "clay")
+        self.assertEqual(guess_surface("national bank open presented by rogers"), "hard")
+
+    def test_unrecognized_tournament_returns_none_not_a_guess(self):
+        # A smaller/less-recognizable event (ITF, WTA 125, a renamed
+        # sponsor) should fall back to "we don't know" rather than a wrong
+        # guess -- callers use this to fall back to the all-surface rating.
+        self.assertIsNone(guess_surface("Some Obscure Challenger Event"))
+        self.assertIsNone(guess_surface(""))
+        self.assertIsNone(guess_surface(None))
+
+
+class FitSurfaceRatingsTests(unittest.TestCase):
+    def _round_robin_by_surface(self, surface):
+        players = ["Strong", "Weak"] + [f"Filler{i}" for i in range(19)]
+        results = []
+        for i, p1 in enumerate(players):
+            for p2 in players[i + 1:]:
+                if p1 == "Strong" or p2 == "Weak":
+                    winner, loser = p1, p2
+                elif p2 == "Strong" or p1 == "Weak":
+                    winner, loser = p2, p1
+                else:
+                    winner, loser = p1, p2
+                results.append({"winner": winner, "loser": loser, "surface": surface})
+        return results
+
+    def test_buckets_and_fits_each_surface_independently(self):
+        results = (
+            self._round_robin_by_surface("hard")
+            + self._round_robin_by_surface("clay")
+            + [{"winner": "Strong", "loser": "Weak", "surface": None}]  # unrecognized tournament -- excluded
+        )
+        fits = fit_surface_ratings(results)
+        self.assertIn("hard", fits)
+        self.assertIn("clay", fits)
+        self.assertIn("grass", fits)
+        self.assertGreater(fits["hard"]["Strong"], fits["hard"]["Weak"])
+        self.assertGreater(fits["clay"]["Strong"], fits["clay"]["Weak"])
+        self.assertEqual(fits["grass"], {})  # no grass results at all
+
+    def test_too_little_data_on_a_surface_returns_empty_for_that_surface_only(self):
+        results = self._round_robin_by_surface("hard") + [
+            {"winner": "Strong", "loser": "Weak", "surface": "clay"},  # nowhere near enough for clay to fit
+        ]
+        fits = fit_surface_ratings(results)
+        self.assertNotEqual(fits["hard"], {})
+        self.assertEqual(fits["clay"], {})
+
+
+class SelectRatingPairTests(unittest.TestCase):
+    def test_prefers_surface_specific_rating_when_both_players_have_one(self):
+        overall = {"A": 0.0, "B": 0.0}  # dead even overall
+        surface_ratings = {"clay": {"A": 5.0, "B": -5.0}}  # A much stronger specifically on clay
+        rating_a, rating_b, source = _select_rating_pair("A", "B", "clay", overall, surface_ratings)
+        self.assertEqual((rating_a, rating_b, source), (5.0, -5.0, "clay"))
+
+    def test_falls_back_to_overall_when_surface_is_unknown(self):
+        overall = {"A": 1.0, "B": -1.0}
+        surface_ratings = {"clay": {"A": 5.0, "B": -5.0}}
+        rating_a, rating_b, source = _select_rating_pair("A", "B", None, overall, surface_ratings)
+        self.assertEqual((rating_a, rating_b, source), (1.0, -1.0, "overall"))
+
+    def test_falls_back_to_overall_when_one_player_lacks_a_surface_rating(self):
+        # B never played a real match on clay this season, so the clay fit
+        # (even if it converged for the field generally) has nothing for B.
+        overall = {"A": 1.0, "B": -1.0}
+        surface_ratings = {"clay": {"A": 5.0}}
+        rating_a, rating_b, source = _select_rating_pair("A", "B", "clay", overall, surface_ratings)
+        self.assertEqual((rating_a, rating_b, source), (1.0, -1.0, "overall"))
+
+    def test_falls_back_to_overall_when_the_surface_fit_never_converged(self):
+        overall = {"A": 1.0, "B": -1.0}
+        surface_ratings = {"grass": {}}  # too little grass data this season to fit at all
+        rating_a, rating_b, source = _select_rating_pair("A", "B", "grass", overall, surface_ratings)
+        self.assertEqual((rating_a, rating_b, source), (1.0, -1.0, "overall"))
+
+
+class FetchMatchHistorySurfaceTaggingTests(unittest.TestCase):
+    def test_tags_each_result_with_the_tournament_s_inferred_surface(self):
+        payload = _scoreboard_payload("Wimbledon", [_comp("1", "A", "B")])
+        with patch("sports.tennis.requests.get", return_value=_mock_response(payload)):
+            history = fetch_match_history()
+        self.assertEqual(history["atp"][0]["surface"], "grass")
+
+    def test_unrecognized_tournament_tags_none(self):
+        payload = _scoreboard_payload("Some Obscure Challenger Event", [_comp("1", "A", "B")])
+        with patch("sports.tennis.requests.get", return_value=_mock_response(payload)):
+            history = fetch_match_history()
+        self.assertIsNone(history["atp"][0]["surface"])
 
 
 if __name__ == "__main__":

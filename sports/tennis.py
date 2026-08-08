@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import re
 from datetime import UTC, datetime, timedelta
 
 import numpy as np
@@ -45,6 +46,92 @@ LOOKBACK_DAYS = 16
 RATING_L2_PENALTY = 0.05
 MIN_PLAYERS_TO_FIT = 20
 MIN_RESULTS_PER_PLAYER_TO_FIT = 2
+
+SURFACES = ("hard", "clay", "grass")
+
+# ESPN's match data exposes no surface field on any endpoint checked during
+# development (confirmed live -- see README). This is a best-effort surface
+# inference from the tournament's own name instead: a real, caught-live case
+# (Marta Kostyuk projected a heavy favorite over Iga Swiatek on hard court,
+# then lost in straight sets after dropping a tight first set) traced back
+# to exactly this gap -- Kostyuk's pooled, surface-blind season rating was
+# built mostly from an outstanding clay/grass season (11-1, 5-1) while her
+# hard-court record was a flat 3-3; Swiatek's best surface this season was
+# actually hard (9-3). A surface-blind rating overstated her for that
+# specific matchup. Keyed by lowercase substring match against the
+# tournament's own name -- not authoritative (smaller ITF/WTA 125/WTA 250
+# events with less recognizable names won't match, and sponsor names change
+# year to year), so this only ever narrows to a surface-specific rating when
+# a match confidently doesn't; unmatched tournaments fall back to the
+# unchanged overall (all-surface) rating exactly as before this existed.
+SURFACE_KEYWORDS = {
+    # Hard
+    "australian open": "hard", "adelaide": "hard", "auckland": "hard", "brisbane": "hard",
+    "hong kong": "hard", "united cup": "hard", "canberra": "hard",
+    "doha": "hard", "qatar": "hard", "dubai": "hard", "abu dhabi": "hard",
+    "indian wells": "hard", "miami open": "hard",
+    "us open": "hard", "cincinnati": "hard", "winston-salem": "hard", "atlanta": "hard",
+    "washington": "hard", "citi open": "hard", "montreal": "hard", "toronto": "hard",
+    "canadian open": "hard", "national bank open": "hard", "san jose": "hard", "san diego": "hard",
+    "guadalajara": "hard", "tokyo": "hard", "japan open": "hard", "china open": "hard",
+    "beijing": "hard", "wuhan": "hard", "zhengzhou": "hard", "shanghai": "hard",
+    "chengdu": "hard", "hangzhou": "hard", "ningbo": "hard",
+    "basel": "hard", "vienna": "hard", "paris masters": "hard", "stockholm": "hard",
+    "antwerp": "hard", "moselle": "hard", "metz": "hard",
+    "delray beach": "hard", "dallas": "hard", "memphis": "hard", "acapulco": "hard",
+    "los cabos": "hard", "st. petersburg": "hard", "st petersburg": "hard",
+    "rotterdam": "hard", "marseille": "hard", "montpellier": "hard", "open sud de france": "hard",
+    "finals": "hard",  # ATP/WTA Finals -- hard indoor most seasons
+    # Clay
+    "monte carlo": "clay", "madrid": "clay", "italian open": "clay", "internazionali": "clay", "rome": "clay",
+    "roland garros": "clay", "french open": "clay",
+    "stuttgart": "clay", "munich": "clay", "bmw open": "clay",
+    "estoril": "clay", "barcelona": "clay", "conde de godo": "clay",
+    "houston": "clay", "us clay court": "clay",
+    "charleston": "clay",  # green clay, not hard
+    "bogota": "clay", "rio de janeiro": "clay", "rio open": "clay", "buenos aires": "clay",
+    "santiago": "clay", "cordoba": "clay", "chile open": "clay",
+    "geneva": "clay", "lyon": "clay", "open parc": "clay",
+    "bastad": "clay", "swedish open": "clay", "hamburg": "clay",
+    "gstaad": "clay", "swiss open": "clay", "umag": "clay", "croatia open": "clay",
+    "kitzbuhel": "clay", "austrian open": "clay", "palermo": "clay",
+    "prague": "clay", "parma": "clay", "cluj": "clay", "iasi": "clay",
+    "strasbourg": "clay", "warsaw": "clay",
+    # Grass
+    "wimbledon": "grass", "halle": "grass", "terra wortmann": "grass",
+    "queen's club": "grass", "queens club": "grass", "cinch championships": "grass",
+    "hsbc championships": "grass", "eastbourne": "grass", "rothesay international": "grass",
+    "birmingham": "grass", "rothesay classic": "grass", "nottingham": "grass",
+    "mallorca": "grass", "bad homburg": "grass", "s-hertogenbosch": "grass",
+    "rosmalen": "grass", "libema open": "grass", "newport": "grass", "hall of fame open": "grass",
+    "berlin": "grass", "bett1open": "grass",
+}
+
+
+# Word-boundary matching, not a raw substring check -- caught live in this
+# module's own tests: "Halle" (a real grass tournament) is a substring of
+# "cHALLEnger", so a naive `keyword in name` check would silently mistag
+# every ordinary ITF/Challenger-tier event as grass. \b anchors each
+# keyword (including multi-word ones like "us open") to real word
+# boundaries so it only matches the actual tournament name, not a
+# coincidental substring inside an unrelated word.
+_SURFACE_PATTERNS = [
+    (re.compile(r"\b" + re.escape(keyword) + r"\b"), surface)
+    for keyword, surface in SURFACE_KEYWORDS.items()
+]
+
+
+def guess_surface(tournament_name: str):
+    """Best-effort surface inference from a tournament's own name -- see
+    SURFACE_KEYWORDS for why this exists and its known limits. Returns None
+    (not "unknown") when nothing matches, so callers can use a plain
+    truthiness check to decide whether a surface-specific rating even
+    applies."""
+    name = (tournament_name or "").lower()
+    for pattern, surface in _SURFACE_PATTERNS:
+        if pattern.search(name):
+            return surface
+    return None
 
 # Bradley-Terry rating span for scale_diff(), set from what a real fit on
 # live ATP/WTA season data actually produces (see tests/test_tennis_ratings
@@ -141,12 +228,14 @@ def fetch_match_history():
     for fitting Bradley-Terry ratings. Retirements/walkovers are kept as a
     normal win/loss (ESPN's winner flag doesn't cleanly distinguish them
     from a clean-sets finish) -- a documented simplification, same spirit as
-    every other honestly-scoped simplification in this project."""
+    every other honestly-scoped simplification in this project. Each result
+    also carries a best-effort inferred `surface` (see guess_surface()) --
+    None when the tournament name didn't match anything recognized."""
     today = datetime.now(UTC).date()
     start = today.replace(month=1, day=1)
     params = {"dates": f"{start.strftime('%Y%m%d')}-{today.strftime('%Y%m%d')}", "limit": 1000}
     results = {"atp": [], "wta": []}
-    for _event, comp in _fetch_raw_events(params):
+    for event, comp in _fetch_raw_events(params):
         tour = SINGLES_TYPE_TO_TOUR.get((comp.get("type") or {}).get("slug", ""))
         if not tour:
             continue
@@ -164,7 +253,7 @@ def fetch_match_history():
         if a_won == b_won:
             continue  # no clean single winner recorded -- don't guess
         winner, loser = (a_name, b_name) if a_won else (b_name, a_name)
-        results[tour].append({"winner": winner, "loser": loser})
+        results[tour].append({"winner": winner, "loser": loser, "surface": guess_surface(event.get("name", ""))})
     return results
 
 
@@ -228,6 +317,37 @@ def fit_player_ratings(results: list[dict], l2_penalty: float = RATING_L2_PENALT
     return {name: float(result.x[i]) for name, i in index.items()}
 
 
+def fit_surface_ratings(results: list[dict], l2_penalty: float = RATING_L2_PENALTY):
+    """One Bradley-Terry fit per surface (hard/clay/grass), each using only
+    that surface's real results -- reuses fit_player_ratings() unchanged, so
+    the same convergence thresholds (MIN_PLAYERS_TO_FIT/MIN_RESULTS_PER_
+    PLAYER_TO_FIT) and L2 shrinkage apply per surface as they do to the
+    overall fit. A surface with too little real data this season (most
+    often grass, whose tour season is only a few weeks long) simply returns
+    an empty dict for that surface, same as the overall fit does -- callers
+    fall back to the overall rating in that case, never to a guess."""
+    by_surface = {surface: [] for surface in SURFACES}
+    for r in results:
+        surface = r.get("surface")
+        if surface in by_surface:
+            by_surface[surface].append(r)
+    return {surface: fit_player_ratings(surface_results, l2_penalty) for surface, surface_results in by_surface.items()}
+
+
+def _select_rating_pair(name_a: str, name_b: str, surface, overall_ratings: dict, surface_ratings: dict):
+    """Prefer a surface-specific rating for both players when the match's
+    own surface is known AND both players have one from that surface's fit
+    (i.e. both actually played real matches on it this season) -- otherwise
+    fall back to the unchanged overall (all-surface) rating. Returns
+    (rating_a, rating_b, source) where source is the surface name actually
+    used, or "overall"."""
+    if surface:
+        surf_ratings = surface_ratings.get(surface) or {}
+        if name_a in surf_ratings and name_b in surf_ratings:
+            return surf_ratings[name_a], surf_ratings[name_b], surface
+    return overall_ratings.get(name_a), overall_ratings.get(name_b), "overall"
+
+
 def rating_win_probability(rating_a: float, rating_b: float):
     return round(float(expit(rating_a - rating_b)), 4)
 
@@ -279,14 +399,16 @@ def build_tour_report(tour: str):
         # there's anything to report; losing history just means every
         # player falls back to the ranking-only factor for this run.
         history = {"atp": [], "wta": []}
-    ratings = fit_player_ratings(history.get(tour, []))
+    tour_history = history.get(tour, [])
+    ratings = fit_player_ratings(tour_history)
+    surface_ratings = fit_surface_ratings(tour_history)
     rankings = fetch_rankings(tour)
 
     games = []
     for match in upcoming:
         a_name, b_name = match["player_a"], match["player_b"]
-        a_rating = ratings.get(a_name)
-        b_rating = ratings.get(b_name)
+        surface = guess_surface(match["event_name"])
+        a_rating, b_rating, rating_source = _select_rating_pair(a_name, b_name, surface, ratings, surface_ratings)
         a_points = (rankings.get(a_name) or {}).get("points")
         b_points = (rankings.get(b_name) or {}).get("points")
 
@@ -332,19 +454,37 @@ def build_tour_report(tour: str):
             "away_rating_fit": b_rating is not None,
             "home_rank": (rankings.get(a_name) or {}).get("rank"),
             "away_rank": (rankings.get(b_name) or {}).get("rank"),
+            "surface": surface,
+            "rating_source": rating_source,
             "factors": ["bradley_terry_rating", "ranking_points"],
             "note": (
                 "Projection uses a weighted tennis model: a Bradley-Terry maximum-"
                 "likelihood rating fit jointly against every real singles result "
                 f"the {tour.upper()} tour has played so far this season "
-                f"({len(history.get(tour, []))} real matches, {len(ratings)} players fit), "
+                f"({len(tour_history)} real matches, {len(ratings)} players fit), "
                 "plus current ATP/WTA ranking points as a secondary and fallback "
                 "signal for players without enough season history to fit reliably. "
-                "Moneyline only -- no spreads/totals market exists for tennis singles "
-                "the way it does for team sports. Surface (clay/hard/grass) is not "
-                "modeled -- ESPN's public match data does not expose a surface field "
-                "on any endpoint checked during development, so this stays a known, "
-                "documented simplification rather than a faked signal."
+                + (
+                    f"This match's surface was inferred as {surface} from the tournament "
+                    f"name, and both players had enough real {surface}-court results this "
+                    "season to use a surface-specific rating instead of the pooled "
+                    "all-surface one."
+                    if rating_source != "overall"
+                    else (
+                        f"Surface was inferred as {surface}, but at least one player didn't "
+                        f"have enough real {surface}-court results this season to fit a "
+                        "reliable surface-specific rating, so the pooled all-surface rating "
+                        "was used instead."
+                        if surface
+                        else "This tournament's surface could not be inferred from its name, "
+                        "so the pooled all-surface rating was used."
+                    )
+                )
+                + " Moneyline only -- no spreads/totals market exists for tennis singles "
+                "the way it does for team sports. Surface inference is best-effort from "
+                "the tournament name (ESPN exposes no surface field on any endpoint "
+                "checked during development) -- smaller/less-recognizable events fall "
+                "back to the all-surface rating rather than guessing a surface."
             ),
         })
 
@@ -355,12 +495,18 @@ def build_tour_report(tour: str):
         "games": games,
         "rating_fit": {
             "players_fit": len(ratings),
-            "results_used": len(history.get(tour, [])),
+            "results_used": len(tour_history),
+            "surface_fits": {
+                surface: {"players_fit": len(surface_ratings.get(surface) or {})}
+                for surface in SURFACES
+            },
         },
         "note": (
             f"Tennis {tour.upper()} weighted model covers a real MLE Bradley-Terry player "
-            "rating (fit against the full season's actual results) and current ranking "
-            "points. Moneyline only. Surface-blind -- documented simplification. Research only."
+            "rating (fit against the full season's actual results, both pooled and split "
+            "by surface where enough same-surface data exists) and current ranking points. "
+            "Moneyline only. Surface inference is best-effort from tournament names, not an "
+            "authoritative feed -- documented simplification. Research only."
         ),
     }
 
