@@ -74,7 +74,34 @@ def result_outcome(row: dict):
     return None
 
 
+
+# Results that mean "this row carries no real graded outcome" -- excluded
+# from realized profit entirely rather than counted as a genuine $0 push.
+# PENDING is the normal not-yet-settled case. DATA_ERROR marks a row that
+# can never be settled at all (see realized_profit_per_unit's docstring) --
+# deliberately a different label from PUSH/VOID/CANCELLED, which in normal
+# sportsbook usage mean the book actually voided a real bet and returned
+# the stake (a genuine $0 P/L event, correctly counted by
+# expected_profit_per_unit()) -- not "we don't trust this row."
+UNSETTLED_RESULTS = {"PENDING", "DATA_ERROR"}
+
+
 def realized_profit_per_unit(row: dict):
+    """A row's realized profit only means anything once it's actually
+    settled -- caught live: save_best_bets.py inserts every new row with a
+    literal profit=0 placeholder alongside result="PENDING" (0, not None,
+    since SQLite has no default-NULL convention here), so a naive
+    "if profit is not None: trust it" check was silently treating every
+    still-unsettled bet as a real $0 push. Applied across 171 real PENDING
+    rows in logs/bets.db (orphaned before matchup/side were captured, so
+    permanently unsettleable by run_settle_props.py -- since relabeled
+    DATA_ERROR after a one-time cleanup), this single-handedly produced a
+    false "positive-EV bets aren't realizing profit" signal in
+    bot/model_governance.py's report -- not one of those 171 rows had
+    actually been graded. Check settlement status before trusting a numeric
+    profit value at all."""
+    if str(row.get("result") or "").strip().upper() in UNSETTLED_RESULTS:
+        return None
     profit = safe_float(row.get("profit"))
     if profit is not None:
         return profit

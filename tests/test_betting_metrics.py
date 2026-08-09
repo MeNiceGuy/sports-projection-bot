@@ -8,6 +8,7 @@ from bot.betting_metrics import (
     expected_profit_per_unit,
     historical_testing_report,
     probability_calibration_curve,
+    realized_profit_per_unit,
     summarize_backtest,
     validate_expected_value,
 )
@@ -71,6 +72,35 @@ class BettingMetricsTests(unittest.TestCase):
         self.assertEqual(validation["evaluated_bets"], 3)
         self.assertEqual(validation["positive_ev_bets"], 2)
         self.assertEqual(validation["status"], "needs_more_results")
+
+    def test_pending_row_is_not_treated_as_a_real_zero_profit_outcome(self):
+        # Regression: caught live -- save_best_bets.py inserts every new
+        # row with a literal profit=0 placeholder alongside result=
+        # "PENDING". Trusting that numeric 0 before checking settlement
+        # status silently counted every still-unsettled bet as a real $0
+        # push, which produced a false "positive-EV bets aren't realizing
+        # profit" signal in governance reporting off 171 real orphaned
+        # PENDING rows -- none of which had actually been graded.
+        self.assertIsNone(realized_profit_per_unit({"result": "PENDING", "profit": 0}))
+        self.assertIsNone(realized_profit_per_unit({"result": "pending", "profit": 0.0}))
+
+    def test_data_error_row_is_also_excluded_not_counted_as_a_zero_push(self):
+        # DATA_ERROR is the label a one-time cleanup applied to 171 orphaned/
+        # fabricated rows in logs/bets.db -- must be excluded the same way
+        # PENDING is, not treated as a genuine PUSH/VOID $0 settlement.
+        self.assertIsNone(realized_profit_per_unit({"result": "DATA_ERROR", "profit": None}))
+
+    def test_settled_row_still_reports_its_real_profit(self):
+        self.assertEqual(realized_profit_per_unit({"result": "WIN", "profit": 0.6667}), 0.6667)
+        self.assertEqual(realized_profit_per_unit({"result": "LOSS", "profit": -1.0}), -1.0)
+
+    def test_validate_expected_value_excludes_pending_rows_from_the_average(self):
+        validation = validate_expected_value([
+            {"predicted_probability": 0.65, "odds": "-120", "result": "PENDING", "profit": 0},
+            {"predicted_probability": 0.65, "odds": "-120", "result": "PENDING", "profit": 0},
+        ])
+        self.assertEqual(validation["evaluated_bets"], 0)
+        self.assertEqual(validation["status"], "unavailable")
 
     def test_historical_testing_report_includes_backtest_calibration_and_ev(self):
         report = historical_testing_report([
