@@ -44,6 +44,7 @@ class MergeResultsPreservesHistoryTests(unittest.TestCase):
                 patch.object(merge_results_module, "GRADED_RESULTS", graded),
                 patch.object(merge_results_module, "PREDICTION_LOG", preds),
                 patch.object(merge_results_module, "RESULTS_TEMPLATE", results),
+                patch.object(merge_results_module, "read_pick_ledger", return_value={}),
             ):
                 added = merge_results_module.merge_results()
 
@@ -78,6 +79,7 @@ class MergeResultsPreservesHistoryTests(unittest.TestCase):
                 patch.object(merge_results_module, "GRADED_RESULTS", graded),
                 patch.object(merge_results_module, "PREDICTION_LOG", preds),
                 patch.object(merge_results_module, "RESULTS_TEMPLATE", results),
+                patch.object(merge_results_module, "read_pick_ledger", return_value={}),
             ):
                 added = merge_results_module.merge_results()
 
@@ -108,6 +110,7 @@ class MergeResultsPreservesHistoryTests(unittest.TestCase):
                 patch.object(merge_results_module, "GRADED_RESULTS", graded),
                 patch.object(merge_results_module, "PREDICTION_LOG", preds),
                 patch.object(merge_results_module, "RESULTS_TEMPLATE", results),
+                patch.object(merge_results_module, "read_pick_ledger", return_value={}),
                 patch.object(merge_results_module, "lookup_pick", return_value={"odds": "-150"}),
             ):
                 merge_results_module.merge_results()
@@ -140,6 +143,7 @@ class MergeResultsPreservesHistoryTests(unittest.TestCase):
                 patch.object(merge_results_module, "GRADED_RESULTS", graded),
                 patch.object(merge_results_module, "PREDICTION_LOG", preds),
                 patch.object(merge_results_module, "RESULTS_TEMPLATE", results),
+                patch.object(merge_results_module, "read_pick_ledger", return_value={}),
                 patch.object(merge_results_module, "lookup_pick", return_value=None),
             ):
                 merge_results_module.merge_results()
@@ -164,6 +168,7 @@ class MergeResultsPreservesHistoryTests(unittest.TestCase):
                 patch.object(merge_results_module, "GRADED_RESULTS", graded),
                 patch.object(merge_results_module, "PREDICTION_LOG", preds),
                 patch.object(merge_results_module, "RESULTS_TEMPLATE", results),
+                patch.object(merge_results_module, "read_pick_ledger", return_value={}),
             ):
                 added = merge_results_module.merge_results()
 
@@ -219,6 +224,7 @@ class MergeResultsWarehouseFallbackTests(unittest.TestCase):
                 patch.object(merge_results_module, "GRADED_RESULTS", graded),
                 patch.object(merge_results_module, "PREDICTION_LOG", preds),
                 patch.object(merge_results_module, "RESULTS_TEMPLATE", results),
+                patch.object(merge_results_module, "read_pick_ledger", return_value={}),
                 patch.object(merge_results_module, "WAREHOUSE_DB", db_path),
                 patch.object(merge_results_module, "lookup_pick", return_value={"odds": "-220"}),
             ):
@@ -257,6 +263,7 @@ class MergeResultsWarehouseFallbackTests(unittest.TestCase):
                 patch.object(merge_results_module, "GRADED_RESULTS", graded),
                 patch.object(merge_results_module, "PREDICTION_LOG", preds),
                 patch.object(merge_results_module, "RESULTS_TEMPLATE", results),
+                patch.object(merge_results_module, "read_pick_ledger", return_value={}),
                 patch.object(merge_results_module, "WAREHOUSE_DB", db_path),
             ):
                 added = merge_results_module.merge_results()
@@ -283,11 +290,122 @@ class MergeResultsWarehouseFallbackTests(unittest.TestCase):
                 patch.object(merge_results_module, "GRADED_RESULTS", graded),
                 patch.object(merge_results_module, "PREDICTION_LOG", preds),
                 patch.object(merge_results_module, "RESULTS_TEMPLATE", results),
+                patch.object(merge_results_module, "read_pick_ledger", return_value={}),
                 patch.object(merge_results_module, "WAREHOUSE_DB", tmp_path / "does_not_exist.db"),
             ):
                 added = merge_results_module.merge_results()
 
             self.assertEqual(added, 0)
+
+
+class AutoGradeFromPickLedgerTests(unittest.TestCase):
+    """The new self-updating grading path: every actionable pick in
+    bot/pick_ledger.py's append-only log gets checked against a real live
+    result (bot/result_fetcher.py) with no manual results_ingest_template
+    .csv entry required at all."""
+
+    def _run(self, pick_ledger_rows, fetch_real_result_return, graded_rows=None):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            graded = tmp_path / "graded_results.csv"
+            write_csv(graded, merge_results_module.FIELDNAMES, graded_rows or [])
+            preds = tmp_path / "prediction_log.csv"
+            write_csv(preds, ["generated_at", "sport", "game_id", "matchup", "lean", "confidence"], [])
+            results = tmp_path / "results_ingest_template.csv"
+            write_csv(results, ["sport", "game_id", "matchup", "actual_winner", "game_completed", "notes"], [])
+
+            with (
+                patch.object(merge_results_module, "GRADED_RESULTS", graded),
+                patch.object(merge_results_module, "PREDICTION_LOG", preds),
+                patch.object(merge_results_module, "RESULTS_TEMPLATE", results),
+                patch.object(merge_results_module, "read_pick_ledger", return_value=pick_ledger_rows),
+                patch.object(merge_results_module, "fetch_real_result", side_effect=fetch_real_result_return),
+            ):
+                added = merge_results_module.merge_results()
+
+            return added, {r["game_id"]: r for r in merge_results_module.read_csv(graded)}
+
+    def test_grades_a_finished_pick_with_no_manual_entry_at_all(self):
+        pick_ledger_rows = {
+            ("ufc", "401886039"): {
+                "sport": "ufc", "game_id": "401886039", "matchup": "Quillan Salkilld at Mateusz Gamrot",
+                "side": "Quillan Salkilld", "odds": "-148", "decision_tier": "premium",
+                "recorded_at": "2026-08-07T15:19:04+00:00",
+            },
+        }
+        added, rows = self._run(pick_ledger_rows, lambda sport, gid: (True, "Quillan Salkilld"))
+
+        self.assertEqual(added, 1)
+        self.assertEqual(rows["401886039"]["was_correct"], "True")
+        self.assertEqual(rows["401886039"]["actual_winner"], "Quillan Salkilld")
+        self.assertEqual(rows["401886039"]["odds"], "-148")
+        self.assertIn("auto-graded", rows["401886039"]["grading_note"])
+
+    def test_a_losing_pick_grades_as_a_loss(self):
+        pick_ledger_rows = {
+            ("tennis_wta", "182186"): {
+                "sport": "tennis_wta", "game_id": "182186", "matchup": "Marta Kostyuk at Iga Swiatek",
+                "side": "Marta Kostyuk", "odds": "130", "decision_tier": "premium",
+                "recorded_at": "2026-08-07T17:16:44+00:00",
+            },
+        }
+        added, rows = self._run(pick_ledger_rows, lambda sport, gid: (True, "Iga Swiatek"))
+
+        self.assertEqual(added, 1)
+        self.assertEqual(rows["182186"]["was_correct"], "False")
+        self.assertEqual(rows["182186"]["profit_units"], "-1.0")
+
+    def test_a_real_draw_grades_as_a_loss_for_whichever_side_was_picked(self):
+        pick_ledger_rows = {
+            ("leagues_cup", "555"): {
+                "sport": "leagues_cup", "game_id": "555", "matchup": "Team A at Team B",
+                "side": "Team B", "odds": "-120", "decision_tier": "watchlist",
+                "recorded_at": "2026-08-07T00:00:00+00:00",
+            },
+        }
+        added, rows = self._run(pick_ledger_rows, lambda sport, gid: (True, None))
+
+        self.assertEqual(added, 1)
+        self.assertEqual(rows["555"]["was_correct"], "False")
+        self.assertEqual(rows["555"]["actual_winner"], "")
+
+    def test_unfinished_game_is_left_ungraded_not_guessed(self):
+        pick_ledger_rows = {
+            ("tennis_atp", "999"): {
+                "sport": "tennis_atp", "game_id": "999", "matchup": "A at B",
+                "side": "B", "odds": "-110", "decision_tier": "premium",
+                "recorded_at": "2026-08-09T00:00:00+00:00",
+            },
+        }
+        added, rows = self._run(pick_ledger_rows, lambda sport, gid: (False, None))
+
+        self.assertEqual(added, 0)
+        self.assertEqual(rows, {})
+
+    def test_already_graded_pick_is_not_re_fetched(self):
+        already_graded = [{
+            "generated_at": "2026-08-07T00:00:00+00:00", "sport": "ufc", "game_id": "401886039",
+            "matchup": "Quillan Salkilld at Mateusz Gamrot", "lean": "Quillan Salkilld", "confidence": "",
+            "actual_winner": "Quillan Salkilld", "was_correct": "True", "odds": "-148",
+            "profit_units": "0.6757", "grading_note": "already graded", "model_era": "post_moneyline_guard",
+        }]
+        pick_ledger_rows = {
+            ("ufc", "401886039"): {
+                "sport": "ufc", "game_id": "401886039", "matchup": "Quillan Salkilld at Mateusz Gamrot",
+                "side": "Quillan Salkilld", "odds": "-148", "decision_tier": "premium",
+                "recorded_at": "2026-08-07T15:19:04+00:00",
+            },
+        }
+        fetch_calls = []
+        def fake_fetch(sport, game_id):
+            fetch_calls.append((sport, game_id))
+            return True, "Quillan Salkilld"
+
+        added, rows = self._run(pick_ledger_rows, fake_fetch, graded_rows=already_graded)
+
+        self.assertEqual(added, 0)
+        self.assertEqual(fetch_calls, [])  # never even attempted -- already graded
+        self.assertEqual(rows["401886039"]["grading_note"], "already graded")
 
 
 if __name__ == "__main__":

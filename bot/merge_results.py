@@ -5,7 +5,8 @@ import sqlite3
 from pathlib import Path
 
 from bot.betting_metrics import expected_profit_per_unit
-from bot.pick_ledger import lookup_pick
+from bot.pick_ledger import lookup_pick, read_existing as read_pick_ledger
+from bot.result_fetcher import fetch_real_result
 
 ROOT = Path(__file__).resolve().parents[1]
 PREDICTION_LOG = ROOT / "logs" / "prediction_log.csv"
@@ -67,6 +68,60 @@ def _load_warehouse_predictions(keys_needed: set[tuple[str, str]]):
         seen.add(key)
         out.append(dict(row))
     return out
+
+
+def _auto_grade_from_pick_ledger(already_graded: set[tuple[str, str]]):
+    """Automatically grade every actionable pick (bot/pick_ledger.py's
+    append-only pick_odds_log.csv -- every premium/watchlist pick this
+    pipeline has ever actually flagged) against its real live result, for
+    any pick not already in graded_results.csv.
+
+    This is what makes grading self-updating: no manual
+    results_ingest_template.csv entry is needed anymore for anything the
+    pipeline itself already recorded a pick for -- run_daily_projection.py
+    calls merge_results() at the start of every run, so "did my premium
+    picks win" gets checked automatically each time the bot runs, not only
+    when someone reports a result back by hand. bot/result_fetcher.py never
+    guesses -- a pick whose game hasn't finished yet (or can't be found)
+    is simply left alone and re-checked on the next run.
+    """
+    graded = {}
+    for key, pick in read_pick_ledger().items():
+        if key in already_graded:
+            continue
+        sport, game_id = key
+        completed, actual_winner = fetch_real_result(sport, game_id)
+        if not completed:
+            continue
+        side = pick.get("side", "")
+        was_correct = bool(actual_winner) and str(side).strip().lower() == str(actual_winner).strip().lower()
+        odds = pick.get("odds", "")
+        if odds:
+            profit_units = expected_profit_per_unit("WIN" if was_correct else "LOSS", odds)
+        elif not was_correct:
+            profit_units = -1.0
+        else:
+            profit_units = None
+
+        note = f"auto-graded from live result ({pick.get('decision_tier', '')} pick)"
+        if actual_winner is None:
+            note += " -- real draw, no side wins a straight moneyline pick"
+
+        graded[key] = {
+            "generated_at": pick.get("recorded_at", ""),
+            "sport": sport,
+            "game_id": game_id,
+            "matchup": pick.get("matchup", ""),
+            "lean": side,
+            "confidence": "",
+            "actual_winner": actual_winner or "",
+            "was_correct": was_correct,
+            "odds": odds,
+            "profit_units": profit_units,
+            "grading_note": note,
+            "model_era": CURRENT_MODEL_ERA,
+        }
+    return graded
 
 
 def merge_results():
@@ -133,6 +188,10 @@ def merge_results():
             "model_era": CURRENT_MODEL_ERA,
         }
         added += 1
+
+    auto_graded = _auto_grade_from_pick_ledger(set(existing_by_key))
+    existing_by_key.update(auto_graded)
+    added += len(auto_graded)
 
     if added:
         rows = list(existing_by_key.values())

@@ -51,16 +51,23 @@ This is a sports research tool, not a guaranteed winning system. It is under act
 Current NBA and MLB outputs now include clearer edge-band labeling so weak projections are easier to separate from stronger leans.
 
 ## Track record to date
-Graded results are tracked in `logs/graded_results.csv` (gitignored, local only) and tagged with a `model_era` so a decision-logic change (e.g. the moneyline suspicious-edge guard added 2026-08-03) doesn't get unfairly credited or blamed for picks made under the old logic. As of 2026-08-05:
+Graded results are tracked in `logs/graded_results.csv` (gitignored, local only) and tagged with a `model_era` so a decision-logic change (e.g. the moneyline suspicious-edge guard added 2026-08-03) doesn't get unfairly credited or blamed for picks made under the old logic. As of 2026-08-09:
 
 | Era | Record | Profit (flat 1u/bet) |
 | --- | --- | --- |
 | `pre_moneyline_guard` | 1-1 | -0.19u |
-| `post_moneyline_guard` (current logic) | 3-0 | +0.56u (1 of 3 wins excluded, odds not recorded) |
+| `post_moneyline_guard` (current logic) | 10-2 | +3.56u (1 of 12 excluded, odds not recorded) |
 
 Profit uses flat 1-unit staking (not the tool's own Kelly sizing), the standard way to report a track record without letting bet-sizing choices flatter or hide the pick quality. It is only as complete as the odds actually captured at pick time: `bot/pick_ledger.py` records the price for every `premium`/`watchlist` pick the moment `run_market_compare.py` flags it, and `bot/merge_results.py` looks that price up when a game finishes to compute `profit_units` -- but this ledger only started once that module existed, so one earlier win (2026-08-05, before the ledger was built) has no recorded price and is excluded from the profit total rather than guessed at; it still counts in the win/loss record above. Odds and profit per bet are visible in `logs/graded_results.csv`.
 
-This sample is far too small to draw any real conclusion from -- it exists for transparency and to build toward the sample size the governance gate (below) actually requires before trusting calibration, not as a performance claim. Every graded row is verified against real box scores (MLB Stats API) before being added, and past results are never deleted or rewritten when the model changes; see `bot/merge_results.py`.
+This sample is far too small to draw any real conclusion from -- it exists for transparency and to build toward the sample size the governance gate (below) actually requires before trusting calibration, not as a performance claim. Every graded row is verified against a real result before being added, and past results are never deleted or rewritten when the model changes; see `bot/merge_results.py`.
+
+### Grading is automatic now
+`run_daily_projection.py` calls `bot/merge_results.py::merge_results()` at the start of every run, before generating that day's new projections. It checks every pick ever recorded in `bot/pick_ledger.py`'s append-only log (`logs/pick_odds_log.csv` -- every `premium`/`watchlist` pick the pipeline has ever actually flagged) against its real live result via `bot/result_fetcher.py`, and grades anything whose game has actually finished. No manual result entry is needed anymore for anything this pipeline itself flagged a pick for -- "did my premium picks win" gets checked every time the bot runs, not only when someone reports a result back by hand.
+
+`bot/result_fetcher.py` looks each pick's real result up by its own ESPN/MLB Stats API game ID -- the same live sources each sport's own projection module already fetches from (ESPN's site API scoreboard for nba/wnba/nfl/ufc/leagues_cup/tennis, MLB Stats API's live-feed endpoint for mlb) -- and never guesses: a game that hasn't finished yet, or can't be found, is simply left alone and re-checked on the next run. Built and live-verified against 8 real, already-known outcomes from this session (5 tennis matches, 1 UFC fight, 2 MLB games) before being trusted, same discipline as every other build in this project; a real soccer draw grades as a loss for whichever side was picked, matching standard straight-moneyline convention, since this pipeline doesn't price the Draw as a bettable side (see "Draw pricing" below).
+
+`results_ingest_template.csv` / manual entry still exists as a fallback for anything outside what the pipeline itself picked (a result you want graded that was never an actionable pick, or a sport `bot/result_fetcher.py` doesn't have a lookup for yet).
 
 ## Finished model stack
 The active NBA and MLB layers now run as weighted betting-research models:

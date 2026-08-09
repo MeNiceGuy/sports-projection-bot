@@ -60,14 +60,27 @@ want to re-run one stage or need to see a single step's raw output.
 6. To build the current grading summary structure:
    python run_grader.py
 
-7. To merge completed game results from the template into graded results:
+7. Grading is automatic now -- run_daily_projection.py (step 4) calls
+   bot/merge_results.py at the start of every run, before generating that
+   day's new projections. It checks every pick ever recorded in
+   logs\pick_odds_log.csv (bot\pick_ledger.py's append-only log of every
+   premium/watchlist pick the pipeline has ever actually flagged) against
+   its real live result (bot\result_fetcher.py -- ESPN's scoreboard for
+   nba/wnba/nfl/ufc/leagues_cup/tennis, MLB Stats API for mlb) and grades
+   anything whose game has actually finished. No manual step needed for
+   anything the pipeline itself picked. A pick's game that hasn't finished
+   yet is simply left alone and re-checked the next time you run the bot.
+
+   To run grading on its own (without a full projection run), or to merge
+   a result you want graded that was never an actionable pick (via
+   logs\results_ingest_template.csv):
    python run_merge_results.py
 
-   Each newly graded row now also gets odds and profit_units (flat 1-unit
-   staking), looked up from logs\pick_odds_log.csv -- the odds actually
-   available when run_market_compare.py flagged the pick as premium/
-   watchlist (bot\pick_ledger.py). A pick graded before that price was
-   ever recorded gets a blank profit_units rather than a guessed one.
+   Each newly graded row gets odds and profit_units (flat 1-unit staking)
+   looked up from logs\pick_odds_log.csv -- the odds actually available
+   when run_market_compare.py flagged the pick as premium/watchlist. A
+   pick graded before that price was ever recorded gets a blank
+   profit_units rather than a guessed one.
 
 8. To build confidence-bucket reporting from graded results:
    python run_confidence_report.py

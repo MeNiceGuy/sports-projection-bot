@@ -6,6 +6,7 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
+from bot.merge_results import merge_results
 from sports.mlb import build_mlb_report
 from sports.nba import build_nba_report
 from sports.wnba import build_wnba_report
@@ -141,6 +142,20 @@ def enrich_report(report: dict):
 
 
 def main():
+    # Check every previously-flagged premium/watchlist pick (bot/pick_ledger.py's
+    # append-only log) against its real live result before generating today's
+    # new projections -- this is what makes the graded record self-updating:
+    # "did my picks actually win" gets checked automatically every time the
+    # bot runs, not only when someone reports a result back by hand. Never
+    # blocks the actual projection run -- a grading failure here (network
+    # blip, an unsupported sport) just means those picks get re-checked next
+    # run, same as bot/result_fetcher.py's own "never guess" behavior.
+    try:
+        newly_graded = merge_results()
+    except Exception as exc:
+        newly_graded = None
+        print({"auto_grading_error": str(exc)})
+
     config = load_config()
     active_sports = [sport for sport in config.get("active_sports", []) if sport in BUILDERS]
     now = datetime.now(UTC).isoformat()
@@ -168,6 +183,8 @@ def main():
         "output": str(output_path),
         "prediction_log": str(PRED_LOG),
         "warehouse": str(ROOT / "logs" / "bets.db"),
+        "newly_graded_picks": newly_graded,
+        "graded_results": str(GRADED_RESULTS),
     })
 
 
