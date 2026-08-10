@@ -1,8 +1,21 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from sports.ncaaf import apply_scoring_stats, build_ncaaf_report, get_league_scoring_stats
 from sports.ncaaf_injuries import team_injury_context
+
+
+def _empty_session_mock():
+    """build_ncaaf_report() fetches a trailing year of real game results via
+    requests.Session() (same day-by-day pattern as sports/nhl.py and
+    sports/ncaab.py). Patching only requests.get doesn't intercept
+    Session().get(), so every report-building test needs this too."""
+    session = MagicMock()
+    empty_response = MagicMock()
+    empty_response.json.return_value = {"events": []}
+    empty_response.raise_for_status.return_value = None
+    session.get.return_value = empty_response
+    return session
 
 
 class NcaafPipelineTests(unittest.TestCase):
@@ -46,6 +59,7 @@ class NcaafPipelineTests(unittest.TestCase):
 
         with (
             patch("sports.ncaaf.requests.get", return_value=mock_response),
+            patch("sports.ncaaf.requests.Session", return_value=_empty_session_mock()),
             patch("sports.ncaaf.get_recent_form", return_value={
                 "last5_wins": 4, "last5_losses": 1, "form_score": 3,
                 "days_since_last_game": 7, "rest_score": 50.0,
@@ -64,6 +78,7 @@ class NcaafPipelineTests(unittest.TestCase):
         self.assertIn("injuries", game["factors"])
         self.assertIn("home_turnover_differential", game)
         self.assertEqual(game["matchup"], "TCU Horned Frogs at North Carolina Tar Heels")
+        self.assertEqual(game["rating_source"], "naive_rate")  # no fitted history in this test
 
     def test_no_games_does_not_crash(self):
         mock_response = unittest.mock.Mock()
@@ -72,6 +87,7 @@ class NcaafPipelineTests(unittest.TestCase):
 
         with (
             patch("sports.ncaaf.requests.get", return_value=mock_response),
+            patch("sports.ncaaf.requests.Session", return_value=_empty_session_mock()),
             patch("sports.ncaaf.get_league_scoring_stats", return_value={}),
             patch("sports.ncaaf.fetch_league_injuries", return_value={}),
         ):
