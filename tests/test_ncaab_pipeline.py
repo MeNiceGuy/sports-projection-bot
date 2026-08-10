@@ -1,7 +1,22 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from sports.ncaab import apply_scoring_stats, build_ncaab_report, get_league_scoring_stats
+
+
+def _empty_session_mock():
+    """build_ncaab_report() fetches a trailing year of real game results via
+    requests.Session() (same day-by-day pattern as sports/nhl.py, needed
+    for the same reason -- see _fetch_game_results()'s docstring). Patching
+    only requests.get (module-level) does not intercept Session().get(), so
+    every report-building test needs this too, or it would make hundreds of
+    real live HTTP calls per test."""
+    session = MagicMock()
+    empty_response = MagicMock()
+    empty_response.json.return_value = {"events": []}
+    empty_response.raise_for_status.return_value = None
+    session.get.return_value = empty_response
+    return session
 
 
 class NcaabPipelineTests(unittest.TestCase):
@@ -44,6 +59,7 @@ class NcaabPipelineTests(unittest.TestCase):
 
         with (
             patch("sports.ncaab.requests.get", return_value=mock_response),
+            patch("sports.ncaab.requests.Session", return_value=_empty_session_mock()),
             patch("sports.ncaab.get_recent_form", return_value={
                 "last5_wins": 4, "last5_losses": 1, "form_score": 3,
                 "days_since_last_game": 2, "rest_score": 56.0,
@@ -62,6 +78,7 @@ class NcaabPipelineTests(unittest.TestCase):
         self.assertIn("home_defense_score", game)
         self.assertEqual(game["home_injury_score"], 50.0)  # documented neutral -- no live feed
         self.assertEqual(game["matchup"], "Miami Hurricanes at Florida Gators")
+        self.assertEqual(game["rating_source"], "naive_rate")  # no fitted history in this test
 
     def test_no_games_does_not_crash(self):
         mock_response = unittest.mock.Mock()
@@ -70,6 +87,7 @@ class NcaabPipelineTests(unittest.TestCase):
 
         with (
             patch("sports.ncaab.requests.get", return_value=mock_response),
+            patch("sports.ncaab.requests.Session", return_value=_empty_session_mock()),
             patch("sports.ncaab.get_league_scoring_stats", return_value={}),
         ):
             report = build_ncaab_report()
