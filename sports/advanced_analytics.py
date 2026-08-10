@@ -49,6 +49,11 @@ SPORT_BASELINES = {
     # confirmed live via sports/nhl.py's team-stats fetch (~3.0 goals/team/
     # game with real home-ice edge).
     "nhl": {"home_score": 3.1, "away_score": 2.9, "score_sd": 1.7, "margin_sd": 2.0, "gap_scale": 0.15},
+    # Real D1 men's scoring is a bit lower-scale than NBA (shorter shot
+    # clock era aside, slower pace than the pros) -- anchored to a real
+    # league-average-ish figure confirmed live via sports/ncaab.py's
+    # standings-based scoring fetch.
+    "ncaab": {"home_score": 74.0, "away_score": 70.0, "score_sd": 11.0, "margin_sd": 12.5, "gap_scale": 0.17},
 }
 
 SPORT_FEATURES = {
@@ -138,6 +143,33 @@ SPORT_FEATURES = {
     "tennis_wta": [
         ("rating", "home_rating_score", "away_rating_score", 0.55),
         ("ranking", "home_ranking_score", "away_ranking_score", 0.45),
+    ],
+    # Mirrors the weight structure in sports/nhl.py's build_nhl_report().
+    # "matchup" reuses the penalty-minute discipline/special-teams factor,
+    # the closest hockey analog to NFL's turnover-differential matchup.
+    "nhl": [
+        ("recent_form", "home_recent_form", "away_recent_form", 0.16),
+        ("home_away", "home_weighted_score", "away_weighted_score", 0.08),
+        ("team_strength", "home_record", "away_record", 0.16),
+        ("offense", "home_offense_score", "away_offense_score", 0.16),
+        ("defense", "home_defense_score", "away_defense_score", 0.16),
+        ("injury_context", "home_injury_score", "away_injury_score", 0.16),
+        ("rest", "home_rest_score", "away_rest_score", 0.08),
+        ("matchup", "home_matchup_score", "away_matchup_score", 0.04),
+    ],
+    # Mirrors the weight structure in sports/ncaab.py's build_ncaab_report().
+    # No injury factor -- ESPN's college-basketball injury feed was empty
+    # and its shape unconfirmed at development time (see sports/ncaab.py).
+    # No pace factor -- no accessible college equivalent of nba_api's
+    # league-wide pace data.
+    "ncaab": [
+        ("recent_form", "home_recent_form", "away_recent_form", 0.18),
+        ("home_away", "home_weighted_score", "away_weighted_score", 0.12),
+        ("team_strength", "home_record", "away_record", 0.18),
+        ("offense", "home_offense_score", "away_offense_score", 0.18),
+        ("defense", "home_defense_score", "away_defense_score", 0.18),
+        ("rest", "home_rest_score", "away_rest_score", 0.09),
+        ("matchup", "home_matchup_score", "away_matchup_score", 0.07),
     ],
 }
 
