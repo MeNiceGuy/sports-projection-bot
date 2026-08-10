@@ -26,6 +26,7 @@ ESPN_TEAM_SPORT_SCOREBOARD_URLS = {
     "leagues_cup": "https://site.api.espn.com/apis/site/v2/sports/soccer/concacaf.leagues.cup/scoreboard",
     "nhl": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard",
     "ncaab": "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard",
+    "ncaaf": "https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard",
 }
 UFC_SCOREBOARD_URL = "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard"
 # Tennis: query both slugs and take whichever returns the id -- ESPN's
@@ -138,6 +139,7 @@ RESULT_FETCHERS = {
     "leagues_cup": lambda game_id: fetch_team_sport_result("leagues_cup", game_id),
     "nhl": lambda game_id: fetch_team_sport_result("nhl", game_id),
     "ncaab": lambda game_id: fetch_team_sport_result("ncaab", game_id),
+    "ncaaf": lambda game_id: fetch_team_sport_result("ncaaf", game_id),
     "ufc": fetch_ufc_result,
     "tennis_atp": fetch_tennis_result,
     "tennis_wta": fetch_tennis_result,

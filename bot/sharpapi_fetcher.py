@@ -48,6 +48,7 @@ LEAGUE_SLUGS = {
     "ufc": "ufc",
     "nhl": "nhl",
     "ncaab": "ncaab",
+    "ncaaf": "ncaaf",
     # NOT "league_cup" (singular) -- confirmed live that's a different, real
     # competition (the English League Cup/Carabao Cup; SharpAPI's own
     # invalid_filter "did_you_mean" suggested it and was wrong). The real

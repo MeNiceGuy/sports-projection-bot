@@ -54,6 +54,10 @@ SPORT_BASELINES = {
     # league-average-ish figure confirmed live via sports/ncaab.py's
     # standings-based scoring fetch.
     "ncaab": {"home_score": 74.0, "away_score": 70.0, "score_sd": 11.0, "margin_sd": 12.5, "gap_scale": 0.17},
+    # Real FBS scoring runs meaningfully higher than the NFL's -- anchored
+    # to a real league-average-ish figure confirmed live via
+    # sports/ncaaf.py's per-team statistics fetch (TCU: 30.7 ppg).
+    "ncaaf": {"home_score": 29.0, "away_score": 26.0, "score_sd": 13.0, "margin_sd": 14.5, "gap_scale": 0.09},
 }
 
 SPORT_FEATURES = {
@@ -170,6 +174,19 @@ SPORT_FEATURES = {
         ("defense", "home_defense_score", "away_defense_score", 0.18),
         ("rest", "home_rest_score", "away_rest_score", 0.09),
         ("matchup", "home_matchup_score", "away_matchup_score", 0.07),
+    ],
+    # Mirrors the weight structure in sports/ncaaf.py's build_ncaaf_report()
+    # -- structurally identical to sports/nfl.py's own feature set (a real
+    # ESPN injury feed exists for college football, unlike NCAAB).
+    "ncaaf": [
+        ("recent_form", "home_recent_form", "away_recent_form", 0.14),
+        ("home_away", "home_weighted_score", "away_weighted_score", 0.10),
+        ("team_strength", "home_record", "away_record", 0.16),
+        ("offense", "home_offense_score", "away_offense_score", 0.16),
+        ("defense", "home_defense_score", "away_defense_score", 0.16),
+        ("injury_context", "home_injury_score", "away_injury_score", 0.16),
+        ("rest", "home_rest_score", "away_rest_score", 0.08),
+        ("matchup", "home_matchup_score", "away_matchup_score", 0.04),
     ],
 }
 
