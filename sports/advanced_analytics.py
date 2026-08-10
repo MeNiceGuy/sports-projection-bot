@@ -42,6 +42,13 @@ SPORT_BASELINES = {
     # calibrate_projection pipeline is identical between them.
     "tennis_atp": {"home_score": 50.0, "away_score": 50.0, "score_sd": 15.0, "margin_sd": 18.0, "gap_scale": 0.20},
     "tennis_wta": {"home_score": 50.0, "away_score": 50.0, "score_sd": 15.0, "margin_sd": 18.0, "gap_scale": 0.20},
+    # NHL scores on a real, low, integer goal scale like soccer -- score_sd
+    # is small in absolute terms (a single goal is a huge swing in a ~3-goal
+    # game) for the same reason leagues_cup's baseline is small, not because
+    # hockey itself is low-variance. Anchored to real 2025-26 league scoring
+    # confirmed live via sports/nhl.py's team-stats fetch (~3.0 goals/team/
+    # game with real home-ice edge).
+    "nhl": {"home_score": 3.1, "away_score": 2.9, "score_sd": 1.7, "margin_sd": 2.0, "gap_scale": 0.15},
 }
 
 SPORT_FEATURES = {
