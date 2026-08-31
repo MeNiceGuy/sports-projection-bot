@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PICK_ODDS_LOG = ROOT / "logs" / "pick_odds_log.csv"
 
-FIELDNAMES = ["sport", "game_id", "matchup", "side", "odds", "decision_tier", "recorded_at"]
+FIELDNAMES = ["sport", "game_id", "matchup", "side", "odds", "decision_tier", "confidence", "model_probability", "recorded_at"]
 
 # Only moneyline picks that actually clear the decision gate are worth
 # recording -- "pass" rows were never bets, and there's no point keeping
@@ -33,6 +33,16 @@ def record_pick_odds(comparisons: list[dict], generated_at: str = "") -> int:
     that's today or next week. Keeps the first-seen odds per game (the
     moment the tool actually flagged the pick as actionable) rather than
     the latest, and never overwrites an existing entry.
+
+    Also carries the model's own predicted probability for the picked side
+    (`best_value_model_probability`, already computed by market_compare.py)
+    through to the ledger -- previously dropped here, which meant a pick
+    graded later via _auto_grade_from_pick_ledger() in bot/merge_results.py
+    had no real probability to log into graded_results.csv, only a
+    confidence label. Without this, no calibration check (this project's
+    own governance report, or bot/dynamic_learning.py's regression) can
+    ever compare a real predicted probability against a real outcome for
+    picks that only ever existed in this ledger.
     """
     existing = read_existing()
     added = 0
@@ -54,6 +64,8 @@ def record_pick_odds(comparisons: list[dict], generated_at: str = "") -> int:
             "side": side,
             "odds": odds,
             "decision_tier": c.get("decision_tier", ""),
+            "confidence": c.get("model_confidence", ""),
+            "model_probability": c.get("best_value_model_probability", ""),
             "recorded_at": generated_at,
         }
         added += 1

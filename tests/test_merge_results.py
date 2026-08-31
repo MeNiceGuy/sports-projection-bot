@@ -154,6 +154,39 @@ class MergeResultsPreservesHistoryTests(unittest.TestCase):
             self.assertEqual(rows["888888"]["odds"], "")
             self.assertEqual(rows["888888"]["profit_units"], "-1.0")
 
+    def test_predicted_probability_from_prediction_log_carries_through_to_grading(self):
+        # prediction_log.csv already logs a real predicted_probability for
+        # the leaned side (model_probability_for_game() in
+        # run_daily_projection.py) -- this must survive into
+        # graded_results.csv, not be dropped, or no calibration check has
+        # a real probability to compare against the real outcome.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            graded = tmp_path / "graded_results.csv"
+            write_csv(graded, merge_results_module.FIELDNAMES, [])
+            preds = tmp_path / "prediction_log.csv"
+            write_csv(preds, ["generated_at", "sport", "game_id", "matchup", "lean", "confidence", "predicted_probability"], [{
+                "generated_at": "2026-08-05T12:00:00+00:00", "sport": "mlb", "game_id": "999999",
+                "matchup": "Team A at Team B", "lean": "Team B", "confidence": "High",
+                "predicted_probability": "0.6161",
+            }])
+            results = tmp_path / "results_ingest_template.csv"
+            write_csv(results, ["sport", "game_id", "matchup", "actual_winner", "game_completed", "notes"], [{
+                "sport": "mlb", "game_id": "999999", "matchup": "Team A at Team B",
+                "actual_winner": "Team B", "game_completed": "true", "notes": "won",
+            }])
+
+            with (
+                patch.object(merge_results_module, "GRADED_RESULTS", graded),
+                patch.object(merge_results_module, "PREDICTION_LOG", preds),
+                patch.object(merge_results_module, "RESULTS_TEMPLATE", results),
+                patch.object(merge_results_module, "read_pick_ledger", return_value={}),
+            ):
+                merge_results_module.merge_results()
+
+            rows = {r["game_id"]: r for r in merge_results_module.read_csv(graded)}
+            self.assertEqual(rows["999999"]["predicted_probability"], "0.6161")
+
     def test_no_new_completed_results_leaves_file_untouched(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
@@ -235,6 +268,64 @@ class MergeResultsWarehouseFallbackTests(unittest.TestCase):
             self.assertEqual(rows["181777"]["lean"], "Jakub Mensik")
             self.assertEqual(rows["181777"]["was_correct"], "True")
             self.assertEqual(rows["181777"]["odds"], "-220")
+
+    def _make_warehouse_with_probabilities(self, db_path: Path, rows: list[dict]):
+        conn = sqlite3.connect(db_path)
+        conn.execute("""
+            CREATE TABLE projection_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                generated_at TEXT, sport TEXT, game_id TEXT, matchup TEXT,
+                lean TEXT, confidence TEXT, home_probability REAL, away_probability REAL
+            )
+        """)
+        for r in rows:
+            conn.execute(
+                "INSERT INTO projection_history (generated_at, sport, game_id, matchup, lean, confidence, "
+                "home_probability, away_probability) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (r["generated_at"], r["sport"], r["game_id"], r["matchup"], r["lean"], r["confidence"],
+                 r["home_probability"], r["away_probability"]),
+            )
+        conn.commit()
+        conn.close()
+
+    def test_predicted_probability_derived_from_warehouse_home_away_split(self):
+        # projection_history stores home_probability/away_probability, not
+        # "the leaned side's probability" directly -- this must pick out
+        # the right one using the same "Away at Home" matchup convention
+        # every sport module writes.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            graded = tmp_path / "graded_results.csv"
+            write_csv(graded, merge_results_module.FIELDNAMES, [])
+            preds = tmp_path / "prediction_log.csv"
+            write_csv(preds, ["generated_at", "sport", "game_id", "matchup", "lean", "confidence"], [])
+            results = tmp_path / "results_ingest_template.csv"
+            write_csv(results, ["sport", "game_id", "matchup", "actual_winner", "game_completed", "notes"], [{
+                "sport": "tennis_atp", "game_id": "181777", "matchup": "Terence Atmane at Jakub Mensik",
+                "actual_winner": "Jakub Mensik", "game_completed": "true", "notes": "won",
+            }])
+            db_path = tmp_path / "bets.db"
+            # matchup is "Away at Home" -> Jakub Mensik is the home player;
+            # lean picked the home side, so predicted_probability should be
+            # home_probability (0.71), not away_probability (0.29).
+            self._make_warehouse_with_probabilities(db_path, [{
+                "generated_at": "2026-08-07T17:11:23+00:00", "sport": "tennis_atp", "game_id": "181777",
+                "matchup": "Terence Atmane at Jakub Mensik", "lean": "Jakub Mensik", "confidence": "High",
+                "home_probability": 0.71, "away_probability": 0.29,
+            }])
+
+            with (
+                patch.object(merge_results_module, "GRADED_RESULTS", graded),
+                patch.object(merge_results_module, "PREDICTION_LOG", preds),
+                patch.object(merge_results_module, "RESULTS_TEMPLATE", results),
+                patch.object(merge_results_module, "read_pick_ledger", return_value={}),
+                patch.object(merge_results_module, "WAREHOUSE_DB", db_path),
+                patch.object(merge_results_module, "lookup_pick", return_value={"odds": "-220"}),
+            ):
+                merge_results_module.merge_results()
+
+            rows = {r["game_id"]: r for r in merge_results_module.read_csv(graded)}
+            self.assertEqual(rows["181777"]["predicted_probability"], "0.71")
 
     def test_already_graded_key_is_not_re_pulled_from_warehouse(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -381,6 +472,19 @@ class AutoGradeFromPickLedgerTests(unittest.TestCase):
 
         self.assertEqual(added, 0)
         self.assertEqual(rows, {})
+
+    def test_predicted_probability_carries_through_from_pick_ledger(self):
+        pick_ledger_rows = {
+            ("ufc", "401886039"): {
+                "sport": "ufc", "game_id": "401886039", "matchup": "Quillan Salkilld at Mateusz Gamrot",
+                "side": "Quillan Salkilld", "odds": "-148", "decision_tier": "premium",
+                "model_probability": "0.5977", "recorded_at": "2026-08-07T15:19:04+00:00",
+            },
+        }
+        added, rows = self._run(pick_ledger_rows, lambda sport, gid: (True, "Quillan Salkilld"))
+
+        self.assertEqual(added, 1)
+        self.assertEqual(rows["401886039"]["predicted_probability"], "0.5977")
 
     def test_already_graded_pick_is_not_re_fetched(self):
         already_graded = [{
