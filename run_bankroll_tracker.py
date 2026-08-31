@@ -24,7 +24,7 @@ history = []
 
 for _, row in df.iterrows():
 
-    bankroll += row["profit"]
+    bankroll += row["profit"] or 0
 
     history.append({
         "created_at": row["created_at"],

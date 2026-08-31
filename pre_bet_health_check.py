@@ -146,7 +146,17 @@ def run_check(max_line_age_hours=DEFAULT_MAX_LINE_AGE_HOURS):
         failures.append("Daily projection report includes placeholder/example games.")
     non_real_projection_games = _projection_non_real_data_games(projection_report)
     if non_real_projection_games:
-        failures.append("Daily projection report includes fallback/unknown data sources.")
+        # Only the specific games with missing/fallback data are untrustworthy - not the
+        # whole day's slate. export_bet_candidates() excludes exactly these games from
+        # what it exports; other clean games/sports are unaffected. This is a warning
+        # (not a failure) so it doesn't block candidate export outright, but it still
+        # counts against the "real_data_only" readiness check via non_real_projection_games.
+        warnings.append(
+            "Excluding {} game(s) from bet candidates due to fallback/unknown data: {}".format(
+                len(non_real_projection_games),
+                "; ".join(f"{g['sport']}:{g['matchup']}" for g in non_real_projection_games),
+            )
+        )
 
     report = _load_json(REPORT_PATH)
     comparisons = report.get("comparisons", [])
@@ -169,6 +179,7 @@ def run_check(max_line_age_hours=DEFAULT_MAX_LINE_AGE_HOURS):
         "projection_age_hours": projection_age,
         "placeholder_projection_games": len(placeholder_projection_games),
         "non_real_projection_games": len(non_real_projection_games),
+        "non_real_projection_game_details": non_real_projection_games,
         "odds_source": status_source,
     }
 

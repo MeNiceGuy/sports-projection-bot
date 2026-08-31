@@ -185,6 +185,16 @@ def export_bet_candidates(require_health: bool = True, enforce_loss_cooldown: bo
     if not comparisons:
         raise RuntimeError("No market comparisons found. Run python run_market_compare.py first.")
 
+    # Exclude only the specific games the health check flagged as having fallback/unknown
+    # data (e.g. an MLB starter not yet announced) - not the whole day's slate.
+    excluded_games = health.get("non_real_projection_game_details", [])
+    excluded_keys = {(g.get("sport"), g.get("matchup")) for g in excluded_games}
+    if excluded_keys:
+        comparisons = [
+            row for row in comparisons
+            if (row.get("sport"), row.get("matchup")) not in excluded_keys
+        ]
+
     mode, blockers, release_gate_status = governance_mode(_load_json(GOVERNANCE_REPORT_PATH))
     candidates = build_candidates(comparisons, mode)
     if not candidates:
@@ -197,6 +207,7 @@ def export_bet_candidates(require_health: bool = True, enforce_loss_cooldown: bo
         "release_gate_status": release_gate_status,
         "release_gate_blockers": blockers,
         "health": health,
+        "excluded_incomplete_data_games": excluded_games,
         "candidate_count": len(candidates),
         "candidates": candidates,
         "disclaimer": (

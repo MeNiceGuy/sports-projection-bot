@@ -280,7 +280,7 @@ class PreBetHealthCheckTests(unittest.TestCase):
             self.assertEqual(result["placeholder_projection_games"], 1)
             self.assertTrue(any("placeholder/example games" in item for item in result["failures"]))
 
-    def test_health_check_fails_fallback_projection_sources(self):
+    def test_health_check_warns_fallback_projection_sources(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
             status_path = tmp_path / "odds_fetch_status.json"
@@ -324,9 +324,14 @@ class PreBetHealthCheckTests(unittest.TestCase):
             ):
                 result = pre_bet_health_check.run_check()
 
-            self.assertFalse(result["ok"])
+            # Fallback/unknown data on individual games is a warning, not a hard failure -
+            # export_bet_candidates() excludes just those games rather than blocking the
+            # whole day's export. The overall health check can still pass.
+            self.assertTrue(result["ok"])
             self.assertEqual(result["non_real_projection_games"], 1)
-            self.assertTrue(any("fallback/unknown data sources" in item for item in result["failures"]))
+            self.assertEqual(len(result["non_real_projection_game_details"]), 1)
+            self.assertEqual(result["non_real_projection_game_details"][0]["matchup"], "Away at Home")
+            self.assertTrue(any("fallback/unknown data" in item for item in result["warnings"]))
 
 
 if __name__ == "__main__":
