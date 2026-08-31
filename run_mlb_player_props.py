@@ -7,6 +7,8 @@ import pandas as pd
 import requests
 from dotenv import load_dotenv
 
+from bot.odds_api_events import build_matchup_event_map
+
 # Without this, THE_ODDS_API_KEY/MLB_PLAYER_PROPS_MAX_AGE_MINUTES/
 # MLB_PLAYER_PROPS_MAX_EVENTS are only visible here if set as real OS
 # environment variables -- a value that only exists in .env would
@@ -88,7 +90,22 @@ def main():
     if len(events) > max_events:
         print(f"mlb player props event cap active: fetching {max_events} of {len(events)} MLB events")
 
-    for event_id, matchup in selected_events:
+    # SharpAPI's game_id is not a valid the-odds-api event id (different
+    # providers, different id schemes) -- look up the-odds-api's own event
+    # ids and match them to our matchups by team name before requesting odds.
+    try:
+        matchup_to_event_id = build_matchup_event_map(
+            "baseball_mlb", api_key, [matchup for _, matchup in selected_events if matchup]
+        )
+    except requests.RequestException as exc:
+        keep_existing_or_empty(f"the-odds-api events lookup failed: {exc}")
+        return
+
+    for game_id, matchup in selected_events:
+        event_id = matchup_to_event_id.get(matchup)
+        if not event_id:
+            print(f"Skipped {matchup} (game_id={game_id}): no matching the-odds-api event found")
+            continue
         url = f"https://api.the-odds-api.com/v4/sports/baseball_mlb/events/{event_id}/odds"
         params = {
             "apiKey": api_key,

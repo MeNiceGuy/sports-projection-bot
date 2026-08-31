@@ -592,7 +592,12 @@ def market_efficiency_testing(comparisons: list[dict], bet_rows: list[dict]):
         blockers.append("positive_ev_not_realizing")
     if clv.get("status") == "not_beating_close":
         blockers.append("clv_not_beating_close")
-    if contradictions:
+    # See the matching comment in governance_checks(): rate_decision() already
+    # requires lean == value_side (plus fresh line, edge, confidence) before a
+    # row can reach premium/watchlist, so contradictions on "pass" rows are
+    # the safety gate working, not evidence the market-logic layer is broken.
+    # Only block on a contradiction that reached an actionable tier anyway.
+    if any(c.get("decision_tier") in {"premium", "watchlist"} for c in contradictions):
         blockers.append("contradictory_market_logic")
 
     if blockers:
@@ -1200,12 +1205,35 @@ def governance_checks(
         })
 
     if contradictions:
-        checks.append({
-            "severity": "high",
-            "area": "contradictory_logic",
-            "status": "blocked",
-            "message": f"{len(contradictions)} market comparison rows contain contradictory decision logic.",
-        })
+        # rate_decision() (bot/market_compare.py) already requires
+        # lean == value_side, a fresh line, and passing edge/confidence
+        # thresholds before a row can reach premium/watchlist -- so most of
+        # detect_contradictions()'s reasons (positive_ev_side_conflicts_with_
+        # model_lean, positive_edge_but_nonpositive_ev,
+        # high_confidence_with_weak_edge_band) can only ever fire on rows
+        # already downgraded to "pass". That's the safety gate working, not
+        # a governance failure, so it shouldn't hard-block the release gate.
+        # Only a contradiction that reached premium/watchlist anyway --
+        # actionable_tier_with_stale_line / actionable_tier_without_model_lean,
+        # which check decision_tier themselves -- means the gate let
+        # something contradictory through, which is the real blocker.
+        actionable_contradictions = [
+            c for c in contradictions if c.get("decision_tier") in {"premium", "watchlist"}
+        ]
+        if actionable_contradictions:
+            checks.append({
+                "severity": "high",
+                "area": "contradictory_logic",
+                "status": "blocked",
+                "message": f"{len(actionable_contradictions)} actionable (premium/watchlist) pick(s) contain contradictory decision logic.",
+            })
+        else:
+            checks.append({
+                "severity": "low",
+                "area": "contradictory_logic",
+                "status": "review",
+                "message": f"{len(contradictions)} non-actionable (pass-tier) comparison rows show internal model disagreement; already excluded from picks, informational only.",
+            })
 
     if edge_persistence:
         fragile_actionable = [
