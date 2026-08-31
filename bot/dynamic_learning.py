@@ -157,6 +157,46 @@ def summarize_probability_buckets(rows: list[dict], minimum_sample_size: int = M
     return output
 
 
+def fit_linear_calibration(scored: list[tuple[float, float]], minimum_sample_size: int = MINIMUM_SAMPLE_SIZE):
+    """Least-squares recalibration line (predicted probability -> realized
+    outcome rate) fit on real (probability, was_correct) pairs -- the same
+    slope/intercept regression bot/model_governance.py's
+    probability_quality_diagnostics() already computes for *reporting*,
+    refit here so a trustworthy fit can actually be applied to future
+    probabilities instead of only being diagnosed.
+
+    Two guards, not just the sample-size gate: a slope <= 0 means the
+    relationship between "how confident the model was" and "how often it
+    was actually right" came out flat or inverted -- a real case hit in
+    this project's own governance report (calibration_slope: -8.33 on an
+    11-sample scoring window). Applying a negative slope would flip the
+    correction backwards, making predictions worse, not better. A slope
+    > 3 is the opposite failure mode: an implausibly steep correction that
+    almost certainly reflects overfitting a small/noisy sample rather than
+    a real relationship. Either case returns None so callers fall back to
+    the coarser multiplier/bucket adjustments below instead of trusting an
+    untrustworthy fit."""
+    if len(scored) < minimum_sample_size:
+        return None
+    n = len(scored)
+    average_probability = sum(p for p, _ in scored) / n
+    average_outcome = sum(o for _, o in scored) / n
+    variance = sum((p - average_probability) ** 2 for p, _ in scored) / n
+    if variance <= 0:
+        return None
+    covariance = sum((p - average_probability) * (o - average_outcome) for p, o in scored) / n
+    slope = covariance / variance
+    if slope <= 0 or slope > 3:
+        return None
+    intercept = average_outcome - (slope * average_probability)
+    return {
+        "slope": round(slope, 4),
+        "intercept": round(intercept, 4),
+        "sample_size": n,
+        "method": "least_squares_probability_vs_outcome_v1",
+    }
+
+
 def build_outcome_learning_state(rows: list[dict], minimum_sample_size: int = MINIMUM_SAMPLE_SIZE):
     sample_size = len(rows)
     correct = sum(1 for row in rows if infer_correct(row))
@@ -164,6 +204,7 @@ def build_outcome_learning_state(rows: list[dict], minimum_sample_size: int = MI
     scored = [(row_probability(row), 1.0 if infer_correct(row) else 0.0) for row in rows if row_probability(row) is not None]
     average_probability = sum(probability for probability, _ in scored) / len(scored) if scored else None
     calibration_bias = average_probability - accuracy if average_probability is not None and accuracy is not None else None
+    linear_calibration = fit_linear_calibration(scored, minimum_sample_size)
 
     global_multiplier = 1.0
     reasons = []
@@ -210,6 +251,7 @@ def build_outcome_learning_state(rows: list[dict], minimum_sample_size: int = MI
         "global_probability_multiplier": round(global_multiplier, 4),
         "global_reasons": reasons,
         "bucket_recommendations": bucket_recommendations,
+        "linear_calibration": linear_calibration,
         "probability_buckets": probability_buckets,
         "by_sport": summarize_accuracy(rows, "sport"),
         "by_confidence": summarize_accuracy(rows, "confidence"),
@@ -268,21 +310,33 @@ def apply_dynamic_learning(probability, learning_state: dict | None = None):
         raw_probability /= 100.0
     raw_probability = max(0.01, min(0.99, raw_probability))
     state = learning_state or {}
-    multiplier = safe_float(state.get("global_probability_multiplier"), 1.0) or 1.0
-    learned = 0.5 + ((raw_probability - 0.5) * multiplier)
-    reasons = list(state.get("global_reasons", []))
     bucket = probability_bucket(raw_probability)
+    linear = state.get("linear_calibration")
 
-    for rec in state.get("bucket_recommendations", []):
-        scope = rec.get("scope", "")
-        if scope != f"probability_bucket:{bucket}":
-            continue
-        action = rec.get("action", "")
-        if action == "calibrate_down":
-            learned -= 0.02
-        elif action == "calibrate_up":
-            learned += 0.02
-        reasons.append(f"{action}:{bucket}")
+    if linear and linear.get("slope") is not None and linear.get("intercept") is not None:
+        # Prefer the fitted regression over the coarser multiplier/bucket
+        # nudges below when one passed fit_linear_calibration()'s sample-size
+        # and sanity guards -- it's a strictly better estimate of the same
+        # thing (predicted-probability-vs-realized-outcome), so applying
+        # both would double-correct the same signal.
+        learned = linear["intercept"] + (linear["slope"] * raw_probability)
+        reasons = [f"linear_calibration_regression:slope={linear['slope']}:n={linear.get('sample_size')}"]
+        multiplier = None
+    else:
+        multiplier = safe_float(state.get("global_probability_multiplier"), 1.0) or 1.0
+        learned = 0.5 + ((raw_probability - 0.5) * multiplier)
+        reasons = list(state.get("global_reasons", []))
+
+        for rec in state.get("bucket_recommendations", []):
+            scope = rec.get("scope", "")
+            if scope != f"probability_bucket:{bucket}":
+                continue
+            action = rec.get("action", "")
+            if action == "calibrate_down":
+                learned -= 0.02
+            elif action == "calibrate_up":
+                learned += 0.02
+            reasons.append(f"{action}:{bucket}")
 
     learned = round(max(0.01, min(0.99, learned)), 4)
     return {
@@ -290,6 +344,7 @@ def apply_dynamic_learning(probability, learning_state: dict | None = None):
         "learned_probability": learned,
         "probability_bucket": bucket,
         "global_probability_multiplier": multiplier,
+        "linear_calibration_applied": bool(linear),
         "mode": state.get("mode", "unconfigured"),
         "apply_policy": state.get("apply_policy", "manual_review_required"),
         "status": "active" if state else "unconfigured",

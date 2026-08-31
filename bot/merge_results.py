@@ -14,7 +14,7 @@ RESULTS_TEMPLATE = ROOT / "logs" / "results_ingest_template.csv"
 GRADED_RESULTS = ROOT / "logs" / "graded_results.csv"
 WAREHOUSE_DB = ROOT / "logs" / "bets.db"
 
-FIELDNAMES = ["generated_at", "sport", "game_id", "matchup", "lean", "confidence", "actual_winner", "was_correct", "odds", "profit_units", "grading_note", "model_era"]
+FIELDNAMES = ["generated_at", "sport", "game_id", "matchup", "lean", "confidence", "predicted_probability", "actual_winner", "was_correct", "odds", "profit_units", "grading_note", "model_era"]
 
 # Bump this after a change meaningful enough that past graded results shouldn't
 # be judged by the same standard as new ones (e.g. the moneyline suspicious-
@@ -45,15 +45,35 @@ def _load_warehouse_predictions(keys_needed: set[tuple[str, str]]):
     Bencic) from the prior day could not be graded through PREDICTION_LOG
     alone because the next day's pipeline runs had already replaced it --
     this closes that gap rather than requiring manual SQL lookups each time.
+
+    Also derives predicted_probability for the leaned side from the
+    warehouse's home_probability/away_probability columns -- projection_
+    history stores both real numbers per game, but not "the probability of
+    whichever side the model actually leaned", so that has to be picked out
+    here using the same "Away at Home" matchup-string convention every sport
+    module already writes (bot/market_compare.py and bot/spread_total_
+    compare.py parse it the same way: home team is the text after " at ").
     """
     if not keys_needed or not WAREHOUSE_DB.exists():
         return []
     conn = sqlite3.connect(WAREHOUSE_DB)
     conn.row_factory = sqlite3.Row
     try:
-        rows = conn.execute(
-            "SELECT generated_at, sport, game_id, matchup, lean, confidence FROM projection_history ORDER BY id"
-        ).fetchall()
+        try:
+            rows = conn.execute(
+                "SELECT generated_at, sport, game_id, matchup, lean, confidence, "
+                "home_probability, away_probability FROM projection_history ORDER BY id"
+            ).fetchall()
+        except sqlite3.OperationalError:
+            # An older projection_history table (created before
+            # home_probability/away_probability existed -- CREATE TABLE IF
+            # NOT EXISTS never retroactively adds columns to an existing
+            # table) still has every other field this fallback needs; only
+            # predicted_probability is unavailable for rows graded through
+            # it, same as before this addition.
+            rows = conn.execute(
+                "SELECT generated_at, sport, game_id, matchup, lean, confidence FROM projection_history ORDER BY id"
+            ).fetchall()
     except sqlite3.OperationalError:
         return []
     finally:
@@ -66,7 +86,19 @@ def _load_warehouse_predictions(keys_needed: set[tuple[str, str]]):
         if key not in keys_needed or key in seen:
             continue
         seen.add(key)
-        out.append(dict(row))
+        record = dict(row)
+        matchup = record.get("matchup") or ""
+        lean = record.get("lean") or ""
+        home_team = matchup.split(" at ")[-1] if " at " in matchup else ""
+        home_prob = record.get("home_probability")
+        away_prob = record.get("away_probability")
+        if lean and home_team and lean.strip().lower() == home_team.strip().lower():
+            record["predicted_probability"] = home_prob
+        elif lean:
+            record["predicted_probability"] = away_prob
+        else:
+            record["predicted_probability"] = None
+        out.append(record)
     return out
 
 
@@ -113,7 +145,8 @@ def _auto_grade_from_pick_ledger(already_graded: set[tuple[str, str]]):
             "game_id": game_id,
             "matchup": pick.get("matchup", ""),
             "lean": side,
-            "confidence": "",
+            "confidence": pick.get("confidence", ""),
+            "predicted_probability": pick.get("model_probability", ""),
             "actual_winner": actual_winner or "",
             "was_correct": was_correct,
             "odds": odds,
@@ -180,6 +213,7 @@ def merge_results():
             "matchup": p.get("matchup", ""),
             "lean": lean,
             "confidence": p.get("confidence", ""),
+            "predicted_probability": p.get("predicted_probability", ""),
             "actual_winner": actual_winner,
             "was_correct": was_correct,
             "odds": odds,
