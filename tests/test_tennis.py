@@ -201,6 +201,25 @@ class FitPlayerRatingsTests(unittest.TestCase):
         ratings = fit_player_ratings(results)
         self.assertGreater(ratings["Elite A"], ratings["Padder"])
 
+    def test_stronger_l2_penalty_shrinks_the_rating_gap(self):
+        # This is the actual mechanism WTA_RATING_L2_PENALTY in tennis.py
+        # relies on: a real graded-record finding (WTA "slight favorite"
+        # picks winning far less often than the same odds bucket on ATP --
+        # see the constant's own comment) is corrected by fitting WTA with
+        # a stronger L2 penalty than ATP, not by changing anything
+        # downstream of the fit. If a stronger penalty didn't actually
+        # shrink rating gaps, that fix would be a no-op.
+        results = self._round_robin_results()
+        default_ratings = fit_player_ratings(results, l2_penalty=0.05)
+        stronger_ratings = fit_player_ratings(results, l2_penalty=0.20)
+
+        default_gap = default_ratings["Strong"] - default_ratings["Weak"]
+        stronger_gap = stronger_ratings["Strong"] - stronger_ratings["Weak"]
+
+        self.assertGreater(default_gap, 0)
+        self.assertGreater(stronger_gap, 0)
+        self.assertLess(stronger_gap, default_gap)
+
 
 class ScoringHelperTests(unittest.TestCase):
     def test_rating_score_favors_higher_rating(self):
@@ -271,6 +290,40 @@ class BuildTourReportTests(unittest.TestCase):
             report = build_tour_report("atp")
         self.assertEqual(report["status"], "error")
         self.assertEqual(report["games"], [])
+
+    def test_wta_fits_with_a_stronger_l2_penalty_than_atp(self):
+        # The actual fix under test: build_tour_report() must select
+        # WTA_RATING_L2_PENALTY for "wta" and the regular RATING_L2_PENALTY
+        # for "atp", not the same value for both -- reported in rating_fit
+        # so it's independently verifiable outside this test too.
+        from sports.tennis import RATING_L2_PENALTY, WTA_RATING_L2_PENALTY
+
+        upcoming_payload = _scoreboard_payload(
+            "Test Open", [_comp("game-1", "Strong Player", "Weak Player", type_slug="womens-singles", state="pre")]
+        )
+        players = [f"Filler{i}" for i in range(25)]
+        history_comps = [
+            _comp(f"h{i}", "Strong Player", filler, type_slug="womens-singles", state="post", a_won=True)
+            for i, filler in enumerate(players)
+        ]
+        history_payload = _scoreboard_payload("Season History", history_comps)
+        rankings_payload = {"rankings": [{"ranks": []}]}
+
+        def side_effect(url, params=None, timeout=None):
+            if "rankings" in url:
+                return _mock_response(rankings_payload)
+            start, end = (params or {}).get("dates", "").split("-")
+            from datetime import datetime as dt
+            span_days = (dt.strptime(end, "%Y%m%d") - dt.strptime(start, "%Y%m%d")).days
+            return _mock_response(history_payload if span_days > 100 else upcoming_payload)
+
+        with patch("sports.tennis.requests.get", side_effect=side_effect):
+            wta_report = build_tour_report("wta")
+            atp_report = build_tour_report("atp")
+
+        self.assertEqual(wta_report["rating_fit"]["l2_penalty"], WTA_RATING_L2_PENALTY)
+        self.assertEqual(atp_report["rating_fit"]["l2_penalty"], RATING_L2_PENALTY)
+        self.assertGreater(wta_report["rating_fit"]["l2_penalty"], atp_report["rating_fit"]["l2_penalty"])
 
 
 class GuessSurfaceTests(unittest.TestCase):
