@@ -44,6 +44,31 @@ LOOKAHEAD_DAYS = 3
 LOOKBACK_DAYS = 16
 
 RATING_L2_PENALTY = 0.05
+
+# WTA gets a stronger L2 penalty than ATP -- real graded record (see
+# graded_results.csv, 42 decided WTA picks vs 55 ATP, both fit with the
+# *same* penalty until this change): ATP's -100..-179 "slight favorite"
+# odds bucket went 17-5 (77.3%, +7.67 units) while WTA's identical odds
+# bucket went 5-10 (33.3%, -6.50 units) -- the model was confidently
+# leaning the "better" WTA player in close matches at a rate the real
+# outcomes didn't support, even though WTA's fitted sample is if anything
+# larger than ATP's (713 players/4,764 results vs 473/3,191 at the time
+# this was measured) -- so the problem isn't too little data, it's that
+# the same rating gap means less real predictive signal on the WTA tour
+# (flatter, more parity-driven talent distribution is a well-documented
+# property of the tour, not specific to this dataset). A larger L2 penalty
+# shrinks every fitted rating gap toward zero before it ever reaches
+# _rating_score()/rating_win_probability(), which is the standard,
+# already-existing mechanism in this fit for exactly this kind of
+# overconfidence -- not a new ad-hoc adjustment layered on top of it.
+# 0.20 (4x ATP's) is a reasoned starting point sized to the magnitude of
+# the observed gap, not a value fit against held-out data -- there isn't
+# enough matched (model-probability, real-outcome) history yet to tune it
+# precisely (see bot/dynamic_learning.py's fit_linear_calibration(), which
+# will eventually be able to do that once enough real predicted_probability
+# rows exist). Revisit this constant once that sample exists.
+WTA_RATING_L2_PENALTY = 0.20
+
 MIN_PLAYERS_TO_FIT = 20
 MIN_RESULTS_PER_PLAYER_TO_FIT = 2
 
@@ -377,9 +402,13 @@ def _player_weighted_score(own_rating, opp_rating, own_points, opp_points):
 def build_tour_report(tour: str):
     """Shared builder behind build_atp_report()/build_wta_report() --
     the tour ('atp'/'wta') only changes which matches get included, ranking
-    file fetched, and the reported model name; everything else (rating fit,
-    scoring, calibration) is identical between the two tours."""
+    file fetched, the reported model name, and (as of the WTA-specific
+    overconfidence fix -- see WTA_RATING_L2_PENALTY above) the L2
+    regularization strength used to fit ratings; the fit/scoring/
+    calibration mechanics themselves are otherwise identical between the
+    two tours."""
     generated_at = datetime.now(UTC).isoformat()
+    l2_penalty = WTA_RATING_L2_PENALTY if tour == "wta" else RATING_L2_PENALTY
     try:
         upcoming = [m for m in fetch_upcoming_matches() if m["tour"] == tour]
     except Exception as e:
@@ -400,8 +429,8 @@ def build_tour_report(tour: str):
         # player falls back to the ranking-only factor for this run.
         history = {"atp": [], "wta": []}
     tour_history = history.get(tour, [])
-    ratings = fit_player_ratings(tour_history)
-    surface_ratings = fit_surface_ratings(tour_history)
+    ratings = fit_player_ratings(tour_history, l2_penalty)
+    surface_ratings = fit_surface_ratings(tour_history, l2_penalty)
     rankings = fetch_rankings(tour)
 
     games = []
@@ -496,6 +525,7 @@ def build_tour_report(tour: str):
         "rating_fit": {
             "players_fit": len(ratings),
             "results_used": len(tour_history),
+            "l2_penalty": l2_penalty,
             "surface_fits": {
                 surface: {"players_fit": len(surface_ratings.get(surface) or {})}
                 for surface in SURFACES
@@ -507,6 +537,14 @@ def build_tour_report(tour: str):
             "by surface where enough same-surface data exists) and current ranking points. "
             "Moneyline only. Surface inference is best-effort from tournament names, not an "
             "authoritative feed -- documented simplification. Research only."
+            + (
+                f" Fit with a stronger L2 penalty ({l2_penalty}, vs {RATING_L2_PENALTY} for ATP) "
+                "-- the real graded record showed WTA close-match favorites winning far less "
+                "often than the same odds range on ATP (33.3% vs 77.3% in the -100..-179 odds "
+                "bucket), so ratings are shrunk more aggressively to reduce that overconfidence."
+                if tour == "wta"
+                else ""
+            )
         ),
     }
 

@@ -32,7 +32,15 @@ def _governance_status(report: dict) -> str:
 
 def _backtest_summary(report: dict) -> dict:
     summary = report.get("summary", report)
-    total = int(summary.get("total_bets", summary.get("graded_bets", 0)) or 0)
+    # bot/backtesting_engine.py's real report has no "summary" wrapper and
+    # counts decided bets under the key "bets" (confirmed against its own
+    # output and tests/test_backtesting_engine.py, used the same way at
+    # both top level and report["latest"]["bets"]) -- "total_bets" and
+    # "graded_bets" were never real keys it produces. Without this fallback
+    # this check always read 0 regardless of how many bets were actually
+    # graded, silently keeping historical_backtest_validation permanently
+    # blocked no matter how much real data accumulated.
+    total = int(summary.get("total_bets", summary.get("graded_bets", summary.get("bets", 0))) or 0)
     roi = summary.get("roi", summary.get("roi_pct"))
     try:
         roi_value = float(roi)
