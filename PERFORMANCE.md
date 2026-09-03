@@ -5,9 +5,11 @@ fix, for anyone picking this project up. Every number below is computed
 directly from the files named in [Methodology](#methodology) &mdash; nothing
 here is illustrative.
 
-**Snapshot as of 2026-09-01:** 111 graded picks &middot; 62&ndash;49 (55.9%) &middot;
-**net &minus;8.79 units** (flat 1-unit staking) &middot; betting readiness gate
-**70/100, not ready**.
+**Snapshot as of 2026-09-03:** 114 graded picks &middot; 65&ndash;49 (57.0%) &middot;
+**net &minus;6.83 units** (flat 1-unit staking) &middot; betting readiness gate
+**70/100, not ready**. (Sport/odds-bucket/confidence tables below are a
+2026-09-01 snapshot and haven't been fully re-run since -- treat exact
+figures there as slightly dated relative to the headline above.)
 
 Win rate alone looks fine. Net profit says otherwise &mdash; that gap is the
 subject of this whole page.
@@ -113,6 +115,40 @@ are two examples. Same direction `research_mlb_regression.py`'s
 starting-pitcher finding pointed toward: more real features beat a thinner
 signal. Not something to build on a 14-pick sample, but a real,
 evidence-backed direction to come back to.
+
+## Closing line value (CLV)
+
+![Closing line value: % of picks that beat the close](docs/performance-charts/clv-beat-rate-by-sport.svg)
+
+Added 2026-09-03. CLV -- whether a pick's price was better than the market's
+closing price -- is the metric professional bettors trust over win rate,
+because it's knowable at bet time rather than after the game finishes.
+`logs/market_line_history.csv` had been accumulating real historical odds
+snapshots the whole time (49k+ rows), but nothing ever captured a closing
+price for a graded pick, so CLV silently computed as a meaningless 0.0 for
+every row. `bot/closing_line.py` fixes that going forward, and
+`backfill_closing_line.py` retroactively filled it for 113 of the 114
+picks graded before the fix existed (matched by normalized matchup, not
+game_id -- a pick's game_id and the odds history's game_id come from
+different providers and never agree, the same cross-provider mismatch
+already solved for player props).
+
+| Sport | Beat close | Record | Note |
+|---|---:|---:|---|
+| WTA tennis | 68.0% | 17/25 | |
+| ATP tennis | 66.7% | 30/45 | |
+| **Overall** | **62.5%** | **50/80** | inside the 60-65%+ range cited as a real-edge benchmark |
+| MLB | 28.6% | 2/7 | too small to read |
+| UFC | 0.0% | 0/2 | too small to read |
+| Leagues Cup | 100.0% | 1/1 | too small to read |
+
+This is the first metric all session that reads as structurally positive
+despite net-negative realized P&L -- exactly what CLV is supposed to
+separate from short-run variance. One honest caveat: this isn't a true
+closing line, it's the last odds snapshot the pipeline happened to capture
+before each game, which can be meaningfully stale on a day the pipeline
+only ran once early. Treat this as a real, positive, but still
+approximate signal -- not final proof of edge.
 
 ## Confidence calibration
 
