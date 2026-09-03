@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 270" font-family="Arial, Helvetica, sans-serif">
+  <rect x="0" y="0" width="760" height="270" rx="10" fill="#ffffff" stroke="#e1e0d9" stroke-width="1"/>
+  <text x="24" y="34" font-size="19" font-weight="800" fill="#14161C">Confidence calibration: target vs actual win rate</text>
+  <text x="24" y="52" font-size="12.5" fill="#5B6472">"High" should beat "Medium" &#8212; it doesn't (confidence_monotonicity_violation: High_below_Medium)</text>
+
+  <g>
+    <rect x="24" y="62" width="14" height="14" rx="3" fill="#0ca30c"/>
+    <text x="43" y="73" font-size="12.5" fill="#5B6472">Actual (meets/beats target)</text>
+    <rect x="220" y="62" width="14" height="14" rx="3" fill="#d03b3b"/>
+    <text x="239" y="73" font-size="12.5" fill="#5B6472">Actual (below target)</text>
+    <rect x="392" y="66" width="3" height="8" fill="#14161C"/>
+    <text x="402" y="73" font-size="12.5" fill="#5B6472">Target win rate</text>
+  </g>
+
+  <!-- Medium: actual 66.7%, target 56%, n=3 -->
+  <text x="24" y="118" font-size="13" font-weight="700" font-family="Consolas, 'SFMono-Regular', Menlo, monospace" fill="#006300">MEDIUM</text>
+  <rect x="140" y="102" width="480" height="24" rx="5" fill="#f4f3ef" stroke="#e1e0d9"/>
+  <rect x="140" y="102" width="320.2" height="24" rx="5" fill="#0ca30c"/>
+  <rect x="408.8" y="98" width="3" height="32" fill="#14161C"/>
+  <text x="330" y="118" font-size="12" font-weight="700" text-anchor="middle" font-family="Consolas, 'SFMono-Regular', Menlo, monospace" fill="#ffffff">66.7%</text>
+  <text x="630" y="118" font-size="12" font-family="Consolas, 'SFMono-Regular', Menlo, monospace" fill="#5B6472">n=3</text>
+
+  <!-- High: actual 55.6%, target 60%, n=18 -->
+  <text x="24" y="178" font-size="13" font-weight="700" font-family="Consolas, 'SFMono-Regular', Menlo, monospace" fill="#d03b3b">HIGH</text>
+  <rect x="140" y="162" width="480" height="24" rx="5" fill="#f4f3ef" stroke="#e1e0d9"/>
+  <rect x="140" y="162" width="266.9" height="24" rx="5" fill="#d03b3b"/>
+  <text x="286" y="178" font-size="12" font-weight="700" text-anchor="middle" font-family="Consolas, 'SFMono-Regular', Menlo, monospace" fill="#ffffff">55.6%</text>
+  <rect x="428" y="158" width="3" height="32" fill="#14161C"/>
+  <text x="630" y="178" font-size="12" font-family="Consolas, 'SFMono-Regular', Menlo, monospace" fill="#5B6472">n=18</text>
+
+  <line x1="140" y1="200" x2="620" y2="200" stroke="#c3c2b7" stroke-width="1"/>
+  <text x="140" y="216" font-size="10.5" text-anchor="middle" fill="#898781" font-family="Consolas, 'SFMono-Regular', Menlo, monospace">0%</text>
+  <text x="380" y="216" font-size="10.5" text-anchor="middle" fill="#898781" font-family="Consolas, 'SFMono-Regular', Menlo, monospace">50%</text>
+  <text x="620" y="216" font-size="10.5" text-anchor="middle" fill="#898781" font-family="Consolas, 'SFMono-Regular', Menlo, monospace">100%</text>
+
+  <text x="24" y="248" font-size="11.5" fill="#B97A1F" font-weight="700">Only 21 of 111 graded picks (19%) carry a confidence label at all &#8212; 90 rows never got one logged.</text>
+</svg>

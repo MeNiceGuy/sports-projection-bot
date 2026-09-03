@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 442" font-family="Arial, Helvetica, sans-serif">
+  <rect x="0" y="0" width="760" height="442" rx="10" fill="#ffffff" stroke="#e1e0d9" stroke-width="1"/>
+  <text x="24" y="34" font-size="19" font-weight="800" fill="#14161C">Same model, same odds range, opposite outcome</text>
+  <text x="24" y="52" font-size="12.5" fill="#5B6472">ATP vs WTA net profit (units), grouped by the odds actually taken &#8212; identical Bradley&#8211;Terry fit for both tours</text>
+
+  <g>
+    <rect x="24" y="62" width="11" height="11" rx="2" fill="#2a78d6"/>
+    <text x="40" y="71.5" font-size="12.5" fill="#5B6472">ATP</text>
+    <rect x="80" y="62" width="11" height="11" rx="2" fill="#eb6834"/>
+    <text x="96" y="71.5" font-size="12.5" fill="#5B6472">WTA</text>
+  </g>
+
+  <g transform="translate(20,88)">
+    <line x1="60" y1="157" x2="700" y2="157" stroke="#898781" stroke-width="1.4"/>
+
+    <!-- underdog: ATP +4.17, WTA -3.69 -->
+    <rect x="96" y="103" width="40" height="54" rx="4" fill="#2a78d6"/>
+    <text x="116" y="96" font-size="12" font-weight="700" text-anchor="middle" font-family="Consolas, 'SFMono-Regular', Menlo, monospace" fill="#2a78d6">+4.17</text>
+    <rect x="144" y="157" width="40" height="48" rx="4" fill="#eb6834"/>
+    <text x="164" y="221" font-size="12" font-weight="700" text-anchor="middle" font-family="Consolas, 'SFMono-Regular', Menlo, monospace" fill="#eb6834">&#8722;3.69</text>
+
+    <!-- slight favorite: ATP +7.667, WTA -6.496 -->
+    <rect x="256" y="58" width="40" height="99" rx="4" fill="#2a78d6"/>
+    <text x="276" y="51" font-size="12" font-weight="700" text-anchor="middle" font-family="Consolas, 'SFMono-Regular', Menlo, monospace" fill="#2a78d6">+7.67</text>
+    <rect x="304" y="157" width="40" height="84" rx="4" fill="#eb6834"/>
+    <text x="324" y="257" font-size="12" font-weight="700" text-anchor="middle" font-family="Consolas, 'SFMono-Regular', Menlo, monospace" fill="#eb6834">&#8722;6.50</text>
+
+    <!-- moderate favorite: ATP -5.39, WTA -1.774 -->
+    <rect x="416" y="157" width="40" height="70" rx="4" fill="#d03b3b"/>
+    <text x="436" y="243" font-size="12" font-weight="700" text-anchor="middle" font-family="Consolas, 'SFMono-Regular', Menlo, monospace" fill="#d03b3b">&#8722;5.39</text>
+    <rect x="464" y="157" width="40" height="23" rx="4" fill="#d03b3b"/>
+    <text x="484" y="196" font-size="12" font-weight="700" text-anchor="middle" font-family="Consolas, 'SFMono-Regular', Menlo, monospace" fill="#d03b3b">&#8722;1.77</text>
+
+    <!-- heavy favorite: ATP -0.534, WTA -0.104 -->
+    <rect x="576" y="157" width="40" height="7" rx="3" fill="#d03b3b"/>
+    <text x="596" y="180" font-size="12" font-weight="700" text-anchor="middle" font-family="Consolas, 'SFMono-Regular', Menlo, monospace" fill="#d03b3b">&#8722;0.53</text>
+    <rect x="624" y="157" width="40" height="2" rx="1" fill="#d03b3b"/>
+    <text x="644" y="175" font-size="12" font-weight="700" text-anchor="middle" font-family="Consolas, 'SFMono-Regular', Menlo, monospace" fill="#d03b3b">&#8722;0.10</text>
+
+    <text x="140" y="292" font-size="11.5" font-weight="700" text-anchor="middle" fill="#5B6472">UNDERDOG</text>
+    <text x="140" y="307" font-size="11" text-anchor="middle" fill="#898781">(+odds)</text>
+    <text x="300" y="292" font-size="11.5" font-weight="800" text-anchor="middle" fill="#B97A1F">SLIGHT FAVORITE</text>
+    <text x="300" y="307" font-size="11" text-anchor="middle" fill="#898781">(&#8722;100 to &#8722;179)</text>
+    <text x="460" y="292" font-size="11.5" font-weight="700" text-anchor="middle" fill="#5B6472">MODERATE FAVORITE</text>
+    <text x="460" y="307" font-size="11" text-anchor="middle" fill="#898781">(&#8722;180 to &#8722;299)</text>
+    <text x="620" y="292" font-size="11.5" font-weight="700" text-anchor="middle" fill="#5B6472">HEAVY FAVORITE</text>
+    <text x="620" y="307" font-size="11" text-anchor="middle" fill="#898781">(&#8804; &#8722;300)</text>
+  </g>
+
+  <text x="24" y="430" font-size="11.5" fill="#B97A1F" font-weight="700">Slight favorites: ATP 17&#8211;5 (77.3%) vs WTA 5&#8211;10 (33.3%) &#8212; not a data gap (WTA's fit sample is larger).</text>
+</svg>
