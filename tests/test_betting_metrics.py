@@ -125,6 +125,20 @@ class BettingMetricsTests(unittest.TestCase):
         self.assertEqual(report["negative_clv_bets"], 1)
         self.assertEqual(report["status"], "needs_more_results")
 
+    def test_clv_tracking_report_excludes_unsettled_placeholder_rows(self):
+        # save_best_bets.py inserts opening_odds == closing_odds for every
+        # prop at insert time (real closing-price capture for props doesn't
+        # exist) -- a PENDING/DATA_ERROR row's "0.0 CLV" is placeholder
+        # noise, not a real flat closing line, and must not count.
+        report = clv_tracking_report([
+            {"opening_odds": "-148", "closing_odds": "-148", "result": "PENDING"},
+            {"opening_odds": "-148", "closing_odds": "-148", "result": "DATA_ERROR"},
+            {"opening_odds": "+120", "closing_odds": "-110", "result": "WIN"},
+        ])
+
+        self.assertEqual(report["tracked_bets"], 1)
+        self.assertEqual(report["positive_clv_bets"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()
