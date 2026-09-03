@@ -144,6 +144,20 @@ def closing_line_value(opening_odds, closing_odds, side: str = "same"):
 def clv_tracking_report(rows: list[dict]):
     tracked = []
     for row in rows:
+        # save_best_bets.py inserts opening_odds/closing_odds both equal to
+        # the fetch-time odds for every prop (real closing-price capture for
+        # props doesn't exist yet, unlike bot/closing_line.py's moneyline
+        # path) -- caught live via bot/model_governance.py reporting 142
+        # "tracked" CLV bets, all flat at exactly 0.0, which is what
+        # opening==closing by construction produces, not real market
+        # movement. UNSETTLED_RESULTS (PENDING/DATA_ERROR) rows are pure
+        # placeholder noise on top of that and get excluded the same way
+        # run_clv_report.py already excludes them; a still-open exercise
+        # rather than a fixed gap is that even a genuinely SETTLED prop's
+        # "CLV" is meaningless until something actually captures a real
+        # closing price for it.
+        if str(row.get("result") or "").strip().upper() in UNSETTLED_RESULTS:
+            continue
         opening_odds = row.get("opening_odds") or row.get("odds")
         closing_odds = row.get("closing_odds")
         if closing_odds in (None, ""):
