@@ -473,6 +473,82 @@ class AutoGradeFromPickLedgerTests(unittest.TestCase):
         self.assertEqual(added, 0)
         self.assertEqual(rows, {})
 
+    def test_closing_line_value_is_computed_from_market_line_history(self):
+        # Real end-to-end wiring check: a pick made at -148, a later real
+        # market snapshot closing at -170 (the side got shorter -- the pick
+        # was made before the market moved toward it, real positive CLV).
+        pick_ledger_rows = {
+            ("ufc", "401886039"): {
+                "sport": "ufc", "game_id": "401886039", "matchup": "Quillan Salkilld at Mateusz Gamrot",
+                "side": "Quillan Salkilld", "odds": "-148", "decision_tier": "premium",
+                "recorded_at": "2026-08-07T15:19:04+00:00",
+            },
+        }
+        history_rows = [{
+            # game_id deliberately does NOT match the pick's ESPN-sourced id
+            # (401886039) -- market_line_history.csv's id is SharpAPI's own
+            # scheme, confirmed live to never agree across any sport. Only
+            # the matchup should connect these.
+            "sport": "ufc", "market": "h2h", "game_id": "ufc_quillansalkilld_mateuszgamrot_2026-08-07_b1",
+            "matchup": "Quillan Salkilld at Mateusz Gamrot", "side_a": "Quillan Salkilld",
+            "side_b": "Mateusz Gamrot", "odds_a": "-170", "odds_b": "150",
+            "timestamp": "2026-08-07T23:00:00Z",
+        }]
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            graded = tmp_path / "graded_results.csv"
+            write_csv(graded, merge_results_module.FIELDNAMES, [])
+            preds = tmp_path / "prediction_log.csv"
+            write_csv(preds, ["generated_at", "sport", "game_id", "matchup", "lean", "confidence"], [])
+            results = tmp_path / "results_ingest_template.csv"
+            write_csv(results, ["sport", "game_id", "matchup", "actual_winner", "game_completed", "notes"], [])
+
+            with (
+                patch.object(merge_results_module, "GRADED_RESULTS", graded),
+                patch.object(merge_results_module, "PREDICTION_LOG", preds),
+                patch.object(merge_results_module, "RESULTS_TEMPLATE", results),
+                patch.object(merge_results_module, "read_pick_ledger", return_value=pick_ledger_rows),
+                patch.object(merge_results_module, "read_history_rows", return_value=history_rows),
+                patch.object(merge_results_module, "fetch_real_result", return_value=(True, "Quillan Salkilld")),
+            ):
+                merge_results_module.merge_results()
+
+            rows = {r["game_id"]: r for r in merge_results_module.read_csv(graded)}
+            self.assertEqual(rows["401886039"]["closing_odds"], "-170.0")
+            self.assertNotEqual(rows["401886039"]["clv_probability_points"], "")
+
+    def test_no_market_history_match_leaves_closing_fields_blank(self):
+        pick_ledger_rows = {
+            ("ufc", "999999"): {
+                "sport": "ufc", "game_id": "999999", "matchup": "A at B",
+                "side": "A", "odds": "-148", "decision_tier": "premium",
+                "recorded_at": "2026-08-07T15:19:04+00:00",
+            },
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            graded = tmp_path / "graded_results.csv"
+            write_csv(graded, merge_results_module.FIELDNAMES, [])
+            preds = tmp_path / "prediction_log.csv"
+            write_csv(preds, ["generated_at", "sport", "game_id", "matchup", "lean", "confidence"], [])
+            results = tmp_path / "results_ingest_template.csv"
+            write_csv(results, ["sport", "game_id", "matchup", "actual_winner", "game_completed", "notes"], [])
+
+            with (
+                patch.object(merge_results_module, "GRADED_RESULTS", graded),
+                patch.object(merge_results_module, "PREDICTION_LOG", preds),
+                patch.object(merge_results_module, "RESULTS_TEMPLATE", results),
+                patch.object(merge_results_module, "read_pick_ledger", return_value=pick_ledger_rows),
+                patch.object(merge_results_module, "read_history_rows", return_value=[]),
+                patch.object(merge_results_module, "fetch_real_result", return_value=(True, "A")),
+            ):
+                merge_results_module.merge_results()
+
+            rows = {r["game_id"]: r for r in merge_results_module.read_csv(graded)}
+            self.assertEqual(rows["999999"]["closing_odds"], "")
+            self.assertEqual(rows["999999"]["clv_probability_points"], "")
+
     def test_predicted_probability_carries_through_from_pick_ledger(self):
         pick_ledger_rows = {
             ("ufc", "401886039"): {
