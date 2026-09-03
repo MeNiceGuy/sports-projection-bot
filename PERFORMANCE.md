@@ -59,6 +59,61 @@ WTA's fitted rating spread (stdev) dropped from 1.62 to 1.00. **The record
 above predates the fix** &mdash; none of these graded picks ran under the
 corrected model. Re-pull this table after WTA picks accumulate under it.
 
+## External research context
+
+While investigating why "High confidence" picks underperform (see above),
+checked the same odds-bucket breakdown against the two sports with priced
+picks outside tennis's strong "slight favorite" range. Both point at the
+same root cause -- model overconfidence on favorites, not the gate logic
+(`rate_decision()` in `bot/market_compare.py` already requires >=5-7%
+edge and positive EV; the thin-edge favorite picks were clearing that bar
+on the model's own probability, which is the actual problem).
+
+**Tennis: the literature says favorites should be *good* value, which makes
+our result more concerning, not less.** The
+[favorite-longshot bias](https://en.wikipedia.org/wiki/Favourite-longshot_bias)
+is one of the most-studied anomalies in betting markets -- bookmakers load
+their margin disproportionately onto longshots, so favorites are typically
+systematically *underpriced* relative to fair probability.
+[Pinnacle's research across 56,004 ATP/WTA matches (2011-2022)](https://www.pinnacle.com/betting-resources/en/predictions/tennis)
+confirms this holds in tennis specifically, and is *stronger* for
+lower-ranked players and bigger tournaments -- exactly the kind of matches
+in our own sample. That means market structure should be helping our
+moderate/heavy-favorite picks, not hurting them. Losing money there anyway
+points at our own probability estimate being overconfident on those
+matchups, not a market headwind -- the same diagnosis
+`WTA_RATING_L2_PENALTY` already targets, and a case for extending a similar
+correction to ATP's moderate-favorite segment specifically, once there's
+enough graded sample to justify it (see
+[How efficient is the ATP tennis betting market? -- Pinnacle](https://www.pinnacle.com/betting-resources/en/Tennis/how-efficient-is-the-atp-tennis-betting-market/URU25K89X26GMH62)).
+
+**MLB may be structurally different -- worth remembering before assuming
+it's the same bug.** All 7 priced MLB picks in the current graded sample
+sit in the "slight favorite" bucket (2-5, -3.62u) -- the same range that's
+tennis's strongest segment. There's genuine, documented academic
+disagreement on MLB specifically:
+[Woodland and Woodland (1994)](https://www.tandfonline.com/doi/abs/10.1080/00036840110095427)
+found a *reverse* favorite-longshot bias in MLB moneylines (bettors
+over-bet favorites, making them systematically bad value -- the opposite
+of tennis's pattern), and more recent work is mixed (see also
+[Swing and a Miss: Behavioral Biases in MLB Betting Markets -- Harvard](https://dash.harvard.edu/bitstreams/81e73570-084b-4e39-84d3-ccb4649c61ab/download)).
+n=7 is nowhere near enough to conclude anything on its own, but this is
+independent, external support that MLB's struggle here might partly
+reflect something real about baseball betting markets, not purely a flaw
+in our own fit -- don't reach for the same fix that worked for WTA without
+checking MLB's own mechanism first.
+
+**A direction worth revisiting once there's more data, not now:** several
+actively-maintained open-source tennis prediction projects layer a
+gradient-boosted ensemble (Random Forest/XGBoost) on top of Elo/
+Bradley-Terry ratings rather than using the rating alone --
+[tennis-elo-vs-ml](https://github.com/rorybunker/tennis-elo-vs-ml) and
+[Tennis-match-prediction-model](https://github.com/nrccstat/Tennis-match-prediction-model)
+are two examples. Same direction `research_mlb_regression.py`'s
+starting-pitcher finding pointed toward: more real features beat a thinner
+signal. Not something to build on a 14-pick sample, but a real,
+evidence-backed direction to come back to.
+
 ## Confidence calibration
 
 ![Confidence calibration: target vs actual win rate](docs/performance-charts/confidence-calibration.svg)
