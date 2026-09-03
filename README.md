@@ -2,6 +2,8 @@
 
 A multi-sport projection and edge-research bot scaffold using public/open data where available. Under active study and upgrade -- see [Track record to date](#track-record-to-date) for the current graded sample and [Important note](#important-note) for how to read it.
 
+**Current performance:** 111 graded picks, 62-49 (55.9%), net **-8.79 units**. Win rate looks fine; profit doesn't -- see **[PERFORMANCE.md](PERFORMANCE.md)** for the full breakdown with charts (profit by sport, the ATP-vs-WTA calibration finding, readiness-gate status).
+
 **New here?** [HOW_TO_RUN.txt](HOW_TO_RUN.txt) has full setup (clone, venv, dependencies, config/API keys) and the complete step-by-step command list. `legacy/` holds an older, unmaintained iteration of the bet-tracking layer that isn't part of the current pipeline -- see [legacy/README.md](legacy/README.md).
 
 ## Current status
