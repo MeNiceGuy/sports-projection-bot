@@ -50,6 +50,8 @@ This is a sports research tool, not a guaranteed winning system. It is under act
 Current NBA and MLB outputs now include clearer edge-band labeling so weak projections are easier to separate from stronger leans.
 
 ## Track record to date
+**For the current full breakdown (111 graded picks as of 2026-09-01, profit by sport, the ATP/WTA calibration finding, and readiness-gate status with charts) see [PERFORMANCE.md](PERFORMANCE.md).** The table immediately below is a much smaller, earlier snapshot (12 picks, 2026-08-09) kept for the `model_era` methodology it documents -- it substantially predates, and reads more favorably than, the current record.
+
 Graded results are tracked in `logs/graded_results.csv` (gitignored, local only) and tagged with a `model_era` so a decision-logic change (e.g. the moneyline suspicious-edge guard added 2026-08-03) doesn't get unfairly credited or blamed for picks made under the old logic. As of 2026-08-09:
 
 | Era | Record | Profit (flat 1u/bet) |
