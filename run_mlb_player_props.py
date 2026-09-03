@@ -8,6 +8,7 @@ import requests
 from dotenv import load_dotenv
 
 from bot.odds_api_events import build_matchup_event_map
+from bot.prop_history import append_prop_history
 
 # Without this, THE_ODDS_API_KEY/MLB_PLAYER_PROPS_MAX_AGE_MINUTES/
 # MLB_PLAYER_PROPS_MAX_EVENTS are only visible here if set as real OS
@@ -144,7 +145,10 @@ def main():
         writer.writeheader()
         writer.writerows(rows)
 
+    history_appended = append_prop_history(rows, "mlb")
+
     print(f"mlb player props written: {len(rows)}")
+    print(f"prop history appended: {history_appended}")
     print(OUT)
 
 
