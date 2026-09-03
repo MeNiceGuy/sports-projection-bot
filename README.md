@@ -2,9 +2,42 @@
 
 A multi-sport projection and edge-research bot scaffold using public/open data where available. Under active study and upgrade -- see [Track record to date](#track-record-to-date) for the current graded sample and [Important note](#important-note) for how to read it.
 
-**Current performance:** 111 graded picks, 62-49 (55.9%), net **-8.79 units**. Win rate looks fine; profit doesn't -- see **[PERFORMANCE.md](PERFORMANCE.md)** for the full breakdown with charts (profit by sport, the ATP-vs-WTA calibration finding, readiness-gate status).
-
 **New here?** [HOW_TO_RUN.txt](HOW_TO_RUN.txt) has full setup (clone, venv, dependencies, config/API keys) and the complete step-by-step command list. `legacy/` holds an older, unmaintained iteration of the bet-tracking layer that isn't part of the current pipeline -- see [legacy/README.md](legacy/README.md).
+
+## Contents
+- [Current performance](#current-performance)
+- [Current status](#current-status)
+- [Goal](#goal)
+- [Important note](#important-note)
+- [Track record to date](#track-record-to-date)
+  - [Grading is automatic now](#grading-is-automatic-now)
+- [Finished model stack](#finished-model-stack)
+- [Market-aware decision layer](#market-aware-decision-layer)
+- [Spreads and totals](#spreads-and-totals)
+- [Upgraded bet-selection filters](#upgraded-bet-selection-filters)
+  - [Draw pricing (Leagues Cup)](#draw-pricing-leagues-cup)
+  - [Why regression, here specifically](#why-regression-here-specifically)
+- [Model governance layer](#model-governance-layer)
+- [AI advisor](#ai-advisor)
+- [Finished deliverables](#finished-deliverables)
+- [Advanced analytics layer](#advanced-analytics-layer)
+- [Player props: NBA and MLB parity](#player-props-nba-and-mlb-parity)
+- [MLB props: opponent-handedness matchup context](#mlb-props-opponent-handedness-matchup-context)
+
+## Current performance
+111 graded picks, 62-49 (55.9%), net **-8.79 units** as of 2026-09-01. Win rate looks fine on its own; profit doesn't -- these three charts are why. Full tables and methodology (exact source file/field for every number): **[PERFORMANCE.md](PERFORMANCE.md)**.
+
+<img src="docs/performance-charts/profit-by-sport.svg" alt="Net profit by sport -- ATP tennis +5.91u, Leagues Cup +1.00u, UFC +0.13u, WNBA -0.15u, MLB -3.62u, WTA tennis -12.07u" width="700">
+
+WTA tennis alone outweighs the portfolio's entire net loss -- exclude it and the record reads +3.27u, not -8.79u.
+
+<img src="docs/performance-charts/atp-vs-wta-odds-bucket.svg" alt="ATP vs WTA net profit by odds bucket -- same model, opposite outcome in the slight-favorite range" width="700">
+
+Same Bradley-Terry rating fit, same "slight favorite" odds range (-100 to -179): ATP goes 17-5 (+7.67u), WTA goes 5-10 (-6.50u). Traced to a structural overconfidence issue, not a data gap -- fixed 2026-09-01 (`WTA_RATING_L2_PENALTY` in `sports/tennis.py`), though the record above predates the fix.
+
+<img src="docs/performance-charts/confidence-calibration.svg" alt="Confidence calibration: target vs actual win rate for Medium and High confidence labels" width="700">
+
+`reports/model_governance_report.json` flags this as `confidence_monotonicity_violation: High_below_Medium` -- "High confidence" picks should win more than "Medium confidence" ones, and currently don't.
 
 ## Current status
 - shared projection architecture
