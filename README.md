@@ -39,6 +39,10 @@ Same Bradley-Terry rating fit, same "slight favorite" odds range (-100 to -179):
 
 `reports/model_governance_report.json` flags this as `confidence_monotonicity_violation: High_below_Medium` -- "High confidence" picks should win more than "Medium confidence" ones, and currently don't.
 
+<img src="docs/performance-charts/clv-beat-rate-by-sport.svg" alt="Closing line value: percent of picks that beat the close, by sport" width="700">
+
+62.5% of graded picks beat the closing line (n=80) -- tennis specifically at 66.7% (ATP) and 68.0% (WTA), inside the 60-65%+ range research cites as a real-edge benchmark. The first metric this session that reads as structurally positive despite net-negative realized P&L -- exactly what CLV is supposed to separate from short-run variance. Added 2026-09-03 (`bot/closing_line.py`); MLB/UFC/Leagues Cup samples are far too small to read yet.
+
 ## Current status
 - shared projection architecture
 - NBA, MLB, WNBA, NFL, UFC, Leagues Cup, ATP/WTA tennis, NHL, NCAAB, and NCAAF active
