@@ -4,7 +4,8 @@ import csv
 import sqlite3
 from pathlib import Path
 
-from bot.betting_metrics import expected_profit_per_unit
+from bot.betting_metrics import closing_line_value, expected_profit_per_unit
+from bot.closing_line import lookup_closing_odds, read_history_rows
 from bot.pick_ledger import lookup_pick, read_existing as read_pick_ledger
 from bot.result_fetcher import fetch_real_result
 
@@ -14,7 +15,26 @@ RESULTS_TEMPLATE = ROOT / "logs" / "results_ingest_template.csv"
 GRADED_RESULTS = ROOT / "logs" / "graded_results.csv"
 WAREHOUSE_DB = ROOT / "logs" / "bets.db"
 
-FIELDNAMES = ["generated_at", "sport", "game_id", "matchup", "lean", "confidence", "predicted_probability", "actual_winner", "was_correct", "odds", "profit_units", "grading_note", "model_era"]
+FIELDNAMES = ["generated_at", "sport", "game_id", "matchup", "lean", "confidence", "predicted_probability", "actual_winner", "was_correct", "odds", "closing_odds", "clv_probability_points", "profit_units", "grading_note", "model_era"]
+
+
+def _closing_line_fields(sport: str, matchup: str, side: str, odds, history_rows: list[dict], game_id: str = ""):
+    """closing_odds + clv_probability_points for one graded pick, or blanks
+    when no real closing snapshot could be found -- see
+    bot/closing_line.py::lookup_closing_odds for why this is a best-effort
+    approximation (last snapshot captured, not a guaranteed true close), why
+    matching is by matchup rather than game_id, and why a miss returns
+    nothing rather than a guess. Requires the pick's own opening `odds` to
+    already be known; without that there's nothing to compare a closing
+    price against."""
+    if not odds:
+        return "", ""
+    closing = lookup_closing_odds(sport, matchup, side, game_id=game_id, rows=history_rows)
+    if closing is None:
+        return "", ""
+    clv = closing_line_value(odds, closing)
+    clv_points = clv.get("clv_probability_points")
+    return closing, (clv_points if clv_points is not None else "")
 
 # Bump this after a change meaningful enough that past graded results shouldn't
 # be judged by the same standard as new ones (e.g. the moneyline suspicious-
@@ -102,7 +122,7 @@ def _load_warehouse_predictions(keys_needed: set[tuple[str, str]]):
     return out
 
 
-def _auto_grade_from_pick_ledger(already_graded: set[tuple[str, str]]):
+def _auto_grade_from_pick_ledger(already_graded: set[tuple[str, str]], history_rows: list[dict] | None = None):
     """Automatically grade every actionable pick (bot/pick_ledger.py's
     append-only pick_odds_log.csv -- every premium/watchlist pick this
     pipeline has ever actually flagged) against its real live result, for
@@ -139,6 +159,8 @@ def _auto_grade_from_pick_ledger(already_graded: set[tuple[str, str]]):
         if actual_winner is None:
             note += " -- real draw, no side wins a straight moneyline pick"
 
+        closing_odds, clv_points = _closing_line_fields(sport, pick.get("matchup", ""), side, odds, history_rows or [], game_id=game_id)
+
         graded[key] = {
             "generated_at": pick.get("recorded_at", ""),
             "sport": sport,
@@ -150,6 +172,8 @@ def _auto_grade_from_pick_ledger(already_graded: set[tuple[str, str]]):
             "actual_winner": actual_winner or "",
             "was_correct": was_correct,
             "odds": odds,
+            "closing_odds": closing_odds,
+            "clv_probability_points": clv_points,
             "profit_units": profit_units,
             "grading_note": note,
             "model_era": CURRENT_MODEL_ERA,
@@ -170,6 +194,12 @@ def merge_results():
     """
     existing_rows = read_csv(GRADED_RESULTS)
     existing_by_key = {(r.get("sport", ""), r.get("game_id", "")): r for r in existing_rows}
+
+    # Read once, not once per pick -- logs/market_line_history.csv is a
+    # real, append-only log of every odds fetch this pipeline has ever run
+    # (tens of thousands of rows already), so re-parsing it inside a
+    # per-pick loop would be real, avoidable I/O cost on every grading run.
+    history_rows = read_history_rows()
 
     preds = read_csv(PREDICTION_LOG)
     results = read_csv(RESULTS_TEMPLATE)
@@ -206,6 +236,8 @@ def merge_results():
         else:
             profit_units = None
 
+        closing_odds, clv_points = _closing_line_fields(p.get("sport", ""), p.get("matchup", ""), lean, odds, history_rows, game_id=p.get("game_id", ""))
+
         existing_by_key[key] = {
             "generated_at": p.get("generated_at", ""),
             "sport": p.get("sport", ""),
@@ -217,13 +249,15 @@ def merge_results():
             "actual_winner": actual_winner,
             "was_correct": was_correct,
             "odds": odds,
+            "closing_odds": closing_odds,
+            "clv_probability_points": clv_points,
             "profit_units": profit_units,
             "grading_note": r.get("notes", "manual result merge"),
             "model_era": CURRENT_MODEL_ERA,
         }
         added += 1
 
-    auto_graded = _auto_grade_from_pick_ledger(set(existing_by_key))
+    auto_graded = _auto_grade_from_pick_ledger(set(existing_by_key), history_rows)
     existing_by_key.update(auto_graded)
     added += len(auto_graded)
 
