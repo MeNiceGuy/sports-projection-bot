@@ -65,17 +65,35 @@ class ModelGovernanceTests(unittest.TestCase):
         self.assertIsNotNone(diagnostics["calibration_intercept"])
         self.assertEqual(diagnostics["status"], "needs_more_results")
 
-    def test_calibration_flags_monotonic_confidence_violation(self):
-        rows = [
-            {"confidence": "Low", "was_correct": "true"},
-            {"confidence": "High", "was_correct": "false"},
-        ]
+    def test_calibration_flags_monotonic_confidence_violation_once_both_buckets_are_sampled_enough(self):
+        # 30 apiece (MIN_BUCKET_SAMPLE) so both buckets report sample_status
+        # "ready" -- a real violation, not noise, should still be caught.
+        rows = (
+            [{"confidence": "Low", "was_correct": "true"}] * 30
+            + [{"confidence": "High", "was_correct": "false"}] * 20
+            + [{"confidence": "High", "was_correct": "true"}] * 10
+        )
 
         calibration = build_calibration(rows)
 
         self.assertIn("High_below_Low", calibration["monotonic_violations"])
         self.assertIn("50-55%", calibration["probability_buckets"])
-        self.assertEqual(calibration["validation_readiness"]["status"], "blocked_until_more_results")
+
+    def test_calibration_does_not_flag_a_violation_from_an_under_sampled_bucket(self):
+        # Same shape as a real production case: High has 25 (below
+        # MIN_BUCKET_SAMPLE) and Medium has only 3 -- neither bucket's
+        # accuracy is reliable, so a lower accuracy on either side must not
+        # be reported as a confidence-ordering violation.
+        rows = (
+            [{"confidence": "High", "was_correct": "true"}] * 16
+            + [{"confidence": "High", "was_correct": "false"}] * 9
+            + [{"confidence": "Medium", "was_correct": "true"}] * 2
+            + [{"confidence": "Medium", "was_correct": "false"}] * 1
+        )
+
+        calibration = build_calibration(rows)
+
+        self.assertEqual(calibration["monotonic_violations"], [])
 
     def test_market_inefficiency_filters_positive_fresh_ev(self):
         comparisons = [
