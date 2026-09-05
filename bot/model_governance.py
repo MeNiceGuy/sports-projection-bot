@@ -320,12 +320,22 @@ def build_calibration(rows: list[dict]):
     ordered = ["Low", "Medium", "High"]
     monotonic_violations = []
     for previous_index, previous in enumerate(ordered):
-        prev_accuracy = buckets.get(previous, {}).get("accuracy")
-        if prev_accuracy is None:
+        prev_bucket = buckets.get(previous, {})
+        prev_accuracy = prev_bucket.get("accuracy")
+        # A bucket under MIN_BUCKET_SAMPLE doesn't have a reliable accuracy
+        # estimate -- comparing it (in either direction) produces
+        # noise-driven "violations" rather than a real confidence-ordering
+        # problem. e.g. a 3-sample Medium bucket beating a 25-sample High
+        # bucket by luck. Only compare buckets that already report
+        # sample_status "ready".
+        if prev_accuracy is None or prev_bucket.get("sample_status") != "ready":
             continue
         for current in ordered[previous_index + 1:]:
-            curr_accuracy = buckets.get(current, {}).get("accuracy")
-            if curr_accuracy is not None and curr_accuracy < prev_accuracy:
+            curr_bucket = buckets.get(current, {})
+            curr_accuracy = curr_bucket.get("accuracy")
+            if curr_accuracy is None or curr_bucket.get("sample_status") != "ready":
+                continue
+            if curr_accuracy < prev_accuracy:
                 monotonic_violations.append(f"{current}_below_{previous}")
 
     return {
